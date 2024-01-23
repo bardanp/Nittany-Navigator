@@ -8,6 +8,7 @@ const Tab = createBottomTabNavigator();
 const events = [
   { id: '1', title: 'Event 1', description: 'Event 1 Description' },
   { id: '2', title: 'Event 2', description: 'Event 2 Description' },
+  { id: '3', title: 'Event 3', description: 'Event 3 Description' },
 ];
 
 function HomeScreen() {
@@ -64,16 +65,17 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   eventItem: {
-    backgroundColor: 'lightcoral',
+    backgroundColor: 'lightblue',
     padding: 20,
     marginVertical: 4,
     marginHorizontal: 15,
     borderRadius: 15,
+    height: 75,
     paddingTop: 10,
     marginTop: 5,
   },
   title: {
-    fontSize: 30,
+    fontSize: 24,
     color: 'black',
     height: 40,
   },
