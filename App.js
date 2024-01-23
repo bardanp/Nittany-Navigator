@@ -20,7 +20,7 @@ function HomeScreen() {
         renderItem={({ item }) => (
           <View style={styles.eventItem}>
             <Text style={styles.title}>{item.title}</Text>
-            <Text>{item.description}</Text>
+            <Text style={styles.desc}>{item.description}</Text>
           </View>
         )}
       />
@@ -65,18 +65,22 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   eventItem: {
-    backgroundColor: 'lightblue',
+    backgroundColor: '#0E67B4',
     padding: 20,
     marginVertical: 4,
     marginHorizontal: 15,
     borderRadius: 15,
-    height: 75,
+    height: 100,
     paddingTop: 10,
     marginTop: 5,
   },
   title: {
     fontSize: 24,
-    color: 'black',
+    color: 'white',
     height: 40,
   },
+  desc: {
+    fontSize: 18,
+    color: 'white',
+  }
 });
