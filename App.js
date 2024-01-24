@@ -56,7 +56,7 @@ export default function App() {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{ tabBarActiveTintColor: '#007bff', tabBarInactiveTintColor: '#a9a9a9',}}>
-        <Tab.Screen name="Events" component={HomeScreen} />
+        <Tab.Screen options={{ tabBarBadge: events.length  }} name="Events" component={HomeScreen} />
         <Tab.Screen name="Notifications" component={NotificationsScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
@@ -73,21 +73,20 @@ const styles = StyleSheet.create({
   },
   eventItem: {
     backgroundColor: '#0E67B4',
-    padding: 20,
+    padding: 5,
+    paddingTop: 15,
+    paddingLeft: 15,
     marginVertical: 4,
-    marginHorizontal: 15,
+    marginHorizontal: 5,
     borderRadius: 15,
-    height: 100,
-    paddingTop: 10,
-    marginTop: 5,
+    height: 70,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     color: 'white',
-    height: 40,
   },
   desc: {
-    fontSize: 18,
+    fontSize: 12,
     color: 'white',
   }
 });
