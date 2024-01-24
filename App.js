@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { MaterialIcons } from 'react-native-vector-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -54,8 +55,7 @@ function SettingsScreen() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{ tabBarActiveTintColor: '#007bff', tabBarInactiveTintColor: '#a9a9a9',}}>
+      <Tab.Navigator screenOptions={{ tabBarActiveTintColor: '#007bff', tabBarInactiveTintColor: '#a9a9a9',}}>
         <Tab.Screen options={{ tabBarBadge: events.length  }} name="Events" component={HomeScreen} />
         <Tab.Screen name="Notifications" component={NotificationsScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
