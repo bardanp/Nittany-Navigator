@@ -9,6 +9,13 @@ const events = [
   { id: '1', title: 'Event 1', description: 'Event 1 Description' },
   { id: '2', title: 'Event 2', description: 'Event 2 Description' },
   { id: '3', title: 'Event 3', description: 'Event 3 Description' },
+  { id: '4', title: 'Event 4', description: 'Event 5 Description' },
+  { id: '5', title: 'Event 5', description: 'Event 5 Description' },
+  { id: '6', title: 'Event 6', description: 'Event 6 Description' },
+  { id: '7', title: 'Event 7', description: 'Event 7 Description' },
+  { id: '8', title: 'Event 8', description: 'Event 8 Description' },
+  { id: '9', title: 'Event 9', description: 'Event 9 Description' },
+  { id: '10', title: 'Event 10', description: 'Event 10 Description' },
 ];
 
 function HomeScreen() {
