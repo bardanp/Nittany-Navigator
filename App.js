@@ -5,6 +5,7 @@ import { Modal, TouchableOpacity, StyleSheet, Text, View, FlatList, Button } fro
 
 const Tab = createBottomTabNavigator();
 
+//Harcoded events, but will be in firebase after setup
 const events = [
   { id: '1', title: 'Event 1', description: 'Event 1 Description' },
   { id: '2', title: 'Event 2', description: 'Event 2 Description' },
@@ -78,7 +79,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator screenOptions={{ tabBarActiveTintColor: '#007bff', tabBarInactiveTintColor: '#a9a9a9',}}>
-        <Tab.Screen options={{ tabBarBadge: events.length  }} name="Events" component={HomeScreen} />
+        <Tab.Screen name="Events" component={HomeScreen} />
         <Tab.Screen name="Notifications" component={NotificationsScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
