@@ -1,4 +1,5 @@
 import React from 'react';
+import MapView from 'react-native-maps';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Modal, TouchableOpacity, StyleSheet, Text, View, FlatList, Button } from 'react-native';
@@ -28,7 +29,7 @@ const events = [
 function HomeScreen() {
   return (
       <View style={styles.screenContainer}>
-        <FlatList
+        {<FlatList
           data={events}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
@@ -38,13 +39,12 @@ function HomeScreen() {
               </View>
               <TouchableOpacity
                 onPress={() => handlePress(item.description)}
-                style={styles.viewButtonContainer}
-              >
+                style={styles.viewButtonContainer}>
                 <Text style={styles.viewButtonText}>View Info</Text>
               </TouchableOpacity>
             </View>
           )}
-        />
+        />}
       </View>
     );
   }
