@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import { View, FlatList, TouchableOpacity, Text, StyleSheet, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import MapView from 'react-native-maps';
 
-// Harcoded events, but will be in firebase after setup
+// // Harcoded events, but will be in firebase after setup
 const events = [
     { id: '1', title: 'Event 1', description: 'Event 1 Description'},
     { id: '2', title: 'Event 2', description: 'Event 2 Description', latitude: 0, longitude: 0 },
@@ -14,55 +15,84 @@ const events = [
 
 ];
 
-
 const handleDesc = (description) => {
     alert('Description: ' + description);
 };
 
 const handleMap = (latitude, longitude) => {
     if (latitude !== null && latitude !== undefined && longitude !== null && longitude !== undefined) {
-        alert('Latitude: ' + latitude + ' Longitude: ' + longitude);
+        alert(`Latitude: ${latitude} Longitude: ${longitude}`);
     } else {
         alert('Location not available for this event.');
     }
 };
 
-
 const HomeScreen = () => {
-    return (
-        <View style={styles.container}>
-            <FlatList
-                data={events}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.eventItem}>
-                        <Text style={styles.title}>{item.title}</Text>
-                        <View style={styles.buttonsContainer}>
-                        <TouchableOpacity onPress={() => handleMap(item.latitude, item.longitude)}
-                            style={styles.button}>
-                            <View style={[styles.buttonIconContainer, styles.mapButton]}>
-                                <Icon name="map" size={20} color="#2ecc71" />
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleDesc(item.description)}
-                            style={styles.button}>
-                            <View style={[styles.buttonIconContainer, styles.infoButton]}>
-                                <Icon name="info" size={20} color="#007bff" />
-                            </View>
-                        </TouchableOpacity>
+    const [viewMode, setViewMode] = useState('list'); // Initial view mode
 
+    return (
+        <SafeAreaView style={styles.container}>
+            <View style={styles.toggleContainer}>
+                <TouchableOpacity
+                    style={styles.toggleButton}
+                    onPress={() => setViewMode(viewMode === 'list' ? 'map' : 'list')}
+                >
+                    <Text style={styles.toggleButtonText}>{viewMode === 'list' ? 'Show Map' : 'Show List'}</Text>
+                </TouchableOpacity>
+            </View>
+            {viewMode === 'list' ? (
+                <FlatList
+                    data={events}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <View style={styles.eventItem}>
+                            <Text style={styles.title}>{item.title}</Text>
+                            <View style={styles.buttonsContainer}>
+                                <TouchableOpacity onPress={() => handleMap(item.latitude, item.longitude)} style={styles.button}>
+                                    <Icon name="map" size={20} color="#2ecc71" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleDesc(item.description)} style={styles.button}>
+                                    <Icon name="info" size={20} color="#007bff" />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                )}
-            />
-        </View>
+                    )}
+                />
+            ) : (
+                <MapView
+                    style={StyleSheet.absoluteFillObject}
+                    initialRegion={{
+                        latitude: 40.2025,
+                        longitude: -76.9783,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }}
+                />
+            )}
+        </SafeAreaView>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f5f5f5',
+    },
+    toggleContainer: {
+        zIndex: 1, // Ensure the button is always on top
+        position: 'absolute', // Position over the list or map view
+        right: 10,
+        top: 10,
+    },
+    toggleButton: {
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 20,
+    },
+    toggleButtonText: {
+        color: '#fff',
+        fontSize: 16,
     },
     eventItem: {
         backgroundColor: '#ffffff',
@@ -70,14 +100,11 @@ const styles = StyleSheet.create({
         padding: 16,
         marginVertical: 8,
         marginHorizontal: 10,
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
         shadowColor: 'rgba(0, 0, 0, 0.1)',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 1,
         shadowRadius: 10,
         elevation: 3,
@@ -85,44 +112,30 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '600',
-        flex: 1, 
+        flex: 1,
     },
     buttonsContainer: {
-        flexDirection: 'row', 
+        flexDirection: 'row',
         alignItems: 'center',
     },
     button: {
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    },
-    mapButton: {
-        backgroundColor: '#2ecc71', 
-    },
-    infoButton: {
-        backgroundColor: '#007bff', 
-        marginLeft: 8, 
-    },
-    buttonIconContainer: {
         borderRadius: 20,
-        padding: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    mapButton: {
-        backgroundColor: 'rgba(46, 204, 113, 0.1)', 
+    toggleButton: {
+        alignSelf: 'flex-end',
+        padding: 10,
+        marginRight: 10,
+        marginTop: 10,
+        backgroundColor: '#007bff',
+        borderRadius: 20,
     },
-    infoButton: {
-        backgroundColor: 'rgba(0, 123, 255, 0.1)', 
-        marginLeft: 8, 
-    },
-    
-    viewButtonText: {
-        color: '#ffffff', 
+    toggleButtonText: {
+        color: '#ffffff',
         fontSize: 16,
-        fontWeight: '500',
     },
 });
 
