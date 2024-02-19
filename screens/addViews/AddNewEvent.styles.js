@@ -1,0 +1,71 @@
+import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+    containerScroll: {
+        flex: 1,
+    },
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#f9f9f9',
+    },
+    datePicker: {
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        padding: 15,
+        marginBottom: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    datePickerText: {
+        fontSize: 16,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 10, 
+        padding: 15,
+        marginBottom: 15,
+        fontSize: 16, 
+        backgroundColor: '#fff', 
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    button: {
+        backgroundColor: '#007bff',
+        borderRadius: 10,
+        padding: 15,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 3,
+        marginBottom: 10, 
+    },
+    buttonBack: {
+        backgroundColor: '#dc3545',
+        borderRadius: 10,
+        padding: 15,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 3,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    });
+    
