@@ -7,6 +7,9 @@ node_modules/
 .expo/
 dist/
 web-build/
+keys.json
+.expo-shared/
+.cache/
 
 # Native
 *.orig.*

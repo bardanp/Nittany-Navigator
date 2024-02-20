@@ -6,9 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import styles from './HomeScreen.styles.js';
 import * as Location from 'expo-location';
 
-const eventsData = require('/Users/bardanphuyel/Documents/GitHub/NittanyNavigator/backend/events/events.json');
-const reportsData = require('/Users/bardanphuyel/Documents/GitHub/NittanyNavigator/backend/reports/reports.json');
-
+const eventsData = require('../../backend/events/events.json');
+const reportsData = require('../../backend/reports/reports.json');
 
 const HomeScreen = ({ isMap, toggleMapView }) => {
     const navigation = useNavigation();
@@ -94,8 +93,8 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
           return 'report-problem';
         }
       };
-      
     
+
       const handleCalloutPress = (item) => {
         Alert.alert(
           item.title,
@@ -110,7 +109,7 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
           {cancelable: true},
         );
       };
-      
+
 
     const renderItem = ({ item }) => {
     
@@ -143,7 +142,7 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
             return date.toLocaleDateString(); 
         };
 
-    
+
         return (
             <View style={[styles.eventItem, item.emergency && styles.emergencyItem]}>
                 <View style={{flex: 1}}>
