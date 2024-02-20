@@ -17,6 +17,7 @@
     "ios": {
       "supportsTablet": true
     },
+    "scheme": "myapp",
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
