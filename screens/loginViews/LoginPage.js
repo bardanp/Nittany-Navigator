@@ -34,15 +34,18 @@ const LoginPage = ({ navigation }) => {
   }, []);
 
   const handleLoginPress = async () => {
-    if (authRequest && discovery) {
-      const result = await authRequest.promptAsync(discovery, { useProxy: true });
-      setResult(result);
-      if (result?.type === 'success') {
-        navigation.navigate('MainMenu');
-      } else {
-        console.error("Authentication failed:");
-      }
-    }
+
+    navigation.navigate('MainMenu');
+
+    // if (authRequest && discovery) {
+    //   const result = await authRequest.promptAsync(discovery, { useProxy: true });
+    //   setResult(result);
+    //   if (result?.type === 'success') {
+    //     navigation.navigate('MainMenu');
+    //   } else {
+    //     console.error("Authentication failed:");
+    //   }
+    // }
   };
 
   return (
