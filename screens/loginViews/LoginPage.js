@@ -5,6 +5,8 @@ import * as AuthSession from 'expo-auth-session';
 import { Ionicons } from '@expo/vector-icons';
 
 import keys from '../../keys.json';
+import jwtDecode from 'jwt-decode'; // You might need to install jwt-decode
+
 
 const tenantId = keys.tenantId;
 const clientId = keys.clientId;
@@ -35,20 +37,28 @@ const LoginPage = ({ navigation }) => {
     initAuthSession();
   }, []);
 
+
   const handleLoginPress = async () => {
 
+
+    //skip the auth and go to homescreen
     navigation.navigate('MainMenu');
 
+    // Auth service to Microsoft Azure AD
     // if (authRequest && discovery) {
     //   const result = await authRequest.promptAsync(discovery, { useProxy: true });
+    //   console.log(result); // Log the entire result to inspect
     //   setResult(result);
     //   if (result?.type === 'success') {
     //     navigation.navigate('MainMenu');
     //   } else {
-    //     console.error("Authentication failed:");
+    //     console.error("Authentication failed:", result);
     //   }
     // }
+
+
   };
+  
 
   return (
     <View style={styles.container}>
