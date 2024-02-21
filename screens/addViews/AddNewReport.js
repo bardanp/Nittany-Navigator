@@ -71,9 +71,9 @@ const AddNewReport = () => {
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonBack} onPress={handleExit}>
+      {/* <TouchableOpacity style={styles.buttonBack} onPress={handleExit}>
         <Text style={styles.buttonText}>Back</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

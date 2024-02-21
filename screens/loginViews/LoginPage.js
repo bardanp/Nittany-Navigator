@@ -8,7 +8,9 @@ import keys from '../../keys.json';
 
 const tenantId = keys.tenantId;
 const clientId = keys.clientId;
-const redirectUri = AuthSession.makeRedirectUri({ scheme: 'nittanynav' });
+const redirectUri = AuthSession.makeRedirectUri({ 
+  scheme: 'nittany-navigator',
+ });
 
 const LoginPage = ({ navigation }) => {
   const [discovery, setDiscovery] = useState(null);

@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginPage from './screens/loginViews/LoginPage';
 import MainMenu from './screens/loginViews/MainMenu';
 
+
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -15,9 +16,10 @@ const App = () => {
       const token = await AsyncStorage.getItem('userToken');
       setIsAuthenticated(!!token);
     };
-
+  
     checkAuthStatus();
   }, []);
+  
 
   return (
     <NavigationContainer>

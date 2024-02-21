@@ -1,12 +1,24 @@
 import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../mapListViews/HomeScreen.js';
 import ProfileScreen from '../profileViews/ProfileScreen.js';
 import AddPage from '../addViews/AddPage.js';
+import AddNewEvent from '../addViews/AddNewEvent.js';
+import AddNewReport from '../addViews/AddNewReport.js';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { MenuProvider } from 'react-native-popup-menu';
 
 const Tab = createBottomTabNavigator();
+const AddStack = createStackNavigator();
+
+const AddStackScreen = () => (
+  <AddStack.Navigator initialRouteName="AddPage">
+    <AddStack.Screen name="AddPage" component={AddPage} options={{ headerShown: false }} />
+    <AddStack.Screen name="addNewEvent" component={AddNewEvent} />
+    <AddStack.Screen name="addNewReport" component={AddNewReport} />
+  </AddStack.Navigator>
+);
 
 const MainMenu = () => {
   return (
@@ -35,7 +47,7 @@ const MainMenu = () => {
 
         <Tab.Screen
           name="Add"
-          component={AddPage}
+          component={AddStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
               <Icon name="add" color={color} size={size} />
