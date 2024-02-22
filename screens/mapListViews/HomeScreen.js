@@ -100,12 +100,11 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
     
 
       const handleCalloutPress = (item) => {
-        setSelectedItem(item);
-        setModalVisible(true);
+        setSelectedItem(item); 
+        setModalVisible(true); 
     };
     
     
-
 
     const renderItem = ({ item }) => {
     
@@ -120,17 +119,8 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
         };
         
         const handleDesc = (item) => {
-            let message = `Title: ${item.title}\nDescription: ${item.description || item.reportDescription}\nDate: ${formatDate(item.timestamp)}\nLocation: ${item.location}\nCreated by: ${item.createdBy}`;
-        
-            if (item.participants) {
-                message += `\nParticipants: ${item.participants}`;
-            }
-        
-            if (item.emergency) {
-                message += `\nEMERGENCY`;
-            }
-        
-            alert(message);
+            setSelectedItem(item); // Set the selected item
+            setModalVisible(true); // Show the modal
         };
     
         const formatDate = (timestamp) => {
@@ -158,6 +148,13 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
                     <Icon name="info" size={20} color="#fff" />
                 </TouchableOpacity>
 
+                <PopupModal
+                visible={modalVisible}
+                transparent={true}
+                onClose={() => setModalVisible(false)}
+                item={selectedItem}
+            />
+
 
                 </View>
             </View>
@@ -170,28 +167,17 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
             {showMap ? (
                 <>
                     <MapView style={styles.map} region={mapRegion}>
-                    {listData.map((item) => (
-                        <Marker
-                        key={item.id}
-                        coordinate={{ latitude: item.latitude, longitude: item.longitude }}
-                        title={item.title} 
-                        >
-                        <Icon name={getIconName(item)} size={30} color={item.isEvent ? "#007bff" : "#ff0000"} />
-                        <Callout onPress={() => handleCalloutPress(item)}>
-                        <View style={styles.customCallout}>
-                            <Text style={styles.calloutTitle}>{item.title}</Text>
-                            <TouchableOpacity
-                            onPress={() => handleCalloutPress(item)}
-                            style={styles.viewDetailsButton}
+                        {listData.map((item) => (
+                            <Marker
+                                key={item.id}
+                                coordinate={{ latitude: item.latitude, longitude: item.longitude }}
+                                onPress={() => handleCalloutPress(item)} // Directly call handleCalloutPress here
                             >
-                            <Text style={styles.viewDetailsButtonText}>View Details</Text>
-                            </TouchableOpacity>
-                        </View>
-                        </Callout>
-
-                        </Marker>
+                                <Icon name={getIconName(item)} size={30} color={item.isEvent ? "#007bff" : "#ff0000"} />
+                            </Marker>
                         ))}
                     </MapView>
+
 
                     <View style={styles.zoomControls}>
                         <TouchableOpacity onPress={zoomIn} style={styles.zoomButton}>
@@ -212,6 +198,7 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
 
                         <PopupModal
                         visible={modalVisible}
+                        transparent={true}
                         onClose={() => setModalVisible(false)}
                         item={selectedItem}
                         />

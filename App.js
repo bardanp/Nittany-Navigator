@@ -4,6 +4,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginPage from './screens/loginViews/LoginPage';
 import MainMenu from './screens/loginViews/MainMenu';
+import ProfileScreen from './screens/profileViews/ProfileScreen';
+import SettingsScreen from './screens/profileViews/views/SettingScreen';
 
 import { firestore } from './backend/firebase';
 import { collection, getDocs } from 'firebase/firestore';
@@ -42,12 +44,22 @@ const App = () => {
       <Stack.Navigator>
         <Stack.Screen
           name="Root"
-          component={RootNavigator}
+          component={RootNavigator} // Pass component directly
           options={{ headerShown: false }}
         />
         <Stack.Screen
           name="MainMenu"
           component={MainMenu}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={ProfileStackNavigator} // Use ProfileStackNavigator here
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
@@ -56,6 +68,28 @@ const App = () => {
 };
 
 export default App;
+
+
+
+// const RootNavigator = ({ isAuthenticated }) => {
+//   return (
+//     <Stack.Navigator>
+//       {!isAuthenticated ? (
+//         <Stack.Screen
+//           name="LoginPage"
+//           component={LoginPage}
+//           options={{ headerShown: false }}
+//         />
+//       ) : (
+//         <Stack.Screen
+//           name="MainMenu"
+//           component={MainMenu}
+//           options={{ headerShown: false }}
+//         />
+//       )}
+//     </Stack.Navigator>
+//   );
+// };
 
 const RootNavigator = ({ isAuthenticated }) => {
   return (
@@ -74,5 +108,26 @@ const RootNavigator = ({ isAuthenticated }) => {
         />
       )}
     </Stack.Navigator>
+  );
+};
+
+// Define ProfileStackNavigator
+const ProfileStack = createStackNavigator();
+
+const ProfileStackNavigator = () => {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ headerShown: false }}
+      />
+      {/* Add other screens for Profile here */}
+    </ProfileStack.Navigator>
   );
 };
