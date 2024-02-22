@@ -5,12 +5,17 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import styles from './HomeScreen.styles.js';
 import * as Location from 'expo-location';
+import PopupModal from './PopupModal.js';
 
 const eventsData = require('../../backend/events/events.json');
 const reportsData = require('../../backend/reports/reports.json');
 
 const HomeScreen = ({ isMap, toggleMapView }) => {
     const navigation = useNavigation();
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+
 
     const listData = [
         ...eventsData.map(e => ({ ...e, id: `event-${e.event_id}`, isEvent: true })),
@@ -96,19 +101,11 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
     
 
       const handleCalloutPress = (item) => {
-        Alert.alert(
-          item.title,
-          `Description: ${item.desc}\n` +
-          `Location: ${item.location}\n` +
-          `Emergency: ${item.emergency ? 'Yes' : 'No'}\n` +
-          `Timestamp: ${new Date(item.timestamp.seconds * 1000).toLocaleString()}\n` +
-          `Created By: ${item.createdBy}`, 
-          [
-            {text: 'OK', onPress: () => console.log('OK Pressed')},
-          ],
-          {cancelable: true},
-        );
-      };
+        setSelectedItem(item);
+        setModalVisible(true);
+    };
+    
+    
 
 
     const renderItem = ({ item }) => {
@@ -162,6 +159,7 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
                     <Icon name="info" size={20} color="#fff" />
                 </TouchableOpacity>
 
+
                 </View>
             </View>
         );
@@ -211,6 +209,14 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
                         <TouchableOpacity onPress={goToUserLocation} style={styles.currentLocationButton}>
                             <Icon name="my-location" size={25} color="#000" /> 
                         </TouchableOpacity>
+
+
+                        <PopupModal
+                        visible={modalVisible}
+                        onClose={() => setModalVisible(false)}
+                        item={selectedItem}
+                        />
+
                     </View>
                 </>
             ) : (
