@@ -41,6 +41,7 @@ const LoginPage = ({ navigation }) => {
   const handleLoginPress = async () => {
 
 
+
     //skip the auth and go to homescreen
     navigation.navigate('MainMenu');
 

@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginPage from './screens/loginViews/LoginPage';
 import MainMenu from './screens/loginViews/MainMenu';
 
+import { firestore } from './backend/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 const Stack = createStackNavigator();
 
@@ -18,6 +20,20 @@ const App = () => {
     };
   
     checkAuthStatus();
+
+    const checkFirestoreConnection = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(firestore, "reports"));
+        querySnapshot.forEach((doc) => {
+          console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
+        });
+        console.log('Connected to Firestore');
+      } catch (error) {
+        console.error('Error connecting to Firestore:', error);
+      }
+    };
+
+    checkFirestoreConnection();
   }, []);
   
 

@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import styles from './HomeScreen.styles.js';
 import * as Location from 'expo-location';
 import PopupModal from './PopupModal.js';
-
 const eventsData = require('../../backend/events/events.json');
 const reportsData = require('../../backend/reports/reports.json');
 
