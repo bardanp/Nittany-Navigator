@@ -2,59 +2,62 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+// Constants for route names to reduce typos and improve maintainability
+const Routes = {
+  ADD_NEW_EVENT: 'addNewEvent',
+  ADD_NEW_REPORT: 'addNewReport',
+  HOME: 'Home',
+};
+
+const OptionButton = ({ title, description, onPress }) => (
+  <TouchableOpacity style={styles.optionContainer} onPress={onPress} accessibilityLabel={title} accessibilityHint={description}>
+    <Text style={styles.optionTitle}>{title}</Text>
+    <Text style={styles.optionDescription}>{description}</Text>
+  </TouchableOpacity>
+);
+
 const AddPage = () => {
   const navigation = useNavigation();
 
-  const handleAddEvent = () => {
-    navigation.navigate('addNewEvent');
-  };
-
-  const handleAddReport = () => {
-    navigation.navigate('addNewReport');
-  };
-
-  const handleBack = () => {
-    navigation.navigate('Home');
+  const navigateTo = (routeName) => () => {
+    navigation.navigate(routeName);
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.optionContainer} onPress={handleAddEvent}>
-        <Text style={styles.optionTitle}>Add an Event</Text>
-        <Text style={styles.optionDescription}>
-          Create a new event and share it with others. Provide details such as title, description, location, date and time, and any additional information.
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.optionContainer} onPress={handleAddReport}>
-        <Text style={styles.optionTitle}>Add a Report</Text>
-        <Text style={styles.optionDescription}>
-          Submit a report for an incident or observation. Include details such as title, description, urgency level, location, date and time, and any relevant images.
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.optionContainer, styles.backButton]} onPress={handleBack}>
+      <OptionButton
+        title="Add an Event"
+        description="Create a new event and share it with others. Provide details such as title, description, location, date and time, and any additional information."
+        onPress={navigateTo(Routes.ADD_NEW_EVENT)}
+      />
+      <OptionButton
+        title="Add a Report"
+        description="Submit a report for an incident or observation. Include details such as title, description, urgency level, location, date and time, and any relevant images."
+        onPress={navigateTo(Routes.ADD_NEW_REPORT)}
+      />
+      <TouchableOpacity style={[styles.optionContainer, styles.backButton]} onPress={navigateTo(Routes.HOME)}>
         <Text style={styles.optionText}>Back to Home</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
+// Consider moving to a separate file if styles grow
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 10,
   },
   optionContainer: {
     backgroundColor: '#ffffff',
     borderRadius: 10,
     padding: 20,
-    marginBottom: 20,
-    width: '80%',
+    marginVertical: 10,
+    width: '90%', // Increased width for better usability
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -67,7 +70,6 @@ const styles = StyleSheet.create({
   },
   optionDescription: {
     fontSize: 16,
-    marginBottom: 10,
     color: '#333',
   },
   backButton: {
@@ -76,6 +78,7 @@ const styles = StyleSheet.create({
   optionText: {
     color: '#fff',
     fontSize: 18,
+    textAlign: 'center', // Center text for better appearance
   },
 });
 
