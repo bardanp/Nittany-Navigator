@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 20,
   },
   profileIcon: {
@@ -70,6 +71,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
+    justifyContent: 'center',
+    alignContent: 'center',
   },
   optionContainer: {
     backgroundColor: '#FFFFFF',

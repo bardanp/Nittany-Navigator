@@ -15,8 +15,8 @@ const AddStack = createStackNavigator();
 const AddStackScreen = () => (
   <AddStack.Navigator initialRouteName="AddPage">
     <AddStack.Screen name="AddPage" component={AddPage} options={{ headerShown: false }} />
-    <AddStack.Screen name="addNewEvent" component={AddNewEvent} />
-    <AddStack.Screen name="addNewReport" component={AddNewReport} />
+    <AddStack.Screen name="addNewEvent" component={AddNewEvent} options={{ headerShown: false }} />
+    <AddStack.Screen name="addNewReport" component={AddNewReport} options={{ headerShown: false }} />
   </AddStack.Navigator>
 );
 

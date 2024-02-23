@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import styles from './AddNewEvent.styles.js';
+import { Ionicons } from '@expo/vector-icons'; 
+import styles from './styles';
 
 const AddNewEvent = () => {
   const [title, setTitle] = useState('');
@@ -42,6 +43,14 @@ const AddNewEvent = () => {
   return (
  <ScrollView style={styles.containerScroll}>
       <View style={styles.container}>
+
+      <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Add New Event</Text>
+        </View>
+
       <TextInput
         style={styles.input}
         placeholder="Title"
@@ -89,9 +98,6 @@ const AddNewEvent = () => {
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.buttonBack} onPress={handleExit}>
-          <Text style={styles.buttonText}>Back</Text>
-        </TouchableOpacity> */}
     </View>
     </ScrollView>
   );

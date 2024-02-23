@@ -33,7 +33,7 @@ const SettingScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
@@ -70,9 +70,10 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'center', // Ensures the title is centered
     alignItems: 'center',
     marginBottom: 20,
+    position: 'relative', // Allows absolute positioning within
   },
   title: {
     fontSize: 24,
@@ -80,6 +81,8 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   backButton: {
+    position: 'absolute', // Position the button absolutely to keep the title centered
+    left: 0, // Align the button to the left
     padding: 10,
   },
   optionContainer: {

@@ -28,6 +28,7 @@ const App = () => {
         const querySnapshot = await getDocs(collection(firestore, "reports"));
         querySnapshot.forEach((doc) => {
           console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
+          console.log(doc.data().title);
         });
         console.log('Connected to Firestore');
       } catch (error) {
@@ -44,7 +45,7 @@ const App = () => {
       <Stack.Navigator>
         <Stack.Screen
           name="Root"
-          component={RootNavigator} // Pass component directly
+          component={RootNavigator} 
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -54,7 +55,7 @@ const App = () => {
         />
         <Stack.Screen
           name="Profile"
-          component={ProfileStackNavigator} // Use ProfileStackNavigator here
+          component={ProfileStackNavigator} 
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -68,28 +69,6 @@ const App = () => {
 };
 
 export default App;
-
-
-
-// const RootNavigator = ({ isAuthenticated }) => {
-//   return (
-//     <Stack.Navigator>
-//       {!isAuthenticated ? (
-//         <Stack.Screen
-//           name="LoginPage"
-//           component={LoginPage}
-//           options={{ headerShown: false }}
-//         />
-//       ) : (
-//         <Stack.Screen
-//           name="MainMenu"
-//           component={MainMenu}
-//           options={{ headerShown: false }}
-//         />
-//       )}
-//     </Stack.Navigator>
-//   );
-// };
 
 const RootNavigator = ({ isAuthenticated }) => {
   return (
@@ -127,7 +106,6 @@ const ProfileStackNavigator = () => {
         component={SettingsScreen}
         options={{ headerShown: false }}
       />
-      {/* Add other screens for Profile here */}
     </ProfileStack.Navigator>
   );
 };

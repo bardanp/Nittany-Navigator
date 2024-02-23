@@ -24,7 +24,7 @@ const PopupModal = ({ visible, onClose, item }) => {
       visible={visible}
       onRequestClose={onClose}
       transparent
-      animationType="fade"
+      animationType="slide"
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
@@ -32,6 +32,9 @@ const PopupModal = ({ visible, onClose, item }) => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollViewContainer}
           >
+            <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
+              <Text style={styles.category}>{isEvent ? 'Event Info' : 'Report Info'}</Text>
+            </View>
             {item.imageurl && !imageError ? (
               <Image
                 source={{ uri: item.imageurl }}
@@ -46,9 +49,7 @@ const PopupModal = ({ visible, onClose, item }) => {
                 resizeMode="contain"
               />
             )}
-            <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
-              <Text style={styles.category}>{isEvent ? 'Event Info' : 'Report Info'}</Text>
-            </View>
+
             <View style={styles.body}>
               <Text style={[styles.title, { color: textColor }]}>{item.title}</Text>
               <Text style={[styles.description, { color: textColor }]}>{item.desc}</Text>
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     width: width - 50,
-    maxWidth: 500, // Not too wide on tablets
+    maxWidth: 500, 
   },
   scrollViewContainer: {
     flexGrow: 1,
@@ -103,6 +104,8 @@ const styles = StyleSheet.create({
     height: 200,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    borderColor: 'grey',
+    borderBottomWidth: 10,
   },
   header: {
     paddingVertical: 10,
