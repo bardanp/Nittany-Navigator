@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import LoginPage from './screens/loginViews/LoginPage';
-import MainMenu from './screens/loginViews/MainMenu';
-import ProfileScreen from './screens/profileViews/ProfileScreen';
-import SettingsScreen from './screens/profileViews/views/SettingScreen';
+import React, { useEffect, useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoginPage from "./screens/loginViews/LoginPage";
+import MainMenu from "./screens/loginViews/MainMenu";
+import ProfileScreen from "./screens/profileViews/ProfileScreen";
+import SettingsScreen from "./screens/profileViews/views/SettingScreen";
 
-import { firestore } from './backend/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { firestore } from "./backend/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const Stack = createStackNavigator();
 
@@ -17,35 +17,30 @@ const App = () => {
 
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = await AsyncStorage.getItem('userToken');
+      const token = await AsyncStorage.getItem("userToken");
       setIsAuthenticated(!!token);
     };
-  
+
     checkAuthStatus();
 
     const checkFirestoreConnection = async () => {
       try {
         const querySnapshot = await getDocs(collection(firestore, "reports"));
-        querySnapshot.forEach((doc) => {
-          console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
-          console.log(doc.data().title);
-        });
-        console.log('Connected to Firestore');
+        console.log("Connected to Firestore");
       } catch (error) {
-        console.error('Error connecting to Firestore:', error);
+        console.error("Error connecting to Firestore:", error);
       }
     };
 
     checkFirestoreConnection();
   }, []);
-  
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
           name="Root"
-          component={RootNavigator} 
+          component={RootNavigator}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -55,7 +50,7 @@ const App = () => {
         />
         <Stack.Screen
           name="Profile"
-          component={ProfileStackNavigator} 
+          component={ProfileStackNavigator}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -90,7 +85,7 @@ const RootNavigator = ({ isAuthenticated }) => {
   );
 };
 
-// Define ProfileStackNavigator
+
 const ProfileStack = createStackNavigator();
 
 const ProfileStackNavigator = () => {

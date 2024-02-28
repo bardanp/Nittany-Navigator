@@ -38,27 +38,49 @@ const LoginPage = ({ navigation }) => {
   }, []);
 
 
-  const handleLoginPress = async () => {
+    
 
 
-
-    //skip the auth and go to homescreen
-    navigation.navigate('MainMenu');
-
-    // Auth service to Microsoft Azure AD
-    // if (authRequest && discovery) {
-    //   const result = await authRequest.promptAsync(discovery, { useProxy: true });
-    //   console.log(result); // Log the entire result to inspect
-    //   setResult(result);
-    //   if (result?.type === 'success') {
-    //     navigation.navigate('MainMenu');
-    //   } else {
-    //     console.error("Authentication failed:", result);
-    //   }
-    // }
+    const handleLoginPress = async () => {
 
 
-  };
+      navigation.navigate('MainMenu');
+
+      // This is for PSU WebSSO login
+      // if (authRequest && discovery) {
+      //   const result = await authRequest.promptAsync(discovery, { useProxy: true });
+      //   console.log(result);
+      //   setResult(result);
+    
+      //   if (result?.type === 'success') {
+      //     // Decode the ID token if needed
+      //     const userInfo = jwtDecode(result.params.id_token);
+      //     console.log("User Info from ID Token:", userInfo);
+    
+      //     // Use the access token to call Microsoft Graph API
+      //     fetchUserInfo(result.authentication.accessToken);
+      //   } else {
+      //     console.error("Authentication failed:", result);
+      //   }
+      // }
+    };
+    
+    const fetchUserInfo = async (accessToken) => {
+      const graphApiUrl = 'https://graph.microsoft.com/v1.0/me';
+      try {
+        const response = await fetch(graphApiUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const userInfo = await response.json();
+        console.log("User Info from Graph API:", userInfo);
+      } catch (error) {
+        console.error("Failed to fetch user info from Graph API:", error);
+      }
+    };
+    
+  
   
 
   return (
