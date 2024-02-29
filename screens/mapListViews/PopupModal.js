@@ -24,7 +24,7 @@ const PopupModal = ({ visible, onClose, item }) => {
       visible={visible}
       onRequestClose={onClose}
       transparent
-      animationType="slide"
+      animationType="fade"
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
@@ -142,9 +142,11 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 10,
+    borderWidth: 5,
+    borderColor: 'blue',
     width: 150,
     height: 50,
-    justifyContent: 'center',
+    justifyContent: 'center', 
     alignContent: 'center',
     borderRadius: 12,
     alignSelf: 'center',

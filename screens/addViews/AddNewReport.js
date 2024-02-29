@@ -3,6 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; // Ensure this is imported
 import styles from './styles';
+import { firestore } from '../../backend/firebase'; 
+import { collection, addDoc } from 'firebase/firestore';
+
 
 const AddNewReport = () => {
   const [title, setTitle] = useState('');
@@ -14,18 +17,26 @@ const AddNewReport = () => {
 
   const navigation = useNavigation();
 
-  const handleSubmit = () => {
-    const report = {
-      title,
-      emergency,
-      description,
-      image,
-      dateTime,
-      location,
-    };
-    console.log(report);
-    navigation.goBack();
+  const handleSubmit = async () => {
+    try {
+        await addDoc(collection(firestore, 'reports'), {
+            title,
+            emergency,
+            description,
+            image,
+            dateTime,
+            location,
+        });
+        console.log('Report added to Firestore successfully!');
+        navigation.goBack(); // Go back to the previous screen
+        navigation.navigate('SubmitSuccess'); // Navigate to the success screen
+    } catch (error) {
+        console.error('Error adding report to Firestore:', error);
+    }
   };
+  
+
+  
 
   return (
     <View style={styles.container}>
@@ -80,22 +91,5 @@ const AddNewReport = () => {
   );
 };
 
-// Ensure your styles include definitions for header, headerTitle, and backButton
-// For example:
-// header: {
-//   flexDirection: 'row',
-//   alignItems: 'center',
-//   justifyContent: 'flex-start', // Adjust as needed
-//   padding: 10,
-//   backgroundColor: '#fff', // Or your preferred header background color
-// },
-// headerTitle: {
-//   fontSize: 20,
-//   fontWeight: 'bold',
-//   marginLeft: 20, // Adjust based on your layout
-// },
-// backButton: {
-//   // Style as needed
-// },
 
 export default AddNewReport;

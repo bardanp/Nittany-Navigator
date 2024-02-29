@@ -28,42 +28,45 @@ const LoginPage = ({ navigation }) => {
 
       const request = new AuthSession.AuthRequest({
         clientId,
-        scopes: ['openid', 'profile', 'User.Read'],
+        scopes: [
+          'openid', 
+          'profile', 
+          'api://d5d2dec1-1315-480f-87b2-3402ce132717/User.Read' // Custom scope
+        ],
         redirectUri,
       });
+      
+      
+      
       setAuthRequest(request);
     };
 
     initAuthSession();
   }, []);
 
+  const handleLoginPress = async () => {
+    // navigation.navigate('MainMenu');
 
-    
-
-
-    const handleLoginPress = async () => {
-
-
+    // This is for PSU WebSSO login
+    if (authRequest && discovery) {
+      const result = await authRequest.promptAsync(discovery, { useProxy: true });
+      console.log(result);
+      setResult(result);
       navigation.navigate('MainMenu');
-
-      // This is for PSU WebSSO login
-      // if (authRequest && discovery) {
-      //   const result = await authRequest.promptAsync(discovery, { useProxy: true });
-      //   console.log(result);
-      //   setResult(result);
-    
-      //   if (result?.type === 'success') {
-      //     // Decode the ID token if needed
-      //     const userInfo = jwtDecode(result.params.id_token);
-      //     console.log("User Info from ID Token:", userInfo);
-    
-      //     // Use the access token to call Microsoft Graph API
-      //     fetchUserInfo(result.authentication.accessToken);
-      //   } else {
-      //     console.error("Authentication failed:", result);
-      //   }
-      // }
-    };
+  
+      if (result?.type === 'success') {
+        // Decode the ID token if needed
+        const userInfo = jwtDecode(result.params.id_token);
+        console.log("User Info from ID Token:", userInfo);
+  
+        // Use the access token to call Microsoft Graph API
+        fetchUserInfo(result.authentication.accessToken);
+      } else {
+        console.error("Authentication failed:", result);
+      }
+    }
+  };
+  
     
     const fetchUserInfo = async (accessToken) => {
       const graphApiUrl = 'https://graph.microsoft.com/v1.0/me';

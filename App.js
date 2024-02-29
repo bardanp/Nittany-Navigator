@@ -6,6 +6,7 @@ import LoginPage from "./screens/loginViews/LoginPage";
 import MainMenu from "./screens/loginViews/MainMenu";
 import ProfileScreen from "./screens/profileViews/ProfileScreen";
 import SettingsScreen from "./screens/profileViews/views/SettingScreen";
+import SubmitSuccessScreen from "./screens/addViews/SubmitSuccessScreen";
 
 import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -56,6 +57,11 @@ const App = () => {
         <Stack.Screen
           name="Settings"
           component={SettingsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SubmitSuccess"
+          component={SubmitSuccessScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

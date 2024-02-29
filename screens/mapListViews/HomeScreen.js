@@ -1,25 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Alert, View, TouchableOpacity, Text, Image, FlatList } from 'react-native';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import styles from './HomeScreen.styles.js';
 import * as Location from 'expo-location';
 import PopupModal from './PopupModal.js';
-const eventsData = require('../../backend/events/events.json');
-const reportsData = require('../../backend/reports/reports.json');
+import { firestore } from '../../backend/firebase.js'; // Adjust the path as necessary
+import { collection, getDocs } from 'firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native';
 
-const HomeScreen = ({ isMap, toggleMapView }) => {
+
+const HomeScreen = ({  }) => {
     const navigation = useNavigation();
 
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-
-
-    const listData = [
-        ...eventsData.map(e => ({ ...e, id: `event-${e.event_id}`, isEvent: true })),
-        ...reportsData.map(r => ({ ...r, id: `report-${r.report_id}`, isReport: true }))
-    ];
+    const [listData, setListData] = useState([]);
+    
     
     const [showMap, setShowMap] = useState(true);
     const [mapRegion, setMapRegion] = useState({
@@ -40,6 +38,34 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
         setShowMap(!showMap);
     };
 
+    // useEffect hook for fetching data
+    useFocusEffect(
+        useCallback(() => {
+            const fetchData = async () => {
+                const eventsCollectionRef = collection(firestore, 'events');
+                const reportsCollectionRef = collection(firestore, 'reports');
+
+                const eventsSnapshot = await getDocs(eventsCollectionRef);
+                const fetchedEvents = eventsSnapshot.docs.map(doc => ({
+                    ...doc.data(),
+                    id: `event-${doc.id}`,
+                    isEvent: true
+                }));
+
+                const reportsSnapshot = await getDocs(reportsCollectionRef);
+                const fetchedReports = reportsSnapshot.docs.map(doc => ({
+                    ...doc.data(),
+                    id: `report-${doc.id}`,
+                    isReport: true
+                }));
+
+                setListData([...fetchedEvents, ...fetchedReports]);
+            };
+
+            fetchData();
+        }, [])
+    );
+
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -49,7 +75,9 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
             ),
             title: showMap ? "Map View" : "List View",
         });
-    }, [showMap, navigation]);
+    }, [showMap, navigation]); 
+
+
 
     const zoomIn = () => {
         setMapRegion(prevRegion => ({
@@ -104,7 +132,6 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
         setModalVisible(true); 
     };
     
-    
 
     const renderItem = ({ item }) => {
     
@@ -124,9 +151,14 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
         };
     
         const formatDate = (timestamp) => {
-            const date = new Date(timestamp.seconds * 1000); 
-            return date.toLocaleDateString(); 
+            if (timestamp && timestamp.seconds) {
+                const date = new Date(timestamp.seconds * 1000);
+                return date.toLocaleDateString();
+            }
+            return 'N/A'; 
         };
+        
+        
 
 
         return (
@@ -154,8 +186,6 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
                 onClose={() => setModalVisible(false)}
                 item={selectedItem}
             />
-
-
                 </View>
             </View>
         );
@@ -171,7 +201,7 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
                             <Marker
                                 key={item.id}
                                 coordinate={{ latitude: item.latitude, longitude: item.longitude }}
-                                onPress={() => handleCalloutPress(item)} // Directly call handleCalloutPress here
+                                onPress={() => handleCalloutPress(item)}
                             >
                                 <Icon name={getIconName(item)} size={30} color={item.isEvent ? "#007bff" : "#ff0000"} />
                             </Marker>
@@ -188,7 +218,7 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={goToPennState} style={styles.pennStateButton}>
-                            <Image source={require('/Users/bardanphuyel/Documents/GitHub/NittanyNavigator/assets/penn-state.png')} style={styles.pennStateIcon} />
+                            <Image source={require('../../assets/penn-state.png')} style={styles.pennStateIcon} />
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={goToUserLocation} style={styles.currentLocationButton}>
@@ -208,10 +238,9 @@ const HomeScreen = ({ isMap, toggleMapView }) => {
             ) : (
                 <FlatList
                 data={listData}
-                keyExtractor={(item) => `${item.event_id || item.report_id}-${item.isEvent ? 'E' : 'R'}`}
+                keyExtractor={(item) => item.id}
                 renderItem={renderItem}
-
-                />
+            />
             )}
 
         </View>
