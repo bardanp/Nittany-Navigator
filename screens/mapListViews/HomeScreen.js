@@ -44,27 +44,31 @@ const HomeScreen = ({  }) => {
             const fetchData = async () => {
                 const eventsCollectionRef = collection(firestore, 'events');
                 const reportsCollectionRef = collection(firestore, 'reports');
-
+    
+                // Fetch events
                 const eventsSnapshot = await getDocs(eventsCollectionRef);
                 const fetchedEvents = eventsSnapshot.docs.map(doc => ({
                     ...doc.data(),
                     id: `event-${doc.id}`,
-                    isEvent: true
+                    isEvent: true,
                 }));
-
+    
+                // Fetch reports
                 const reportsSnapshot = await getDocs(reportsCollectionRef);
                 const fetchedReports = reportsSnapshot.docs.map(doc => ({
                     ...doc.data(),
                     id: `report-${doc.id}`,
-                    isReport: true
+                    isReport: true,
                 }));
-
+    
+                // Combine and set state
                 setListData([...fetchedEvents, ...fetchedReports]);
             };
-
+    
             fetchData();
         }, [])
     );
+    
 
     useEffect(() => {
         navigation.setOptions({
@@ -151,12 +155,14 @@ const HomeScreen = ({  }) => {
         };
     
         const formatDate = (timestamp) => {
-            if (timestamp && timestamp.seconds) {
+            // Check if timestamp exists and has the property 'seconds'
+            if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
                 const date = new Date(timestamp.seconds * 1000);
                 return date.toLocaleDateString();
             }
-            return 'N/A'; 
+            return 'N/A';
         };
+        
         
         
 

@@ -24,7 +24,7 @@ const AddNewReport = () => {
             emergency,
             description,
             image,
-            dateTime,
+            dateTime, 
             location,
         });
         console.log('Report added to Firestore successfully!');

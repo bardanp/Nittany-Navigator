@@ -10,10 +10,14 @@ const PopupModal = ({ visible, onClose, item }) => {
 
   const [imageError, setImageError] = useState(false);
 
-  const formatDate = timestamp => {
-    const date = new Date(timestamp.seconds * 1000);
-    return date.toLocaleDateString("en-US");
+  const formatDate = (timestamp) => {
+    if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
+      const date = new Date(timestamp.seconds * 1000);
+      return date.toLocaleDateString("en-US");
+    }
+    return 'N/A';
   };
+  
 
   const isEvent = !!item.event_id;
   const headerBackgroundColor = isEvent ? '#4CAF50' : '#F44336'; 
