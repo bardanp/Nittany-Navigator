@@ -1,100 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Button, Text, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
-import * as AuthSession from 'expo-auth-session';
+import {
+  exchangeCodeAsync,
+  makeRedirectUri,
+  useAuthRequest,
+  useAutoDiscovery,
+} from 'expo-auth-session';
 import { Ionicons } from '@expo/vector-icons';
-
 import keys from '../../keys.json';
-import jwtDecode from 'jwt-decode'; // You might need to install jwt-decode
+import { jwtDecode } from 'jwt-decode'; 
+import { decode, encode } from "base-64";
+
+if (!global.atob) {
+  global.atob = decode;
+}
+
+if (!global.btoa) {
+  global.btoa = encode;
+}
 
 
-const tenantId = keys.tenantId;
-const clientId = keys.clientId;
-const redirectUri = AuthSession.makeRedirectUri({ 
-  scheme: 'nittany-navigator',
- });
+WebBrowser.maybeCompleteAuthSession();
 
 const LoginPage = ({ navigation }) => {
-  const [discovery, setDiscovery] = useState(null);
-  const [authRequest, setAuthRequest] = useState(null);
-  const [result, setResult] = useState(null);
+  const tenantId = keys.tenantId;
+  const clientId = keys.clientId;
 
-  useEffect(() => {
-    const initAuthSession = async () => {
-      WebBrowser.maybeCompleteAuthSession();
+  // Auto-discovery for Microsoft's OpenID configuration
+  const discovery = useAutoDiscovery(`https://login.microsoftonline.com/${tenantId}/v2.0`);
 
-      const discoveryData = await AuthSession.fetchDiscoveryAsync(`https://login.microsoftonline.com/${tenantId}/v2.0`);
-      setDiscovery(discoveryData);
+  // Dynamic redirectUri based on the environment
+  const redirectUri = makeRedirectUri({
+    scheme: 'nittany-navigator', // Ensure this matches your scheme configured in app.json
+  });
 
-      const request = new AuthSession.AuthRequest({
-        clientId,
-        scopes: [
-          'openid', 
-          'profile', 
-          'api://d5d2dec1-1315-480f-87b2-3402ce132717/User.Read' // Custom scope
-        ],
-        redirectUri,
-      });
-      
-      
-      
-      setAuthRequest(request);
-    };
+  // State to store the token
+  const [token, setToken] = useState(null);
 
-    initAuthSession();
-  }, []);
+  // AuthRequest hook
+  const [request, , promptAsync] = useAuthRequest(
+    {
+      clientId,
+      scopes: ['openid', 'profile', 'email', 'offline_access'],
+      redirectUri,
+    },
+    discovery
+  );
 
-  const handleLoginPress = async () => {
-    // navigation.navigate('MainMenu');
-
-    // This is for PSU WebSSO login
-    if (authRequest && discovery) {
-      const result = await authRequest.promptAsync(discovery, { useProxy: true });
-      console.log(result);
-      setResult(result);
-      navigation.navigate('MainMenu');
-  
-      if (result?.type === 'success') {
-        // Decode the ID token if needed
-        const userInfo = jwtDecode(result.params.id_token);
-        console.log("User Info from ID Token:", userInfo);
-  
-        // Use the access token to call Microsoft Graph API
-        fetchUserInfo(result.authentication.accessToken);
-      } else {
-        console.error("Authentication failed:", result);
-      }
-    }
-  };
-  
-    
-    const fetchUserInfo = async (accessToken) => {
-      const graphApiUrl = 'https://graph.microsoft.com/v1.0/me';
-      try {
-        const response = await fetch(graphApiUrl, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+  const handleLoginPress = () => {
+    promptAsync().then((codeResponse) => {
+      if (request && codeResponse?.type === 'success' && discovery) {
+        exchangeCodeAsync(
+          {
+            clientId,
+            code: codeResponse.params.code,
+            extraParams: request.codeVerifier
+              ? { code_verifier: request.codeVerifier }
+              : undefined,
+            redirectUri,
           },
-        });
-        const userInfo = await response.json();
-        console.log("User Info from Graph API:", userInfo);
-      } catch (error) {
-        console.error("Failed to fetch user info from Graph API:", error);
+          discovery,
+        ).then((res) => {
+          if (res.accessToken) {
+            setToken(res.accessToken); // Store the token in state
+            // Decode the ID token if needed
+            const userInfo = jwtDecode(res.idToken);
+            console.log('User Info:', userInfo);
+            // Navigate or further process token as needed
+            navigation.navigate('MainMenu');
+          }
+        }).catch(error => console.error('Exchange code async error:', error));
       }
-    };
-    
-  
-  
+    }).catch(error => console.error('Prompt async error:', error));
+  };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Ionicons name="school" size={100} color="#2f80ed" style={styles.logo} />
       <Text style={styles.title}>Welcome to Nittany Navigator</Text>
       <Text style={styles.description}>Your go-to for a connected, informed, and safe campus journey.</Text>
-      <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+      <TouchableOpacity style={styles.button} onPress={handleLoginPress} disabled={!request}>
         <Text style={styles.buttonText}>Sign In with PSU Login</Text>
       </TouchableOpacity>
-    </View>
+      {token && <Text>Token: {token.substring(0, 10)}...</Text>}
+    </SafeAreaView>
   );
 };
 

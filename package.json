@@ -27,6 +27,7 @@
     "@react-navigation/stack": "^6.3.21",
     "base-64": "^1.0.0",
     "bootstrap-icons": "^1.11.3",
+    "core-js": "^3.36.0",
     "dotenv": "^16.4.5",
     "expo": "^49.0.23",
     "expo-auth-session": "~5.0.2",

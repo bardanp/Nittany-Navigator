@@ -39,13 +39,13 @@ const PopupModal = ({ visible, onClose, item }) => {
             <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
               <Text style={styles.category}>{isEvent ? 'Event Info' : 'Report Info'}</Text>
             </View>
-            {item.imageurl && !imageError ? (
+            {item.image && !imageError ? (
               <Image
-                source={{ uri: item.imageurl }}
+                source={{ uri: item.image }}
                 style={styles.image}
-                resizeMode="contain"
+                resizeMode= 'stretch'
                 onError={() => setImageError(true)} 
-              />
+              /> 
             ) : (
               <Image
                 source={noPicturesIcon} 
@@ -53,6 +53,7 @@ const PopupModal = ({ visible, onClose, item }) => {
                 resizeMode="contain"
               />
             )}
+
 
             <View style={styles.body}>
               <Text style={[styles.title, { color: textColor }]}>{item.title}</Text>
@@ -106,8 +107,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 200,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     borderColor: 'grey',
     borderBottomWidth: 10,
   },
@@ -145,9 +144,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   closeButton: {
-    padding: 10,
+    padding: 0,
     borderWidth: 5,
-    borderColor: 'blue',
     width: 150,
     height: 50,
     justifyContent: 'center', 
@@ -158,7 +156,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
   },
