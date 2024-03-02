@@ -1,30 +1,38 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, SafeAreaView, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native'; // Ensure you have this if you're using navigation
 
 const ProfileScreen = () => {
+  const [userInfo, setUserInfo] = useState({
+    email: '',
+    fullName: 'Loading...', // Combine firstName and lastName
+    profilePicUri: null, // Adjust based on what you save in AsyncStorage
+  });
 
-  const navigation = useNavigation();
+  const navigation = useNavigation(); // Use this to navigate
 
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      const userInfoString = await AsyncStorage.getItem('userInfo');
+      if (userInfoString) {
+        const userInfo = JSON.parse(userInfoString);
+        setUserInfo({
+          ...userInfo,
+          fullName: userInfo.fullName, // Adjust according to what you actually save
+          email: userInfo.email,
+          profilePicUri: userInfo.profilePicUri, // Ensure this is the key used
+        });
+      }
+    };
+    loadUserInfo();
+  }, []);
 
-  const handleSettings = () => {
-    navigation.navigate('Settings');
-  };
-
-    // Inside ProfileScreen component
-  const handleEventHistory = () => {
-    navigation.navigate('EventHistory');
-  };
-
-  const handleReportHistory = () => {
-    navigation.navigate('ReportHistory');
-  };
-
-  const handleAbout = () => {
-    navigation.navigate('About');
-  };
-
+  const profilePicSource = userInfo.profilePicUri ? { uri: userInfo.profilePicUri } : require('../../assets/no-profile.png');
+  const profileName = userInfo.fullName ? userInfo.fullName : 'Loading...';
+  const profileEmail = userInfo.email ? userInfo.email : 'Loading...';
 
   const profileOptions = [
       { title: 'Event History', description: 'View past events and their details.', iconName: 'history', handler: 'EventHistory' },
@@ -36,9 +44,10 @@ const ProfileScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        <View style={styles.header}>
-          <Image source={require('../../assets/no-profile.png')} style={styles.profileIcon} />
-          <Text style={styles.username}>John Doe</Text>
+      <View style={styles.header}>
+          <Image source={profilePicSource} style={styles.profileIcon} />
+          <Text style={styles.username}>{userInfo.fullName}</Text>
+          <Text style={styles.email}>{userInfo.email}</Text>
         </View>
 
         {profileOptions.map((option, index) => (

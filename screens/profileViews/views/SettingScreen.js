@@ -9,8 +9,7 @@ const SettingScreen = () => {
   const settingsOptions = [
     { title: 'Notifications', description: 'Manage notification preferences.', iconName: 'notifications', handler: 'Notifications' },
     { title: 'Privacy', description: 'View and manage privacy settings.', iconName: 'privacy-tip', handler: 'Privacy' },
-    { title: 'Advanced Settings', description: 'Access advanced settings and configurations.', iconName: 'settings-suggest', handler: 'AdvancedSettings' },
-    { title: 'Account Settings', description: 'Manage your account preferences and details.', iconName: 'manage-accounts', handler: 'AccountSettings' },
+    { title: 'Other Settings', description: 'Access other settings and configurations.', iconName: 'other', handler: 'AdvancedSettings' },
   ];
 
   const handleLogout = () => {

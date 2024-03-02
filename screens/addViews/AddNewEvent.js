@@ -48,7 +48,6 @@ const AddNewEvent = () => {
   };
 
   
-
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');

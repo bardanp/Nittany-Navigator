@@ -28,8 +28,8 @@ const AddNewReport = () => {
             location,
         });
         console.log('Report added to Firestore successfully!');
-        navigation.goBack(); // Go back to the previous screen
-        navigation.navigate('SubmitSuccess'); // Navigate to the success screen
+        navigation.goBack(); 
+        navigation.navigate('SubmitSuccess'); 
     } catch (error) {
         console.error('Error adding report to Firestore:', error);
     }

@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
-import {
-  exchangeCodeAsync,
-  makeRedirectUri,
-  useAuthRequest,
-  useAutoDiscovery,
-} from 'expo-auth-session';
+import { exchangeCodeAsync, makeRedirectUri, useAuthRequest, useAutoDiscovery } from 'expo-auth-session';
 import { Ionicons } from '@expo/vector-icons';
 import keys from '../../keys.json';
 import { jwtDecode } from 'jwt-decode'; 
 import { decode, encode } from "base-64";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 if (!global.atob) {
   global.atob = decode;
@@ -48,6 +45,25 @@ const LoginPage = ({ navigation }) => {
     discovery
   );
 
+  const saveUserInfo = async (userInfo) => {
+    try {
+      // Extracting name and email from the user info object
+      const formattedUserInfo = {
+        email: userInfo.email,
+        // Assuming the name field is formatted as "Lastname, Firstname"
+        firstName: userInfo.name?.split(', ')[1],
+        lastName: userInfo.name?.split(', ')[0],
+        // Add a placeholder for the profilePic if you have a field for it
+        // profilePic: userInfo.picture_url, // Example
+      };
+  
+      await AsyncStorage.setItem('userInfo', JSON.stringify(formattedUserInfo));
+    } catch (e) {
+      console.error('Saving user info failed', e);
+    }
+  };
+  
+
   const handleLoginPress = () => {
     promptAsync().then((codeResponse) => {
       if (request && codeResponse?.type === 'success' && discovery) {
@@ -62,14 +78,15 @@ const LoginPage = ({ navigation }) => {
           },
           discovery,
         ).then((res) => {
-          if (res.accessToken) {
-            setToken(res.accessToken); // Store the token in state
-            // Decode the ID token if needed
-            const userInfo = jwtDecode(res.idToken);
-            console.log('User Info:', userInfo);
-            // Navigate or further process token as needed
-            navigation.navigate('MainMenu');
-          }
+        if (res.accessToken) {
+          setToken(res.accessToken); // Store the token in state
+          // Decode the ID token if needed
+          const userInfo = jwtDecode(res.idToken);
+          console.log('User Info:', userInfo);
+          saveUserInfo(userInfo); // Save user info
+          navigation.navigate('MainMenu'); // Navigate or further process token as needed
+        }
+
         }).catch(error => console.error('Exchange code async error:', error));
       }
     }).catch(error => console.error('Prompt async error:', error));
