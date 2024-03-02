@@ -8,11 +8,12 @@ import { useNavigation } from '@react-navigation/native'; // Ensure you have thi
 const ProfileScreen = () => {
   const [userInfo, setUserInfo] = useState({
     email: '',
-    fullName: 'Loading...', // Combine firstName and lastName
-    profilePicUri: null, // Adjust based on what you save in AsyncStorage
+    fullName: 'Loading...',
+    primaryAffiliation: 'Not specified',
+    profilePicUri: null,
   });
 
-  const navigation = useNavigation(); // Use this to navigate
+  const navigation = useNavigation();
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -20,19 +21,18 @@ const ProfileScreen = () => {
       if (userInfoString) {
         const userInfo = JSON.parse(userInfoString);
         setUserInfo({
-          ...userInfo,
-          fullName: userInfo.fullName, // Adjust according to what you actually save
           email: userInfo.email,
-          profilePicUri: userInfo.profilePicUri, // Ensure this is the key used
+          fullName: `${userInfo.firstName} ${userInfo.lastName}`,
+          primaryAffiliation: userInfo.primaryAffiliation,
+          profilePicUri: userInfo.profilePicUri,
         });
       }
     };
     loadUserInfo();
   }, []);
+  
 
   const profilePicSource = userInfo.profilePicUri ? { uri: userInfo.profilePicUri } : require('../../assets/no-profile.png');
-  const profileName = userInfo.fullName ? userInfo.fullName : 'Loading...';
-  const profileEmail = userInfo.email ? userInfo.email : 'Loading...';
 
   const profileOptions = [
       { title: 'Event History', description: 'View past events and their details.', iconName: 'history', handler: 'EventHistory' },
@@ -44,29 +44,33 @@ const ProfileScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-      <View style={styles.header}>
+        <View style={styles.profileHeader}>
           <Image source={profilePicSource} style={styles.profileIcon} />
-          <Text style={styles.username}>{userInfo.fullName}</Text>
-          <Text style={styles.email}>{userInfo.email}</Text>
+          <View style={styles.userInfo}>
+            <Text style={styles.username}>{userInfo.fullName}</Text>
+            <Text style={styles.userDetail}>{userInfo.email}</Text>
+            <Text style={styles.userDetail}>User type: {userInfo.primaryAffiliation}</Text>
+          </View>
         </View>
 
-        {profileOptions.map((option, index) => (
-          <TouchableOpacity style={styles.optionContainer} key={index} onPress={() => navigation.navigate(option.handler)}>
-            <View style={styles.optionIcon}>
-              {/* Adjust the icon library as necessary, here using MaterialIcons for consistency */}
+        <View style={styles.profileOptions}>
+          {profileOptions.map((option, index) => (
+            <TouchableOpacity key={index} style={styles.optionContainer} onPress={() => navigation.navigate(option.handler)}>
               <MaterialIcons name={option.iconName} size={28} color="#007AFF" />
-            </View>
-            <View style={styles.optionTextContainer}>
-              <Text style={styles.optionTitle}>{option.title}</Text>
-              <Text style={styles.optionDescription}>{option.description}</Text>
-            </View>
-            <Ionicons name="chevron-forward-outline" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-        ))}
+              <View style={styles.optionTextContainer}>
+                <Text style={styles.optionTitle}>{option.title}</Text>
+                <Text style={styles.optionDescription}>{option.description}</Text>
+              </View>
+              <Ionicons name="chevron-forward-outline" size={24} color="#C7C7CC" />
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -74,25 +78,33 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     padding: 20,
-    paddingTop: 50,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  profileHeader: {
     alignItems: 'center',
-    marginBottom: 30,
-    position: 'relative',
+    marginBottom: 40,
   },
   profileIcon: {
-    width: 80, // Increased size for profile
-    height: 80,
-    borderRadius: 40,
-    marginRight: 10,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 20,
+  },
+  userInfo: {
+    alignItems: 'center',
   },
   username: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
+    marginBottom: 8,
+  },
+  userDetail: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 4,
+  },
+  profileOptions: {
+    marginTop: 20,
   },
   optionContainer: {
     flexDirection: 'row',
@@ -102,22 +114,19 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 1,
-  },
-  optionIcon: {
-    marginRight: 16,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   optionTextContainer: {
+    marginLeft: 16,
     flex: 1,
   },
   optionTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1A202C',
-    marginBottom: 2,
   },
   optionDescription: {
     fontSize: 14,

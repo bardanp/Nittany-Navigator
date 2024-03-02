@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; // Ensure this is imported
+import { Ionicons } from '@expo/vector-icons'; 
 import styles from './styles';
 import { firestore } from '../../backend/firebase'; 
 import { collection, addDoc } from 'firebase/firestore';
-
 
 const AddNewReport = () => {
   const [title, setTitle] = useState('');
@@ -19,32 +18,30 @@ const AddNewReport = () => {
 
   const handleSubmit = async () => {
     try {
-        await addDoc(collection(firestore, 'reports'), {
-            title,
-            emergency,
-            description,
-            image,
-            dateTime, 
-            location,
-        });
-        console.log('Report added to Firestore successfully!');
-        navigation.goBack(); 
-        navigation.navigate('SubmitSuccess'); 
+      await addDoc(collection(firestore, 'reports'), {
+        title,
+        emergency,
+        description,
+        image,
+        dateTime, 
+        location,
+      });
+      console.log('Report added to Firestore successfully!');
+      navigation.goBack(); 
+      navigation.navigate('SubmitSuccess'); 
     } catch (error) {
-        console.error('Error adding report to Firestore:', error);
+      console.error('Error adding report to Firestore:', error);
     }
   };
-  
-
-  
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+
         <Text style={styles.headerTitle}>Add New Report</Text>
       </View>
       {/* Content */}
@@ -90,6 +87,5 @@ const AddNewReport = () => {
     </View>
   );
 };
-
 
 export default AddNewReport;

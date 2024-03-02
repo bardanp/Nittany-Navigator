@@ -16,12 +16,17 @@
       "**/*"
     ],
     "ios": {
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to capture event photos.",
+        "NSPhotoLibraryUsageDescription": "This app accesses the photo library to select event photos."
+      },
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
       }
     },
     "web": {

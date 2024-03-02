@@ -163,8 +163,6 @@ const HomeScreen = ({  }) => {
             return 'N/A';
         };
         
-        
-        
 
 
         return (

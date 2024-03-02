@@ -1,69 +1,71 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  containerScroll: {
-    flex: 1,
-  },
   container: {
     flex: 1,
+    backgroundColor: '#E5E5E5', // Light grey background
     padding: 20,
-    backgroundColor: '#f0f0f0',
   },
-  datePicker: {
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Center the content horizontally
     alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    marginBottom: 20,
+    position: 'relative', // Ensure the positioning context
+    paddingBottom: 20,
   },
-  datePickerText: {
-    fontSize: 16,
+  backButton: {
+    padding: 10,
+    position: 'absolute',
+    left: 0,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333', // Dark grey
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center', // Center the text horizontally
   },
   input: {
+    backgroundColor: '#FFF', // White
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#DDD', // Light grey border
     borderRadius: 10,
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     marginBottom: 15,
     fontSize: 16,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
+    width: '100%',
+    color: '#333', // Dark grey text
+    shadowColor: '#000', // Black shadow
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
   },
-  button: {
-    backgroundColor: '#007bff',
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-    marginBottom: 10,
+  datePicker: {
+    ...this.input,
+    marginBottom: 20,
   },
-  buttonBack: {
-    backgroundColor: '#dc3545',
+  button: {
+    backgroundColor: '#007BFF', // Blue button
     borderRadius: 10,
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    width: '100%',
     alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#007BFF', // Blue shadow
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 3,
   },
   buttonText: {
-    color: '#fff',
+    color: '#FFF', // White text
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -71,65 +73,33 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#333', // Dark grey text
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    position: 'relative',
-  },
-  backButton: {
-    position: 'absolute',
-    left: 0,
-    padding: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  // New styles from enhanced AddPage
   optionContainer: {
+    ...this.input,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
-    padding: 20,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    width: '100%',
-    maxWidth: 600,
   },
   optionText: {
     fontSize: 18,
-    color: '#007bff',
+    color: '#007BFF', // Blue text
     marginLeft: 10,
   },
   centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black
   },
   modalView: {
-    margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#FFF', // White modal background
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowColor: '#000', // Black shadow
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -137,15 +107,15 @@ export default StyleSheet.create({
     maxWidth: 400,
   },
   formSubmitButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#28A745', // Green button
     borderRadius: 5,
-    padding: 10,
-    marginTop: 10,
+    paddingVertical: 10,
     width: '100%',
     alignItems: 'center',
+    marginTop: 10,
   },
   formSubmitButtonText: {
-    color: '#fff',
+    color: '#FFF', // White text
     fontSize: 18,
     fontWeight: 'bold',
   },

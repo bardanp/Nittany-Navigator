@@ -39,57 +39,69 @@ const LoginPage = ({ navigation }) => {
   const [request, , promptAsync] = useAuthRequest(
     {
       clientId,
-      scopes: ['openid', 'profile', 'email', 'offline_access'],
+      scopes: ['openid', 'profile', 'email', 'offline_access', 'User.Read'],
       redirectUri,
     },
     discovery
   );
 
-  const saveUserInfo = async (userInfo) => {
+  const saveUserInfo = async (accessToken) => {
     try {
-      // Extracting name and email from the user info object
+      const graphResponse = await fetch('https://graph.microsoft.com/v1.0/me?$select=displayName,givenName,surname,mail,userPrincipalName,extension_d5d2dec11315480f87b23402ce132717_primaryAffiliation', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      
+      const userInfo = await graphResponse.json();
+  
+      // Log the user info here
+      console.log('User info from Graph API:', userInfo);
+  
       const formattedUserInfo = {
-        email: userInfo.email,
-        // Assuming the name field is formatted as "Lastname, Firstname"
-        firstName: userInfo.name?.split(', ')[1],
-        lastName: userInfo.name?.split(', ')[0],
-        // Add a placeholder for the profilePic if you have a field for it
-        // profilePic: userInfo.picture_url, // Example
+        email: userInfo.mail || userInfo.userPrincipalName,
+        firstName: userInfo.givenName,
+        lastName: userInfo.surname,
+        primaryAffiliation: userInfo.jobTitle || 'Not specified', // This assumes jobTitle is the primary affiliation
       };
   
       await AsyncStorage.setItem('userInfo', JSON.stringify(formattedUserInfo));
     } catch (e) {
-      console.error('Saving user info failed', e);
+      console.error('Fetching user info from Microsoft Graph API failed', e);
     }
   };
   
+  
+  
 
   const handleLoginPress = () => {
-    promptAsync().then((codeResponse) => {
-      if (request && codeResponse?.type === 'success' && discovery) {
-        exchangeCodeAsync(
-          {
-            clientId,
-            code: codeResponse.params.code,
-            extraParams: request.codeVerifier
-              ? { code_verifier: request.codeVerifier }
-              : undefined,
-            redirectUri,
-          },
-          discovery,
-        ).then((res) => {
-        if (res.accessToken) {
-          setToken(res.accessToken); // Store the token in state
-          // Decode the ID token if needed
-          const userInfo = jwtDecode(res.idToken);
-          console.log('User Info:', userInfo);
-          saveUserInfo(userInfo); // Save user info
-          navigation.navigate('MainMenu'); // Navigate or further process token as needed
-        }
 
-        }).catch(error => console.error('Exchange code async error:', error));
-      }
-    }).catch(error => console.error('Prompt async error:', error));
+    navigation.navigate('MainMenu');
+
+
+    // promptAsync().then((codeResponse) => {
+    //   if (request && codeResponse?.type === 'success' && discovery) {
+    //     exchangeCodeAsync(
+    //       {
+    //         clientId,
+    //         code: codeResponse.params.code,
+    //         extraParams: request.codeVerifier
+    //           ? { code_verifier: request.codeVerifier }
+    //           : undefined,
+    //         redirectUri,
+    //       },
+    //       discovery,
+    //     ).then((res) => {
+    //       if (res.accessToken) {
+    //         setToken(res.accessToken); // Store the token in state
+    //         saveUserInfo(res.accessToken); // Modified to pass accessToken
+    //         navigation.navigate('MainMenu'); 
+    //       }
+    //     }).catch(error => console.error('Exchange code async error:', error));
+    //   }
+    // }).catch(error => console.error('Prompt async error:', error));
   };
 
   return (
