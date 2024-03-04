@@ -23,19 +23,12 @@ WebBrowser.maybeCompleteAuthSession();
 const LoginPage = ({ navigation }) => {
   const tenantId = keys.tenantId;
   const clientId = keys.clientId;
-
-  // Auto-discovery for Microsoft's OpenID configuration
   const discovery = useAutoDiscovery(`https://login.microsoftonline.com/${tenantId}/v2.0`);
-
-  // Dynamic redirectUri based on the environment
   const redirectUri = makeRedirectUri({
-    scheme: 'nittany-navigator', // Ensure this matches your scheme configured in app.json
+    scheme: 'nittany-navigator', 
   });
 
-  // State to store the token
   const [token, setToken] = useState(null);
-
-  // AuthRequest hook
   const [request, , promptAsync] = useAuthRequest(
     {
       clientId,
@@ -53,18 +46,14 @@ const LoginPage = ({ navigation }) => {
           'Content-Type': 'application/json'
         }
       });
-      
-      
       const userInfo = await graphResponse.json();
-  
-      // Log the user info here
       console.log('User info from Graph API:', userInfo);
   
       const formattedUserInfo = {
         email: userInfo.mail || userInfo.userPrincipalName,
         firstName: userInfo.givenName,
         lastName: userInfo.surname,
-        primaryAffiliation: userInfo.jobTitle || 'Not specified', // This assumes jobTitle is the primary affiliation
+        primaryAffiliation: userInfo.jobTitle || 'Not specified', 
       };
   
       await AsyncStorage.setItem('userInfo', JSON.stringify(formattedUserInfo));
@@ -77,31 +66,29 @@ const LoginPage = ({ navigation }) => {
   
 
   const handleLoginPress = () => {
+    // navigation.navigate('MainMenu');
 
-    navigation.navigate('MainMenu');
-
-
-    // promptAsync().then((codeResponse) => {
-    //   if (request && codeResponse?.type === 'success' && discovery) {
-    //     exchangeCodeAsync(
-    //       {
-    //         clientId,
-    //         code: codeResponse.params.code,
-    //         extraParams: request.codeVerifier
-    //           ? { code_verifier: request.codeVerifier }
-    //           : undefined,
-    //         redirectUri,
-    //       },
-    //       discovery,
-    //     ).then((res) => {
-    //       if (res.accessToken) {
-    //         setToken(res.accessToken); // Store the token in state
-    //         saveUserInfo(res.accessToken); // Modified to pass accessToken
-    //         navigation.navigate('MainMenu'); 
-    //       }
-    //     }).catch(error => console.error('Exchange code async error:', error));
-    //   }
-    // }).catch(error => console.error('Prompt async error:', error));
+    promptAsync().then((codeResponse) => {
+      if (request && codeResponse?.type === 'success' && discovery) {
+        exchangeCodeAsync(
+          {
+            clientId,
+            code: codeResponse.params.code,
+            extraParams: request.codeVerifier
+              ? { code_verifier: request.codeVerifier }
+              : undefined,
+            redirectUri,
+          },
+          discovery,
+        ).then((res) => {
+          if (res.accessToken) {
+            setToken(res.accessToken);
+            saveUserInfo(res.accessToken);
+            navigation.navigate('MainMenu'); 
+          }
+        }).catch(error => console.error('Exchange code async error:', error));
+      }
+    }).catch(error => console.error('Prompt async error:', error));
   };
 
   return (
@@ -112,7 +99,6 @@ const LoginPage = ({ navigation }) => {
       <TouchableOpacity style={styles.button} onPress={handleLoginPress} disabled={!request}>
         <Text style={styles.buttonText}>Sign In with PSU Login</Text>
       </TouchableOpacity>
-      {token && <Text>Token: {token.substring(0, 10)}...</Text>}
     </SafeAreaView>
   );
 };
@@ -145,11 +131,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 6,
+    alignContent: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    alignContent: 'center',
+    justifyContent: 'center',
   },
 });
 

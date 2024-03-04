@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import styles from './HomeScreen.styles.js';
 import * as Location from 'expo-location';
 import PopupModal from './PopupModal.js';
-import { firestore } from '../../backend/firebase.js'; // Adjust the path as necessary
+import { firestore } from '../../backend/firebase.js'; 
 import { collection, getDocs } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -17,6 +17,8 @@ const HomeScreen = ({  }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [listData, setListData] = useState([]);
+    const [userLocation, setUserLocation] = useState(null);
+
     
     
     const [showMap, setShowMap] = useState(true);
@@ -45,7 +47,6 @@ const HomeScreen = ({  }) => {
                 const eventsCollectionRef = collection(firestore, 'events');
                 const reportsCollectionRef = collection(firestore, 'reports');
     
-                // Fetch events
                 const eventsSnapshot = await getDocs(eventsCollectionRef);
                 const fetchedEvents = eventsSnapshot.docs.map(doc => ({
                     ...doc.data(),
@@ -53,15 +54,13 @@ const HomeScreen = ({  }) => {
                     isEvent: true,
                 }));
     
-                // Fetch reports
                 const reportsSnapshot = await getDocs(reportsCollectionRef);
                 const fetchedReports = reportsSnapshot.docs.map(doc => ({
                     ...doc.data(),
                     id: `report-${doc.id}`,
                     isReport: true,
                 }));
-    
-                // Combine and set state
+
                 setListData([...fetchedEvents, ...fetchedReports]);
             };
     
@@ -79,6 +78,38 @@ const HomeScreen = ({  }) => {
             ),
             title: showMap ? "Map View" : "List View",
         });
+
+
+        const watchUserLocation = async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permission to access location was denied');
+                return;
+            }
+    
+            watchPositionSub = await Location.watchPositionAsync(
+                {
+                    accuracy: Location.Accuracy.High,
+                    distanceInterval: 5, 
+                },
+                (location) => {
+                    setUserLocation({
+                        latitude: location.coords.latitude,
+                        longitude: location.coords.longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    });
+                }
+            );
+        };
+    
+        watchUserLocation();
+
+        return () => {
+            if (watchPositionSub) {
+                watchPositionSub.remove();
+            }
+        };
     }, [showMap, navigation]); 
 
 
@@ -210,8 +241,15 @@ const HomeScreen = ({  }) => {
                                 <Icon name={getIconName(item)} size={30} color={item.isEvent ? "#007bff" : "#ff0000"} />
                             </Marker>
                         ))}
+                        {userLocation && (
+                            <Marker
+                                coordinate={userLocation}
+                                title="My Location"
+                            >
+                                <Icon name="location-pin" size={30} color="#007bff" />
+                            </Marker>
+                        )}
                     </MapView>
-
 
                     <View style={styles.zoomControls}>
                         <TouchableOpacity onPress={zoomIn} style={styles.zoomButton}>

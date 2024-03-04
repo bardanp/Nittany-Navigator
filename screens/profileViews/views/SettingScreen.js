@@ -2,19 +2,31 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as WebBrowser from 'expo-web-browser';
+import { makeRedirectUri } from 'expo-auth-session';
 
+import keys from '../../../keys.json';
 
 const SettingScreen = () => {
   const navigation = useNavigation();
+  const { tenantId } = keys; 
 
   const settingsOptions = [
     { title: 'Notifications', description: 'Manage notification preferences.', iconName: 'notifications', handler: 'Notifications' },
     { title: 'Privacy', description: 'View and manage privacy settings.', iconName: 'privacy-tip', handler: 'Privacy' },
-    { title: 'Other Settings', description: 'Access other settings and configurations.', iconName: 'other', handler: 'AdvancedSettings' },
+    { title: 'Other Settings', description: 'Access other settings and configurations.', iconName: 'settings', handler: 'AdvancedSettings' },
   ];
 
-  const handleLogout = () => {
-    console.log("Logout button pressed");
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('userInfo');
+
+    const logoutUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(makeRedirectUri({
+      scheme: 'nittany-navigator', 
+    }))}`;
+    console.log('User logged out. Redirecting to:', logoutUrl);
+    await WebBrowser.openBrowserAsync(logoutUrl);
+    navigation.navigate('LoginPage'); 
   };
 
   return (
@@ -107,12 +119,16 @@ const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: '#E53E3E',
     shadowOpacity: 0.1,
+    alignContent: 'center',
+    justifyContent: 'center',
   },
   logoutText: {
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
     textAlign: 'center',
+    alignContent: 'center',
+    justifyContent: 'center',
   },
 });
 
