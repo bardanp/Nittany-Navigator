@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   backButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: '#FF6347',
   },
   optionText: {
     color: '#fff',

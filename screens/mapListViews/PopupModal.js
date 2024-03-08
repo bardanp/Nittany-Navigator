@@ -1,14 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
-
 import noPicturesIcon from '../../assets/no-pictures.png';
+import { firestore } from '../../backend/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
 const PopupModal = ({ visible, onClose, item }) => {
-  if (!item) return null;
-
+  const [modalData, setModalData] = useState(null);
   const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    const fetchModalData = async () => {
+      if (!item) return;
+      const documentRef = doc(firestore, item.isEvent ? 'events' : 'reports', item.id.substring(item.id.indexOf('-') + 1));
+      const docSnap = await getDoc(documentRef);
+      if (docSnap.exists()) {
+        setModalData(docSnap.data());
+      } else {
+        console.log('No such document!');
+      }
+    };
+    fetchModalData();
+  }, [item]);
 
   const formatDate = (timestamp) => {
     if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
@@ -17,11 +31,10 @@ const PopupModal = ({ visible, onClose, item }) => {
     }
     return 'N/A';
   };
-  
 
-  const isEvent = !!item.event_id;
-  const headerBackgroundColor = isEvent ? '#4CAF50' : '#F44336'; 
-  const textColor = '#333'; 
+  const isEvent = !!modalData?.event_id;
+  const headerBackgroundColor = isEvent ? '#4CAF50' : '#F44336';
+  const textColor = '#333';
 
   return (
     <Modal
@@ -39,35 +52,34 @@ const PopupModal = ({ visible, onClose, item }) => {
             <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
               <Text style={styles.category}>{isEvent ? 'Event Info' : 'Report Info'}</Text>
             </View>
-            {item.image && !imageError ? (
+            {modalData?.image && !imageError ? (
               <Image
-                source={{ uri: item.image }}
+                source={{ uri: modalData.image }}
                 style={styles.image}
                 resizeMode= 'stretch'
-                onError={() => setImageError(true)} 
-              /> 
+                onError={() => setImageError(true)}
+              />
             ) : (
               <Image
-                source={noPicturesIcon} 
+                source={noPicturesIcon}
                 style={styles.image}
                 resizeMode="contain"
               />
             )}
 
-
             <View style={styles.body}>
-              <Text style={[styles.title, { color: textColor }]}>{item.title}</Text>
-              <Text style={[styles.description, { color: textColor }]}>{item.desc}</Text>
+              <Text style={[styles.title, { color: textColor }]}>{modalData?.title}</Text>
+              <Text style={[styles.description, { color: textColor }]}>{modalData?.desc}</Text>
               <Text style={[styles.details, { color: textColor }]}>
-                {`Date: ${formatDate(item.timestamp)}`}
+                {`Date: ${formatDate(modalData?.timestamp)}`}
               </Text>
               <Text style={[styles.details, { color: textColor }]}>
-                {`Location: ${item.location}`}
+                {`Location: ${modalData?.location}`}
               </Text>
               <Text style={[styles.details, { color: textColor }]}>
-                {`Created by: ${item.createdBy}`}
+                {`Created by: ${modalData?.createdBy}`}
               </Text>
-              {item.emergency && (
+              {modalData?.emergency && (
                 <Text style={[styles.emergency, styles.details]}>
                   EMERGENCY
                 </Text>
@@ -86,7 +98,6 @@ const PopupModal = ({ visible, onClose, item }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
@@ -99,7 +110,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     width: width - 50,
-    maxWidth: 500, 
+    maxWidth: 500,
   },
   scrollViewContainer: {
     flexGrow: 1,
@@ -145,10 +156,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 0,
-    borderWidth: 5,
+    borderWidth: 2,
     width: 150,
     height: 50,
-    justifyContent: 'center', 
+    justifyContent: 'center',
     alignContent: 'center',
     borderRadius: 12,
     alignSelf: 'center',

@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E5E5E5', // Light grey background
+    backgroundColor: '#F8F8F8', // Light grey background
     padding: 20,
   },
   header: {
@@ -22,7 +22,7 @@ export default StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333', // Dark grey
+    color: '#444', // Dark grey
     position: 'absolute',
     left: 0,
     right: 0,
@@ -32,13 +32,13 @@ export default StyleSheet.create({
     backgroundColor: '#FFF', // White
     borderWidth: 1,
     borderColor: '#DDD', // Light grey border
-    borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
     marginBottom: 15,
     fontSize: 16,
     width: '100%',
-    color: '#333', // Dark grey text
+    color: '#555', // Dark grey text
     shadowColor: '#000', // Black shadow
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -50,15 +50,15 @@ export default StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#007BFF', // Blue button
-    borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    backgroundColor: '#FF6347', // Tomato button
+    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
-    shadowColor: '#007BFF', // Blue shadow
+    shadowColor: '#FF6347', // Tomato shadow
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -73,7 +73,7 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#333', // Dark grey text
+    color: '#555', // Dark grey text
   },
   optionContainer: {
     ...this.input,
@@ -84,7 +84,7 @@ export default StyleSheet.create({
   },
   optionText: {
     fontSize: 18,
-    color: '#007BFF', // Blue text
+    color: '#FF6347', // Tomato text
     marginLeft: 10,
   },
   centeredView: {
@@ -107,7 +107,7 @@ export default StyleSheet.create({
     maxWidth: 400,
   },
   formSubmitButton: {
-    backgroundColor: '#28A745', // Green button
+    backgroundColor: '#4682B4', // Steel Blue button
     borderRadius: 5,
     paddingVertical: 10,
     width: '100%',

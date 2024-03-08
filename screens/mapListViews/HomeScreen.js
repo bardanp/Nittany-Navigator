@@ -181,12 +181,11 @@ const HomeScreen = ({  }) => {
         };
         
         const handleDesc = (item) => {
-            setSelectedItem(item); // Set the selected item
-            setModalVisible(true); // Show the modal
+            setSelectedItem(item); 
+            setModalVisible(true); 
         };
     
         const formatDate = (timestamp) => {
-            // Check if timestamp exists and has the property 'seconds'
             if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
                 const date = new Date(timestamp.seconds * 1000);
                 return date.toLocaleDateString();

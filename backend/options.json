@@ -1,0 +1,18 @@
+{
+  "locations": [
+    {"id": "1", "name": "Olmstead Building"},
+    {"id": "2", "name": "(SEC) Student Enrichment Center"},
+    {"id": "3", "name": "(CUB) Capital Union Building"},
+    {"id": "4", "name": "(EAB) Educational Activities Building"},
+    {"id": "5", "name": "Science and Technology Building"},
+    {"id": "6", "name": "Courtyard"},
+    {"id": "7", "name": "Library"}
+  ],
+  "categories": [
+    {"id": "1", "name": "Emergency"},
+    {"id": "2", "name": "School Closure"},
+    {"id": "3", "name": "Construction"},
+    {"id": "4", "name": "Maintenance"},
+    {"id": "5", "name": "Other"}
+  ]
+}
