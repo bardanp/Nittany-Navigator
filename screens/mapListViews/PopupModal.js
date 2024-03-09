@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 0,
-    borderWidth: 2,
+    borderWidth: 5,
     width: 150,
     height: 50,
     justifyContent: 'center',
