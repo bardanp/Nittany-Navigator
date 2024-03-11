@@ -19,15 +19,30 @@ const SettingScreen = () => {
   ];
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('userInfo');
-
-    const logoutUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(makeRedirectUri({
-      scheme: 'nittany-navigator', 
-    }))}`;
-    console.log('User logged out. Redirecting to:', logoutUrl);
-    await WebBrowser.openBrowserAsync(logoutUrl);
-    navigation.navigate('LoginPage'); 
+    try {
+      // Remove user info from AsyncStorage
+      await AsyncStorage.removeItem('userInfo');
+  
+      // Construct logout URL
+      const logoutUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(makeRedirectUri({
+        scheme: 'nittany-navigator', 
+      }))}`;
+  
+      // Log the logout URL for debugging
+      console.log('User logged out. Redirecting to:', logoutUrl);
+  
+      // Open browser to perform logout
+      await WebBrowser.openBrowserAsync(logoutUrl);
+  
+      // Navigate to login page
+      navigation.navigate('LoginPage'); 
+      alert('You have been logged out.');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      // Handle error if necessary
+    }
   };
+  
 
   return (
     <SafeAreaView style={styles.container}>

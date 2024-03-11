@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Switch, Alert, Image, Modal, StyleSheet, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Switch, Alert, Image, Modal, StyleSheet, ScrollView, TouchableWithoutFeedback, FlatList } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { firestore, storage } from '../../backend/firebase';
@@ -7,7 +7,6 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import options from '../../backend/options.json';
 import { useNavigation } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
 
 const AddNewReport = () => {
   const [title, setTitle] = useState('');
@@ -16,9 +15,9 @@ const AddNewReport = () => {
   const [image, setImage] = useState(null);
   const [date, setDate] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [location, setLocation] = useState('');
+  const [locationId, setLocationId] = useState(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
-  const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const navigation = useNavigation();
 
@@ -68,8 +67,8 @@ const AddNewReport = () => {
         description,
         image: imageUrl,
         dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
-        location,
-        category,
+        location: locationId ? options.locations.find(loc => loc.id === locationId).name : '',
+        category: categoryId ? options.categories.find(cat => cat.id === categoryId).name : '',
       });
       Alert.alert("Success", "Report added successfully!");
       navigation.goBack();
@@ -92,22 +91,22 @@ const AddNewReport = () => {
     }
     return null;
   };
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  
+
   const renderSelectedLocation = () => {
-    return selectedLocation ? (
-      <Text style={styles.selectedText}>Selected Location: {selectedLocation.name}</Text>
-    ) : null;
+    const selectedLocation = locationId ? options.locations.find(loc => loc.id === locationId) : null;
+    if (selectedLocation) {
+      return <Text style={styles.selectedText}>Selected Location: {selectedLocation.name}</Text>;
+    }
+    return null;
   };
-  
+
   const renderSelectedCategory = () => {
-    return selectedCategory ? (
-      <Text style={styles.selectedText}>Selected Category: {selectedCategory.name}</Text>
-    ) : null;
+    const selectedCategory = categoryId ? options.categories.find(cat => cat.id === categoryId) : null;
+    if (selectedCategory) {
+      return <Text style={styles.selectedText}>Selected Category: {selectedCategory.name}</Text>;
+    }
+    return null;
   };
-  
-  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -163,19 +162,18 @@ const AddNewReport = () => {
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text style={styles.modalTitle}>Select Location</Text>
-              <Picker
-                selectedValue={selectedLocation ? selectedLocation.id : ''}
-                onValueChange={(itemValue, itemIndex) => {
-                  console.log('Selected Location:', itemValue);
-                  setSelectedLocation(options.locations.find(loc => loc.id === itemValue));
-                }}
-                style={styles.picker}>
-                {options.locations.map((loc) => (
-                  <Picker.Item key={loc.id} label={loc.name} value={loc.id} />
-                ))}
-              </Picker>
-
-
+              <FlatList
+                data={options.locations}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => {
+                    setLocationId(item.id);
+                    setShowLocationPicker(false);
+                  }}>
+                    <Text style={styles.item}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
               <TouchableOpacity onPress={() => setShowLocationPicker(false)} style={[styles.modalButton, styles.closeButton]}>
                 <Text style={styles.modalButtonText}>Close</Text>
               </TouchableOpacity>
@@ -183,8 +181,8 @@ const AddNewReport = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-
       {renderSelectedLocation()}
+
       <TouchableOpacity onPress={() => setShowCategoryPicker(true)} style={styles.button}>
         <Text style={styles.buttonText}>Select Category</Text>
       </TouchableOpacity>
@@ -196,32 +194,36 @@ const AddNewReport = () => {
         <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-            <Picker
-              selectedValue={selectedCategory ? selectedCategory.id : ''}
-              onValueChange={(itemValue, itemIndex) => {
-                console.log('Selected Category:', itemValue);
-                setSelectedCategory(options.categories.find(cat => cat.id === itemValue));
-              }}
-              style={styles.picker}>
-              {options.categories.map((cat) => (
-                <Picker.Item key={cat.id} label={cat.name} value={cat.id} />
-              ))}
-            </Picker>
+              <Text style={styles.modalTitle}>Select Category</Text>
+              <FlatList
+                data={options.categories}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => {
+                    setCategoryId(item.id);
+                    setShowCategoryPicker(false);
+                  }}>
+                    <Text style={styles.item}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
               <TouchableOpacity onPress={() => setShowCategoryPicker(false)} style={[styles.modalButton, styles.closeButton]}>
                 <Text style={styles.modalButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
           </View>
-        </TouchableWithoutFeedback> 
+        </TouchableWithoutFeedback>
       </Modal>
-
       {renderSelectedCategory()}
+
       <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
         <Text style={styles.buttonText}>Submit Report</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 };
+
+// Remaining code is the same as before, I'll just adjust the styles
 
 const styles = StyleSheet.create({
   container: {
@@ -292,43 +294,68 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
+    height: '50%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalView: {
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 20, // Smoother, more modern look
     elevation: 5,
     minWidth: 300,
-    padding: 20,
+    padding: 25, // More padding for a spacious look
+    alignItems: 'center', // Center align the items
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 24, // Slightly larger for emphasis
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20, // Increase spacing for a less cramped feel
     textAlign: 'center',
     color: '#2c3e50',
   },
-  picker: {
+  pickerContainer: {
     borderWidth: 1,
     borderColor: '#bdc3c7',
     borderRadius: 8,
     marginBottom: 20,
+    maxHeight: 150,
+  },
+  picker: {
+    height: '100%',
+    width: '100%',
+    borderRadius: 8,
+  },
+  item: {
+    fontSize: 18, // Ensure items are legible
+    padding: 10, // More padding for a touch-friendly UI
+    borderWidth: 1, // Subtle borders for each item
+    borderColor: '#ecf0f1', // Soft color for the borders
+    borderRadius: 10, // Rounded corners for a modern look
+    marginVertical: 5, // Space between items
+    backgroundColor: '#ecf0f1', // Light background for each item
+    color: '#333', // Text color that contrasts well with the background
+    width: 250, // Fixed width for consistency
+    textAlign: 'center', // Center align text
   },
   modalButton: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#3498db', // Consistent button color
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 20, // Rounded corners for buttons
     alignItems: 'center',
+    alignSelf: 'stretch', // Stretch to fit the modal width
+    marginVertical: 10, // Space above and below
   },
   modalButtonText: {
     color: '#fff',
     fontSize: 18,
   },
   closeButton: {
-    marginTop: 10,
+    backgroundColor: '#95a5a6', // A more neutral close button color
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 18,
   },
   submitButton: {
     backgroundColor: '#27ae60',
@@ -338,5 +365,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
+
 
 export default AddNewReport;
