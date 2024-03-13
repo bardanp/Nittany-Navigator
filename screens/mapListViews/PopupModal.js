@@ -13,7 +13,8 @@ const PopupModal = ({ visible, onClose, item }) => {
   useEffect(() => {
     const fetchModalData = async () => {
       if (!item) return;
-      const documentRef = doc(firestore, item.isEvent ? 'events' : 'reports', item.id.substring(item.id.indexOf('-') + 1));
+      const documentId = item.id.split('-')[1]; 
+      const documentRef = doc(firestore, item.isEvent ? 'events' : 'reports', documentId);
       const docSnap = await getDoc(documentRef);
       if (docSnap.exists()) {
         setModalData(docSnap.data());
@@ -25,15 +26,23 @@ const PopupModal = ({ visible, onClose, item }) => {
   }, [item]);
 
   const formatDate = (timestamp) => {
-    if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
-      const date = new Date(timestamp.seconds * 1000);
-      return date.toLocaleDateString("en-US");
+    if (!timestamp) {
+      return 'N/A';
     }
-    return 'N/A';
+    const date = timestamp.toDate();
+    return date.toLocaleDateString("en-US", {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
+  
+  
 
-  const isEvent = !!modalData?.event_id;
-  const headerBackgroundColor = isEvent ? '#4CAF50' : '#F44336';
+  const isReport = true; 
+  const headerBackgroundColor = isReport ? '#F44336' : '#4CAF50'; 
   const textColor = '#333';
 
   return (
@@ -50,13 +59,13 @@ const PopupModal = ({ visible, onClose, item }) => {
             contentContainerStyle={styles.scrollViewContainer}
           >
             <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
-              <Text style={styles.category}>{isEvent ? 'Event Info' : 'Report Info'}</Text>
+              <Text style={styles.category}>{'Report Info'}</Text>
             </View>
-            {modalData?.image && !imageError ? (
+            {modalData?.image ? (
               <Image
                 source={{ uri: modalData.image }}
                 style={styles.image}
-                resizeMode= 'stretch'
+                resizeMode='stretch'
                 onError={() => setImageError(true)}
               />
             ) : (
@@ -69,18 +78,18 @@ const PopupModal = ({ visible, onClose, item }) => {
 
             <View style={styles.body}>
               <Text style={[styles.title, { color: textColor }]}>{modalData?.title}</Text>
-              <Text style={[styles.description, { color: textColor }]}>{modalData?.desc}</Text>
+              <Text style={[styles.description, { color: textColor }]}>{modalData?.description}</Text>
               <Text style={[styles.details, { color: textColor }]}>
-                {`Date: ${formatDate(modalData?.timestamp)}`}
+                {`Date: ${modalData?.dateTime ? formatDate(modalData.dateTime) : 'N/A'}`}
               </Text>
               <Text style={[styles.details, { color: textColor }]}>
                 {`Location: ${modalData?.location}`}
               </Text>
               <Text style={[styles.details, { color: textColor }]}>
-                {`Created by: ${modalData?.createdBy}`}
+                {`Category: ${modalData?.category}`}
               </Text>
               {modalData?.emergency && (
-                <Text style={[styles.emergency, styles.details]}>
+                <Text style={[styles.emergency, { color: textColor }]}>
                   EMERGENCY
                 </Text>
               )}

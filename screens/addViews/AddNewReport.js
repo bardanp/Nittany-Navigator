@@ -29,8 +29,8 @@ const AddNewReport = () => {
       quality: 1,
     });
   
-    if (!result.cancelled) {
-      const uri = result.uri;
+    if (!result.canceled && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
       setImage(uri);
     }
   };
@@ -107,6 +107,8 @@ const AddNewReport = () => {
     }
     return null;
   };
+
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -294,23 +296,26 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    height: '50%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalView: {
     backgroundColor: '#fff',
-    borderRadius: 20, // Smoother, more modern look
+    borderRadius: 20,
     elevation: 5,
     minWidth: 300,
-    padding: 25, // More padding for a spacious look
-    alignItems: 'center', // Center align the items
-  },
+    padding: 25,
+    alignItems: 'center',
+    maxHeight: '80%', 
+    alignSelf: 'center', 
+    marginTop: 'auto', 
+    marginBottom: 'auto',
+  },  
   modalTitle: {
-    fontSize: 24, // Slightly larger for emphasis
+    fontSize: 24, 
     fontWeight: 'bold',
-    marginBottom: 20, // Increase spacing for a less cramped feel
+    marginBottom: 20, 
     textAlign: 'center',
     color: '#2c3e50',
   },
@@ -351,7 +356,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   closeButton: {
-    backgroundColor: '#95a5a6', // A more neutral close button color
+    backgroundColor: '#7f8c8d',
+    marginTop: 10,
   },
   closeButtonText: {
     color: '#fff',

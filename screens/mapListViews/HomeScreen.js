@@ -9,7 +9,9 @@ import PopupModal from './PopupModal.js';
 import { firestore } from '../../backend/firebase.js'; 
 import { collection, getDocs } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
+import options from '../../backend/options.json';
 
+  
 
 const HomeScreen = ({  }) => {
     const navigation = useNavigation();
@@ -40,7 +42,6 @@ const HomeScreen = ({  }) => {
         setShowMap(!showMap);
     };
 
-    // useEffect hook for fetching data
     useFocusEffect(
         useCallback(() => {
             const fetchData = async () => {
@@ -68,6 +69,19 @@ const HomeScreen = ({  }) => {
         }, [])
     );
     
+    const formatDate = (timestamp) => {
+        if (!timestamp) {
+          return 'N/A';
+        }
+        const date = timestamp.toDate();
+        return date.toLocaleDateString("en-US", {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      };
 
     useEffect(() => {
         navigation.setOptions({
@@ -134,6 +148,62 @@ const HomeScreen = ({  }) => {
         setMapRegion(pennStateCoords);
         setShowMap(true);
     };
+
+    const getCategoryIcon = (categoryName) => {
+        switch (categoryName) {
+            case 'Emergency':
+                return { icon: 'warning', color: '#ff0000' };
+            case 'School Closure':
+                return { icon: 'school', color: '#ff5722' }; 
+            case 'Construction':
+                return { icon: 'construction', color: '#ff9800' }; 
+            case 'Maintenance':
+                return { icon: 'build', color: '#ffeb3b' }; 
+            case 'Other':
+            default:
+                return { icon: 'info', color: '#607d8b' }; 
+        }
+    };
+
+    const getIconName = (item) => {
+        if (item.isEvent) {
+            return { icon: 'event', color: '#1976d2' };
+        } else if (item.isReport) {
+            return getCategoryIcon(item.category); 
+        } else {
+            return { icon: 'help_outline', color: '#9e9e9e' }; 
+        }
+    };
+
+    
+
+    const renderMarkers = () => {
+        return listData.filter(item => item.isReport).map((item) => {
+            const location = options.locations.find(loc => loc.name === item.location);
+            if (location) {
+                const { icon, color } = getIconName(item);
+    
+    
+                return (
+                    <Marker
+                        key={item.id}
+                        coordinate={{
+                            latitude: location.latitude,
+                            longitude: location.longitude
+                        }}
+                        onPress={() => handleCalloutPress(item)}>
+                        <Icon name={icon} size={30} color={color} />
+                    </Marker>
+                );
+            }
+            return null;
+        }).filter(marker => marker !== null);
+    };
+    
+    const handleCalloutPress = (item) => {
+        setSelectedItem(item);
+        setModalVisible(true);
+    };
       
 
     const goToUserLocation = async () => {
@@ -151,76 +221,54 @@ const HomeScreen = ({  }) => {
         });
         setShowMap(true);
     };
-
-
-    const getIconName = (item) => {
-        if (item.isEvent) {
-          return 'event';
-        } else {
-          return 'report-problem';
-        }
-      };
-    
-
-      const handleCalloutPress = (item) => {
-        setSelectedItem(item); 
-        setModalVisible(true); 
-    };
-    
+      
 
     const renderItem = ({ item }) => {
+        const { icon, color } = getIconName(item);
     
-        const handleMap = (latitude, longitude) => {
-            setMapRegion({
-                latitude,
-                longitude,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
-            });
-            setShowMap(true);
+        const handleMap = (itemLocation) => {
+            const location = options.locations.find(loc => loc.name === itemLocation);
+        
+            if (location) {
+                setMapRegion({
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    latitudeDelta: 0.005,
+                    longitudeDelta: 0.005,
+                });
+                setShowMap(true); 
+            } else {
+                console.log('Location not found for:', itemLocation); 
+            }
         };
         
-        const handleDesc = (item) => {
+        
+        const handleDesc = () => {
             setSelectedItem(item); 
             setModalVisible(true); 
         };
-    
-        const formatDate = (timestamp) => {
-            if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
-                const date = new Date(timestamp.seconds * 1000);
-                return date.toLocaleDateString();
-            }
-            return 'N/A';
-        };
-        
 
 
         return (
-            <View style={[styles.eventItem, item.emergency && styles.emergencyItem]}>
-                <View style={{flex: 1}}>
+            <View style={styles.eventItem}>
+                <View style={[styles.iconContainer, { backgroundColor: color }]}>
+                    <Icon name={icon} size={24} color="#fff" />
+                </View>
+                <View style={{ flex: 1 }}>
                     <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.info}>{`Date: ${formatDate(item.timestamp)}`}</Text>
+                    <Text style={styles.info}>{`Date: ${item.dateTime ? formatDate(item.dateTime) : 'N/A'}`}</Text>
                     <Text style={styles.info}>{`Location: ${item.location}`}</Text>
-                    <Text style={styles.info}>{`Created by: ${item.createdBy}`}</Text>
                     {item.participants && <Text style={styles.info}>{`Participants: ${item.participants}`}</Text>}
-                    {item.emergency && <Text style={styles.emergency}>EMERGENCY</Text>}
                 </View>
                 <View style={styles.buttonsContainer}>
-                <TouchableOpacity onPress={() => handleMap(item.latitude, item.longitude)} style={[styles.button, styles.mapButton]}>
+                <TouchableOpacity onPress={() => handleMap(item.location)} style={styles.button}>
                     <Icon name="map" size={20} color="#fff" />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => handleDesc(item)} style={[styles.button, styles.infoButton]}>
+                <TouchableOpacity onPress={handleDesc} style={styles.button}>
                     <Icon name="info" size={20} color="#fff" />
                 </TouchableOpacity>
-
-                <PopupModal
-                visible={modalVisible}
-                transparent={true}
-                onClose={() => setModalVisible(false)}
-                item={selectedItem}
-            />
-                </View>
+            </View>
             </View>
         );
     };
@@ -231,19 +279,12 @@ const HomeScreen = ({  }) => {
             {showMap ? (
                 <>
                     <MapView style={styles.map} region={mapRegion}>
-                        {listData.map((item) => (
-                            <Marker
-                                key={item.id}
-                                coordinate={{ latitude: item.latitude, longitude: item.longitude }}
-                                onPress={() => handleCalloutPress(item)}
-                            >
-                                <Icon name={getIconName(item)} size={30} color={item.isEvent ? "#007bff" : "#ff0000"} />
-                            </Marker>
-                        ))}
+                        {renderMarkers()}
+
                         {userLocation && (
                             <Marker
                                 coordinate={userLocation}
-                                title="My Location"
+                                title="Current Location"
                             >
                                 <Icon name="location-pin" size={30} color="#007bff" />
                             </Marker>

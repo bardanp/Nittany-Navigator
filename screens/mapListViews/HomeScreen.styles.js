@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5', 
+        backgroundColor: '#F0F0F0',
     },
     map: {
         flex: 1,
@@ -13,6 +13,14 @@ export default StyleSheet.create({
         bottom: 20,
         right: 20, 
         backgroundColor: 'transparent',
+    },
+    iconContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 16,
     },
     zoomButton: {
         backgroundColor: '#ffffff', 
@@ -58,8 +66,6 @@ export default StyleSheet.create({
         width: 30,
         height: 30, 
     },
-
-    // Styles for the list view
     emergencyItem: {
         borderColor: 'red', 
         borderWidth: 2,
@@ -68,7 +74,6 @@ export default StyleSheet.create({
         color: 'red',
         fontWeight: 'bold',
     },
-    
     eventItem: {
         backgroundColor: '#ffffff',
         borderRadius: 8,
@@ -90,46 +95,43 @@ export default StyleSheet.create({
         color: '#333',
         marginBottom: 4,
     },
-    info: {
-        fontSize: 12,
-        color: '#666',
-        marginBottom: 4,
-    },
     description: {
         fontSize: 12,
         color: '#999',
         lineHeight: 18,
     },
+    buttonsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 'auto',
+    },
     button: {
-        width: 32,
-        height: 32,
+        marginLeft: 8,
+        width: 36,
+        height: 36,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 16,
+        borderRadius: 18,
         backgroundColor: '#007bff',
-        marginBottom: 4,
-    },
-    infoButton: {
-        backgroundColor: '#28a745',
     },
     buttonText: {
         color: '#fff',
         fontSize: 12,
         fontWeight: 'bold',
     },
-    customMarker: {
-        backgroundColor: "#FFF",
-        padding: 5,
-        borderRadius: 5,
-        borderColor: '#CCC',
-        borderWidth: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      markerText: {
-        color: '#333',
-        fontWeight: 'bold',
-      },
+        customMarker: {
+            backgroundColor: 'white',
+            padding: 5,
+            borderRadius: 15,
+            borderWidth: 1,
+            borderColor: 'gray',
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        markerText: {
+            fontWeight: 'bold',
+            color: 'black',
+        },
       customCallout: {
         borderRadius: 5,
         padding: 10,
@@ -155,5 +157,4 @@ export default StyleSheet.create({
         color: "#ffffff",
         textAlign: "center",
       },
-      
 });

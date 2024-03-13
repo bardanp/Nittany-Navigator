@@ -1,18 +1,18 @@
 {
   "locations": [
-    {"id": "1", "name": "Olmstead Building"},
-    {"id": "2", "name": "(SEC) Student Enrichment Center"},
-    {"id": "3", "name": "(CUB) Capital Union Building"},
-    {"id": "4", "name": "(EAB) Educational Activities Building"},
-    {"id": "5", "name": "Science and Technology Building"},
-    {"id": "6", "name": "Courtyard"},
-    {"id": "7", "name": "Library"}
+    {"id": "1", "name": "Olmstead Building", "latitude": 40.205257, "longitude": -76.741986},
+    {"id": "2", "name": "(SEC) Student Enrichment Center", "latitude": 40.203833, "longitude": -76.742250},
+    {"id": "3", "name": "(CUB) Capital Union Building", "latitude": 40.202176, "longitude": -76.741669},
+    {"id": "4", "name": "(EAB) Educational Activities Building", "latitude": 40.202734, "longitude": -76.743001},
+    {"id": "5", "name": "Science and Technology Building", "latitude": 40.204592, "longitude": -76.742290},
+    {"id": "6", "name": "Courtyard", "latitude": 40.204657, "longitude": -76.741640},
+    {"id": "7", "name": "Library", "latitude": 40.204268, "longitude": -76.741330}
   ],
   "categories": [
-    {"id": "1", "name": "Emergency"},
-    {"id": "2", "name": "School Closure"},
-    {"id": "3", "name": "Construction"},
-    {"id": "4", "name": "Maintenance"},
-    {"id": "5", "name": "Other"}
+    {"id": "1", "name": "Emergency", "icon": "warning", "color": "#ff0000"},
+    {"id": "2", "name": "School Closure", "icon": "school", "color": "#ff5722"},
+    {"id": "3", "name": "Construction", "icon": "construction", "color": "#ff9800"},
+    {"id": "4", "name": "Maintenance", "icon": "build", "color": "#ffeb3b"},
+    {"id": "5", "name": "Other", "icon": "info", "color": "#607d8b"}
   ]
 }
