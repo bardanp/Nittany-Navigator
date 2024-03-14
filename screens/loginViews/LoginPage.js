@@ -8,7 +8,6 @@ import { jwtDecode } from 'jwt-decode';
 import { decode, encode } from "base-64";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 if (!global.atob) {
   global.atob = decode;
 }
@@ -16,7 +15,6 @@ if (!global.atob) {
 if (!global.btoa) {
   global.btoa = encode;
 }
-
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -62,9 +60,6 @@ const LoginPage = ({ navigation }) => {
     }
   };
   
-  
-  
-
   const handleLoginPress = () => {
     // navigation.navigate('MainMenu');
 

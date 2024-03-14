@@ -13,7 +13,7 @@ const PopupModal = ({ visible, onClose, item }) => {
   useEffect(() => {
     const fetchModalData = async () => {
       if (!item) return;
-      const documentId = item.id.split('-')[1]; 
+      const documentId = item.id.split('-')[1];
       const documentRef = doc(firestore, item.isEvent ? 'events' : 'reports', documentId);
       const docSnap = await getDoc(documentRef);
       if (docSnap.exists()) {
@@ -38,11 +38,13 @@ const PopupModal = ({ visible, onClose, item }) => {
       minute: '2-digit',
     });
   };
-  
-  
 
-  const isReport = true; 
-  const headerBackgroundColor = isReport ? '#F44336' : '#4CAF50'; 
+  const createdBy = modalData?.createdBy
+    ? `Created by: ${modalData.createdBy}`
+    : 'Created by: Unknown';
+
+  const isReport = true;
+  const headerBackgroundColor = isReport ? '#F44336' : '#4CAF50';
   const textColor = '#333';
 
   return (
@@ -87,6 +89,9 @@ const PopupModal = ({ visible, onClose, item }) => {
               </Text>
               <Text style={[styles.details, { color: textColor }]}>
                 {`Category: ${modalData?.category}`}
+              </Text>
+              <Text style={[styles.details, { color: textColor }]}>
+                {createdBy}
               </Text>
               {modalData?.emergency && (
                 <Text style={[styles.emergency, { color: textColor }]}>

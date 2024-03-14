@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Switch, Alert, Image, Modal, StyleSheet, ScrollView, TouchableWithoutFeedback, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Switch,
+  Alert,
+  Image,
+  Modal,
+  StyleSheet,
+  ScrollView,
+  TouchableWithoutFeedback,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';
-import { firestore, storage } from '../../backend/firebase';
+import { auth, firestore, storage } from '../../backend/firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import options from '../../backend/options.json';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddNewReport = () => {
   const [title, setTitle] = useState('');
@@ -20,67 +34,51 @@ const AddNewReport = () => {
   const [categoryId, setCategoryId] = useState(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const navigation = useNavigation();
-
-  const handleImagePick = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
   
-    if (!result.canceled && result.assets.length > 0) {
-      const uri = result.assets[0].uri;
-      setImage(uri);
-    }
-  };
-  
-
-  const uploadImageAsync = async (uri) => {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        console.error(e);
-        reject(new TypeError('Network request failed'));
-      };
-      xhr.responseType = 'blob';
-      xhr.open('GET', uri, true);
-      xhr.send(null);
-    });
-
-    const fileRef = ref(storage, `reports/${Date.now()}`);
-    await uploadBytes(fileRef, blob);
-    blob.close();
-
-    return await getDownloadURL(fileRef);
-  };
-
   const handleSubmit = async () => {
-    const imageUrl = image ? await uploadImageAsync(image) : '';
+    console.log('Submitting report...');
     try {
-      await addDoc(collection(firestore, 'reports'), {
-        title,
-        emergency,
-        description,
-        image: imageUrl,
-        dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
-        location: locationId ? options.locations.find(loc => loc.id === locationId).name : '',
-        category: categoryId ? options.categories.find(cat => cat.id === categoryId).name : '',
-      });
-      Alert.alert("Success", "Report added successfully!");
-      navigation.goBack();
+  
+      const userInfoString = await AsyncStorage.getItem('userInfo');
+      if (userInfoString) {
+        console.log('User info found:', userInfoString);
+        const userInfo = JSON.parse(userInfoString);
+        const createdBy = `${userInfo.firstName} ${userInfo.lastName.charAt(0)}.`;
+  
+        await addDoc(collection(firestore, 'reports'), {
+          title,
+          emergency,
+          description,
+          dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
+          location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
+          category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
+          createdBy: createdBy,
+        });
+  
+        console.log('Report added successfully!');
+        Alert.alert('Success', 'Report added successfully!');
+        navigation.goBack();
+      } else {
+        console.log('User information not found.');
+        Alert.alert('Error', 'User information not found.');
+      }
     } catch (error) {
       console.error('Error adding report to Firestore:', error);
-      Alert.alert("Error", "Failed to add the report.");
+      Alert.alert('Error', 'Failed to add the report.');
     }
   };
+  
 
   const renderImage = () => {
     if (image) {
-      return <Image source={{ uri: image }} style={styles.image} />;
+      return (
+        <View>
+          <Image source={{ uri: image }} style={styles.image} />
+          <TouchableOpacity onPress={clearImage} style={styles.clearButton}>
+            <Text style={styles.clearButtonText}>Remove Image</Text>
+          </TouchableOpacity>
+        </View>
+      );
     }
     return null;
   };
@@ -93,7 +91,7 @@ const AddNewReport = () => {
   };
 
   const renderSelectedLocation = () => {
-    const selectedLocation = locationId ? options.locations.find(loc => loc.id === locationId) : null;
+    const selectedLocation = locationId ? options.locations.find((loc) => loc.id === locationId) : null;
     if (selectedLocation) {
       return <Text style={styles.selectedText}>Selected Location: {selectedLocation.name}</Text>;
     }
@@ -101,14 +99,12 @@ const AddNewReport = () => {
   };
 
   const renderSelectedCategory = () => {
-    const selectedCategory = categoryId ? options.categories.find(cat => cat.id === categoryId) : null;
+    const selectedCategory = categoryId ? options.categories.find((cat) => cat.id === categoryId) : null;
     if (selectedCategory) {
       return <Text style={styles.selectedText}>Selected Category: {selectedCategory.name}</Text>;
     }
     return null;
   };
-
-  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -118,14 +114,15 @@ const AddNewReport = () => {
         placeholder="Title"
         onChangeText={setTitle}
         value={title}
+        placeholderTextColor="#999"
       />
       <View style={styles.switchContainer}>
         <Text style={styles.label}>Emergency:</Text>
         <Switch
           onValueChange={setEmergency}
           value={emergency}
-          trackColor={{ false: "#767577", true: "#f39c12" }}
-          thumbColor={emergency ? "#f5dd4b" : "#f4f3f4"}
+          trackColor={{ false: '#ccc', true: '#3498db' }}
+          thumbColor={emergency ? '#fff' : '#f4f3f4'}
         />
       </View>
       <TextInput
@@ -134,11 +131,14 @@ const AddNewReport = () => {
         multiline
         onChangeText={setDescription}
         value={description}
+        placeholderTextColor="#999"
       />
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.button}>
-        <Text style={styles.buttonText}>Pick Date & Time</Text>
-      </TouchableOpacity>
-      {renderSelectedDate()}
+      <View style={styles.actionContainer}>
+        <Text style={styles.actionText} onPress={() => setShowDatePicker(true)}>
+          Pick Date & Time
+        </Text>
+        {renderSelectedDate()}
+      </View>
       <DateTimePickerModal
         isVisible={showDatePicker}
         mode="datetime"
@@ -148,18 +148,18 @@ const AddNewReport = () => {
         }}
         onCancel={() => setShowDatePicker(false)}
       />
-      <TouchableOpacity onPress={handleImagePick} style={styles.button}>
-        <Text style={styles.buttonText}>Pick Image (Optional)</Text>
-      </TouchableOpacity>
-      {renderImage()}
-      <TouchableOpacity onPress={() => setShowLocationPicker(true)} style={styles.button}>
-        <Text style={styles.buttonText}>Select Location (Optional)</Text>
-      </TouchableOpacity>
+      <View style={styles.actionContainer}>
+        <Text style={styles.actionText} onPress={() => setShowLocationPicker(true)}>
+          Select Location
+        </Text>
+        {renderSelectedLocation()}
+      </View>
       <Modal
         visible={showLocationPicker}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowLocationPicker(false)}>
+        onRequestClose={() => setShowLocationPicker(false)}
+      >
         <TouchableWithoutFeedback onPress={() => setShowLocationPicker(false)}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
@@ -168,31 +168,38 @@ const AddNewReport = () => {
                 data={options.locations}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => {
-                    setLocationId(item.id);
-                    setShowLocationPicker(false);
-                  }}>
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setLocationId(item.id);
+                      setShowLocationPicker(false);
+                    }}
+                  >
                     <Text style={styles.item}>{item.name}</Text>
-                  </TouchableOpacity>
+                  </TouchableWithoutFeedback>
                 )}
               />
-              <TouchableOpacity onPress={() => setShowLocationPicker(false)} style={[styles.modalButton, styles.closeButton]}>
-                <Text style={styles.modalButtonText}>Close</Text>
-              </TouchableOpacity>
+              <TouchableWithoutFeedback onPress={() => setShowLocationPicker(false)}>
+                <View style={[styles.modalButton, styles.closeButton]}>
+                  <Text style={styles.modalButtonText}>Close</Text>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      {renderSelectedLocation()}
 
-      <TouchableOpacity onPress={() => setShowCategoryPicker(true)} style={styles.button}>
-        <Text style={styles.buttonText}>Select Category</Text>
-      </TouchableOpacity>
+      <View style={styles.actionContainer}>
+        <Text style={styles.actionText} onPress={() => setShowCategoryPicker(true)}>
+          Select Category
+        </Text>
+        {renderSelectedCategory()}
+      </View>
       <Modal
         visible={showCategoryPicker}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowCategoryPicker(false)}>
+        onRequestClose={() => setShowCategoryPicker(false)}
+      >
         <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
@@ -201,70 +208,87 @@ const AddNewReport = () => {
                 data={options.categories}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => {
-                    setCategoryId(item.id);
-                    setShowCategoryPicker(false);
-                  }}>
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setCategoryId(item.id);
+                      setShowCategoryPicker(false);
+                    }}
+                  >
                     <Text style={styles.item}>{item.name}</Text>
-                  </TouchableOpacity>
+                  </TouchableWithoutFeedback>
                 )}
               />
-              <TouchableOpacity onPress={() => setShowCategoryPicker(false)} style={[styles.modalButton, styles.closeButton]}>
-                <Text style={styles.modalButtonText}>Close</Text>
-              </TouchableOpacity>
+              <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>
+                <View style={[styles.modalButton, styles.closeButton]}>
+                  <Text style={styles.modalButtonText}>Close</Text>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      {renderSelectedCategory()}
 
-      <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-        <Text style={styles.buttonText}>Submit Report</Text>
-      </TouchableOpacity>
+      <TouchableWithoutFeedback onPress={handleSubmit}>
+        <View style={styles.submitButton}>
+          <Text style={styles.buttonText}>Submit Report</Text>
+        </View>
+      </TouchableWithoutFeedback>
     </ScrollView>
   );
 };
-
-// Remaining code is the same as before, I'll just adjust the styles
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   header: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
-    color: '#2c3e50',
+    marginBottom: 20,
+    color: '#333',
   },
   label: {
     fontSize: 18,
     marginRight: 10,
     color: '#333',
   },
+  clearButton: {
+    backgroundColor: '#ff6347',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  clearButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#bdc3c7',
+    borderColor: '#ccc',
     borderRadius: 8,
-    padding: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
     marginBottom: 20,
-    backgroundColor: '#ecf0f1',
-    fontSize: 18,
+    width: '100%',
+    backgroundColor: '#f9f9f9',
+    fontSize: 16,
     color: '#333',
   },
   inputMultiline: {
     borderWidth: 1,
-    borderColor: '#bdc3c7',
+    borderColor: '#ccc',
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
     minHeight: 150,
-    textAlignVertical: 'top',
-    backgroundColor: '#ecf0f1',
-    fontSize: 18,
+    width: '100%',
+    backgroundColor: '#f9f9f9',
+    fontSize: 16,
     color: '#333',
   },
   switchContainer: {
@@ -272,19 +296,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  button: {
-    backgroundColor: '#3498db',
-    padding: 18,
-    borderRadius: 8,
-    alignItems: 'center',
+  actionContainer: {
+    width: '100%',
     marginBottom: 20,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
+  actionText: {
+    color: '#3498db',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   selectedText: {
-    fontSize: 18,
+    fontSize: 16,
     marginBottom: 10,
     color: '#333',
   },
@@ -302,75 +325,66 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: '#fff',
-    borderRadius: 20,
+    borderRadius: 12,
     elevation: 5,
-    minWidth: 300,
     padding: 25,
     alignItems: 'center',
-    maxHeight: '80%', 
-    alignSelf: 'center', 
-    marginTop: 'auto', 
+    maxHeight: '80%',
+    alignSelf: 'center',
+    marginTop: 'auto',
     marginBottom: 'auto',
-  },  
+  },
   modalTitle: {
-    fontSize: 24, 
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20, 
-    textAlign: 'center',
-    color: '#2c3e50',
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#bdc3c7',
-    borderRadius: 8,
     marginBottom: 20,
-    maxHeight: 150,
-  },
-  picker: {
-    height: '100%',
-    width: '100%',
-    borderRadius: 8,
+    textAlign: 'center',
+    color: '#333',
   },
   item: {
-    fontSize: 18, // Ensure items are legible
-    padding: 10, // More padding for a touch-friendly UI
-    borderWidth: 1, // Subtle borders for each item
-    borderColor: '#ecf0f1', // Soft color for the borders
-    borderRadius: 10, // Rounded corners for a modern look
-    marginVertical: 5, // Space between items
-    backgroundColor: '#ecf0f1', // Light background for each item
-    color: '#333', // Text color that contrasts well with the background
-    width: 250, // Fixed width for consistency
-    textAlign: 'center', // Center align text
+    fontSize: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderColor: '#eee',
+    borderRadius: 8,
+    marginVertical: 5,
+    backgroundColor: '#f9f9f9',
+    color: '#333',
+    width: '100%',
+    textAlign: 'center',
   },
   modalButton: {
-    backgroundColor: '#3498db', // Consistent button color
-    padding: 15,
-    borderRadius: 20, // Rounded corners for buttons
+    backgroundColor: '#3498db',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
     alignItems: 'center',
-    alignSelf: 'stretch', // Stretch to fit the modal width
-    marginVertical: 10, // Space above and below
+    alignSelf: 'stretch',
+    marginVertical: 10,
   },
   modalButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   closeButton: {
-    backgroundColor: '#7f8c8d',
+    backgroundColor: '#bdc3c7',
     marginTop: 10,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 18,
   },
   submitButton: {
     backgroundColor: '#27ae60',
-    padding: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 25,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 20,
   },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
-
 
 export default AddNewReport;

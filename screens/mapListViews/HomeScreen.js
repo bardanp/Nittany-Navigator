@@ -22,7 +22,6 @@ const HomeScreen = ({  }) => {
     const [userLocation, setUserLocation] = useState(null);
 
     
-    
     const [showMap, setShowMap] = useState(true);
     const [mapRegion, setMapRegion] = useState({
         latitude: 40.204444839295846,
@@ -183,7 +182,6 @@ const HomeScreen = ({  }) => {
             if (location) {
                 const { icon, color } = getIconName(item);
     
-    
                 return (
                     <Marker
                         key={item.id}
@@ -198,7 +196,7 @@ const HomeScreen = ({  }) => {
             }
             return null;
         }).filter(marker => marker !== null);
-    };
+    }; 
     
     const handleCalloutPress = (item) => {
         setSelectedItem(item);
@@ -226,9 +224,9 @@ const HomeScreen = ({  }) => {
     const renderItem = ({ item }) => {
         const { icon, color } = getIconName(item);
     
-        const handleMap = (itemLocation) => {
-            const location = options.locations.find(loc => loc.name === itemLocation);
-        
+        const handleMap = () => {
+            const location = options.locations.find(loc => loc.name === item.location);
+    
             if (location) {
                 setMapRegion({
                     latitude: location.latitude,
@@ -236,19 +234,17 @@ const HomeScreen = ({  }) => {
                     latitudeDelta: 0.005,
                     longitudeDelta: 0.005,
                 });
-                setShowMap(true); 
+                setShowMap(true);
             } else {
-                console.log('Location not found for:', itemLocation); 
+                console.log('Location not found for:', item.location);
             }
         };
-        
-        
+    
         const handleDesc = () => {
-            setSelectedItem(item); 
-            setModalVisible(true); 
+            setSelectedItem(item);
+            setModalVisible(true);
         };
-
-
+    
         return (
             <View style={styles.eventItem}>
                 <View style={[styles.iconContainer, { backgroundColor: color }]}>
@@ -261,14 +257,14 @@ const HomeScreen = ({  }) => {
                     {item.participants && <Text style={styles.info}>{`Participants: ${item.participants}`}</Text>}
                 </View>
                 <View style={styles.buttonsContainer}>
-                <TouchableOpacity onPress={() => handleMap(item.location)} style={styles.button}>
-                    <Icon name="map" size={20} color="#fff" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={handleDesc} style={styles.button}>
-                    <Icon name="info" size={20} color="#fff" />
-                </TouchableOpacity>
-            </View>
+                    <TouchableOpacity onPress={handleMap} style={styles.button}>
+                        <Icon name="map" size={20} color="#fff" />
+                    </TouchableOpacity>
+    
+                    <TouchableOpacity onPress={handleDesc} style={styles.button}>
+                        <Icon name="info" size={20} color="#fff" />
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     };
