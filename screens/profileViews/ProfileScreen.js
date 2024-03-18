@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-n
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native'; // Ensure you have this if you're using navigation
+import { useNavigation } from '@react-navigation/native'; 
 
 const ProfileScreen = () => {
   const [userInfo, setUserInfo] = useState({
@@ -11,28 +11,37 @@ const ProfileScreen = () => {
     fullName: 'Loading...',
     primaryAffiliation: 'Not specified',
     profilePicUri: null,
+    campus: 'Not specified', 
   });
+  
 
   const navigation = useNavigation();
 
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  }
+
   useEffect(() => {
     const loadUserInfo = async () => {
-      const userInfoString = await AsyncStorage.getItem('userInfo');
-      if (userInfoString) {
-        const userInfo = JSON.parse(userInfoString);
-        setUserInfo({
-          email: userInfo.email,
-          fullName: `${userInfo.firstName} ${userInfo.lastName}`,
-          primaryAffiliation: userInfo.primaryAffiliation,
-          profilePicUri: userInfo.profilePicUri,
-        });
-      }
+        const userInfoString = await AsyncStorage.getItem('userInfo');
+        if (userInfoString) {
+            const userInfo = JSON.parse(userInfoString);
+            setUserInfo({
+                email: userInfo.email,
+                fullName: `${userInfo.firstName} ${userInfo.lastName}`,
+                primaryAffiliation: capitalizeFirstLetter(userInfo.userType), 
+                campus: userInfo.campus,
+            });
+        }
     };
     loadUserInfo();
   }, []);
+
   
 
   const profilePicSource = userInfo.profilePicUri ? { uri: userInfo.profilePicUri } : require('../../assets/no-profile.png');
+  const isAdminUser = ['STAFF', 'FACULTY'].includes(userInfo.primaryAffiliation.toUpperCase());
+
 
   const profileOptions = [
       { title: 'Event History', description: 'View past events and their details.', iconName: 'history', handler: 'EventHistory' },
@@ -40,6 +49,16 @@ const ProfileScreen = () => {
       { title: 'About', description: 'Learn more about the application and its creators.', iconName: 'info', handler: 'About' },
       { title: 'Settings', description: 'Adjust profile settings and preferences.', iconName: 'settings', handler: 'Settings' },
     ];
+
+    if (isAdminUser) {
+      profileOptions.push({
+        title: 'Admin Panel',
+        description: 'Access admin features and settings.',
+        iconName: 'admin-panel-settings',
+        handler: 'AdminPanel', 
+      });
+    }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -49,8 +68,10 @@ const ProfileScreen = () => {
           <View style={styles.userInfo}>
             <Text style={styles.username}>{userInfo.fullName}</Text>
             <Text style={styles.userDetail}>{userInfo.email}</Text>
-            <Text style={styles.userDetail}>User type: {userInfo.primaryAffiliation}</Text>
+            <Text style={styles.userDetail}>Campus: {userInfo.campus}</Text> 
+            <Text style={styles.userDetail}>User Type: {userInfo.primaryAffiliation}</Text>
           </View>
+
         </View>
 
         <View style={styles.profileOptions}>
@@ -81,7 +102,6 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     alignItems: 'center',
-    marginBottom: 40,
   },
   profileIcon: {
     width: 120,

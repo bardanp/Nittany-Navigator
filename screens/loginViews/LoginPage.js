@@ -38,20 +38,21 @@ const LoginPage = ({ navigation }) => {
 
   const saveUserInfo = async (accessToken) => {
     try {
-      const graphResponse = await fetch('https://graph.microsoft.com/v1.0/me?$select=displayName,givenName,surname,mail,userPrincipalName,extension_d5d2dec11315480f87b23402ce132717_primaryAffiliation', {
+      const graphResponse = await fetch('https://graph.microsoft.com/v1.0/me?$select=displayName,givenName,surname,mail,userPrincipalName,extension_b82288b902534da7beb676a3535134f5_extensionAttribute1,extension_b82288b902534da7beb676a3535134f5_extensionAttribute4', {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         }
       });
       const userInfo = await graphResponse.json();
-      console.log('User info from Graph API:', userInfo);
+      console.log('User info:', userInfo);
   
       const formattedUserInfo = {
         email: userInfo.mail || userInfo.userPrincipalName,
         firstName: userInfo.givenName,
         lastName: userInfo.surname,
-        primaryAffiliation: userInfo.jobTitle || 'Not specified', 
+        userType: userInfo['extension_b82288b902534da7beb676a3535134f5_extensionAttribute1'] || 'Not specified',
+        campus: userInfo['extension_b82288b902534da7beb676a3535134f5_extensionAttribute4'] || 'Not specified', // Save campus information
       };
   
       await AsyncStorage.setItem('userInfo', JSON.stringify(formattedUserInfo));
@@ -60,8 +61,8 @@ const LoginPage = ({ navigation }) => {
     }
   };
   
+
   const handleLoginPress = () => {
-    // navigation.navigate('MainMenu');
 
     promptAsync().then((codeResponse) => {
       if (request && codeResponse?.type === 'success' && discovery) {

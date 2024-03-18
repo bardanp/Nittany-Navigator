@@ -7,9 +7,15 @@ import MainMenu from "./screens/loginViews/MainMenu";
 import ProfileScreen from "./screens/profileViews/ProfileScreen";
 import SettingsScreen from "./screens/profileViews/views/SettingScreen";
 import SubmitSuccessScreen from "./screens/addViews/SubmitSuccessScreen";
+import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
 
 import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
+import EventHistory from "./screens/profileViews/views/EventHistory";
+import ReportHistory from "./screens/profileViews/views/ReportHistory";
+import About from "./screens/profileViews/views/About";
+
+
 
 const Stack = createStackNavigator();
 
@@ -62,6 +68,26 @@ const App = () => {
         <Stack.Screen
           name="SubmitSuccess"
           component={SubmitSuccessScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AdminPanel"
+          component={AdminPanel}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EventHistory"
+          component={EventHistory}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ReportHistory"
+          component={ReportHistory}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="About"
+          component={About}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

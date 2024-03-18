@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,26 +20,20 @@ const SettingScreen = () => {
 
   const handleLogout = async () => {
     try {
-      // Remove user info from AsyncStorage
       await AsyncStorage.removeItem('userInfo');
-  
-      // Construct logout URL
+
       const logoutUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(makeRedirectUri({
         scheme: 'nittany-navigator', 
       }))}`;
   
-      // Log the logout URL for debugging
       console.log('User logged out. Redirecting to:', logoutUrl);
   
-      // Open browser to perform logout
       await WebBrowser.openBrowserAsync(logoutUrl);
   
-      // Navigate to login page
       navigation.navigate('LoginPage'); 
       alert('You have been logged out.');
     } catch (error) {
       console.error('Error logging out:', error);
-      // Handle error if necessary
     }
   };
   
@@ -55,7 +49,7 @@ const SettingScreen = () => {
         </View>
 
         {settingsOptions.map((option, index) => (
-          <TouchableOpacity style={styles.optionContainer} key={index} onPress={() => navigation.navigate(option.handler)}>
+          <TouchableOpacity style={styles.optionContainer} key={index} onPress={() => Alert.alert("Coming Soon!")}>
             <View style={styles.optionIcon}>
               <MaterialIcons name={option.iconName} size={28} color="#007AFF" />
             </View>
