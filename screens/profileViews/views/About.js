@@ -36,7 +36,7 @@ const About = () => {
             </View>
 
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                <Text style={styles.backButtonText}>Go Back</Text>
+                <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
         </ScrollView>
     );

@@ -157,4 +157,13 @@ export default StyleSheet.create({
         color: "#ffffff",
         textAlign: "center",
       },
+      customMarker: {
+        backgroundColor: '#007bff',
+        borderRadius: 15,
+        padding: 5
+    },
+    customMarkerText: {
+        color: '#fff',
+        fontWeight: 'bold'
+    }
 });

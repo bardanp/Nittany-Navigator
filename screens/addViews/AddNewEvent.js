@@ -1,45 +1,103 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Switch,
+  Alert,
+  Image,
+  Modal,
+  StyleSheet,
+  ScrollView,
+  TouchableWithoutFeedback,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { firestore } from '../../backend/firebase';
+import * as ImagePicker from 'expo-image-picker';
+import { auth, firestore, storage } from '../../backend/firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import options from '../../backend/options.json';
 import { useNavigation } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddNewEvent = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [image, setImage] = useState(null);
   const [date, setDate] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [location, setLocation] = useState('');
+  const [locationId, setLocationId] = useState(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [organizer, setOrganizer] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [rsvpCount, setRsvpCount] = useState(0);
+  const [categoryId, setCategoryId] = useState(null);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const navigation = useNavigation();
 
   const handleSubmit = async () => {
+    console.log('Submitting event...');
     try {
-      await addDoc(collection(firestore, 'events'), {
+
+      const eventInfo = {
         title,
         description,
+        image: "",
         dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
-        location,
-      });
-      console.log('Event added to Firestore successfully!');
-      navigation.navigate('SubmitSuccess');
+        location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
+        organizer,
+        contactEmail,
+        rsvpCount,
+        category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
+        submitedOn: Timestamp.now(),
+      };
+
+      await addDoc(collection(firestore, 'events'), eventInfo);
+
+      console.log('Event added successfully!');
+      Alert.alert('Success', 'Event added successfully!');
+      navigation.goBack();
+
     } catch (error) {
       console.error('Error adding event to Firestore:', error);
-      // Handle error, e.g., show an alert or handle it in another way
+      Alert.alert('Error', 'Failed to add the event.');
     }
   };
 
+  const renderSelectedDate = () => {
+    if (date) {
+      return <Text style={styles.selectedText}>Selected Date: {date.toString()}</Text>;
+    }
+    return null;
+  };
+
+  const renderSelectedLocation = () => {
+    const selectedLocation = locationId ? options.locations.find((loc) => loc.id === locationId) : null;
+    if (selectedLocation) {
+      return <Text style={styles.selectedText}>Selected Location: {selectedLocation.name}</Text>;
+    }
+    return null;
+  };
+
+  const renderSelectedCategory = () => {
+    const selectedCategory = categoryId ? options.categories.find((cat) => cat.id === categoryId) : null;
+    if (selectedCategory) {
+      return <Text style={styles.selectedText}>Selected Category: {selectedCategory.name}</Text>;
+    }
+    return null;
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Add New Event</Text>
       <TextInput
         style={styles.input}
         placeholder="Title"
         onChangeText={setTitle}
         value={title}
+        placeholderTextColor="#999"
       />
       <TextInput
         style={styles.inputMultiline}
@@ -47,13 +105,14 @@ const AddNewEvent = () => {
         multiline
         onChangeText={setDescription}
         value={description}
+        placeholderTextColor="#999"
       />
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.button}>
-        <Text>Pick Date & Time</Text>
-      </TouchableOpacity>
-      {date && (
-        <Text>Selected Date: {date.toString()}</Text>
-      )}
+      <View style={styles.actionContainer}>
+        <Text style={styles.actionText} onPress={() => setShowDatePicker(true)}>
+          Pick Date & Time
+        </Text>
+        {renderSelectedDate()}
+      </View>
       <DateTimePickerModal
         isVisible={showDatePicker}
         mode="datetime"
@@ -63,147 +122,257 @@ const AddNewEvent = () => {
         }}
         onCancel={() => setShowDatePicker(false)}
       />
-      <TouchableOpacity onPress={() => setShowLocationPicker(true)} style={styles.button}>
-        <Text>Select Location (Optional)</Text>
-      </TouchableOpacity>
+      <View style={styles.actionContainer}>
+        <Text style={styles.actionText} onPress={() => setShowLocationPicker(true)}>
+          Select Location
+        </Text>
+        {renderSelectedLocation()}
+      </View>
       <Modal
         visible={showLocationPicker}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowLocationPicker(false)}>
-        <View style={styles.centeredModalView}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Location</Text>
-            <Picker
-              selectedValue={location}
-              onValueChange={(itemValue) => {
-                setLocation(itemValue);
-                setShowLocationPicker(false);
-              }}
-              style={{height: 150, width: 300}}>
-              {options.locations.map((loc) => (
-                <Picker.Item key={loc.id} label={loc.name} value={loc.name} />
-              ))}
-            </Picker>
-            <TouchableOpacity onPress={() => setShowLocationPicker(false)} style={styles.modalButton}>
-              <Text>Done</Text>
-            </TouchableOpacity>
+        onRequestClose={() => setShowLocationPicker(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setShowLocationPicker(false)}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Select Location</Text>
+              <FlatList
+                data={options.locations}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setLocationId(item.id);
+                      setShowLocationPicker(false);
+                    }}
+                  >
+                    <Text style={styles.item}>{item.name}</Text>
+                  </TouchableWithoutFeedback>
+                )}
+              />
+              <TouchableWithoutFeedback onPress={() => setShowLocationPicker(false)}>
+                <View style={[styles.modalButton, styles.closeButton]}>
+                  <Text style={styles.modalButtonText}>Close</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
-      {location && (
-        <Text>Selected Location: {location}</Text>
-      )}
-      <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-        <Text>Submit Event</Text>
-      </TouchableOpacity>
+
+      <View style={styles.actionContainer}>
+        <Text style={styles.actionText} onPress={() => setShowCategoryPicker(true)}>
+          Select Category
+        </Text>
+        {renderSelectedCategory()}
+      </View>
+      <Modal
+        visible={showCategoryPicker}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowCategoryPicker(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Select Category</Text>
+              <FlatList
+                data={options.categories}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setCategoryId(item.id);
+                      setShowCategoryPicker(false);
+                    }}
+                  >
+                    <Text style={styles.item}>{item.name}</Text>
+                  </TouchableWithoutFeedback>
+                )}
+              />
+              <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>
+                <View style={[styles.modalButton, styles.closeButton]}>
+                  <Text style={styles.modalButtonText}>Close</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Organizer"
+        onChangeText={setOrganizer}
+        value={organizer}
+        placeholderTextColor="#999"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Contact Email"
+        onChangeText={setContactEmail}
+        value={contactEmail}
+        placeholderTextColor="#999"
+      />
+
+      <TouchableWithoutFeedback onPress={handleSubmit}>
+        <View style={styles.submitButton}>
+          <Text style={styles.buttonText}>Submit Event</Text>
+        </View>
+      </TouchableWithoutFeedback>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
+    backgroundColor: '#fff',
+    alignItems: 'left',
+    justifyContent: 'left',
   },
   header: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#333',
+  },
+  label: {
+    fontSize: 18,
+    marginRight: 10,
+    color: '#333',
+  },
+  clearButton: {
+    backgroundColor: '#ff6347',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  clearButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
   input: {
     borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    padding: 10,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
     marginBottom: 20,
+    width: '100%',
+    backgroundColor: '#f9f9f9',
+    fontSize: 16,
+    color: '#333',
   },
   inputMultiline: {
     borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    padding: 10,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 15,
     marginBottom: 20,
-    minHeight: 100,
-    textAlignVertical: 'top',
+    minHeight: 150,
+    width: '100%',
+    backgroundColor: '#f9f9f9',
+    fontSize: 16,
+    color: '#333',
   },
-  button: {
-    backgroundColor: '#007bff',
-    padding: 12,
-    borderRadius: 5,
+  switchContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
   },
-  submitButton: {
-    backgroundColor: '#28a745',
-    padding: 12,
-    borderRadius: 5,
-    alignItems: 'center',
+  actionContainer: {
+    width: '100%',
     marginBottom: 20,
   },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    width: '80%',
-    alignSelf: 'center',
-    marginTop: '50%',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+  actionText: {
+    color: '#3498db',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
-  picker: {
+  selectedText: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#333',
+  },
+  image: {
     width: '100%',
     height: 200,
+    borderRadius: 8,
+    marginBottom: 20,
   },
-  modalButton: {
-    marginTop: 20,
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
-  },
-  modalButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  centeredModalView: {
+  centeredView: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
-  modalContent: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  modalButton: {
-    backgroundColor: "#2196F3",
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    marginTop: 15
+  modalView: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    elevation: 5,
+    padding: 25,
+    alignItems: 'center',
+    maxHeight: '80%',
+    alignSelf: 'center',
+    marginTop: 'auto',
+    marginBottom: 'auto',
   },
   modalTitle: {
-    marginBottom: 15,
-    textAlign: "center"
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  item: {
+    fontSize: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderColor: '#eee',
+    borderRadius: 8,
+    marginVertical: 5,
+    backgroundColor: '#f9f9f9',
+    color: '#333',
+    width: '100%',
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#3498db',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    marginVertical: 10,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    backgroundColor: '#bdc3c7',
+    marginTop: 10,
+  },
+  submitButton: {
+    backgroundColor: '#27ae60',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

@@ -53,6 +53,8 @@ const AddNewReport = () => {
           location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
           category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
           createdBy: createdBy,
+          image: "NULL",
+          submitedOn: Timestamp.now(),
         });
   
         console.log('Report added successfully!');

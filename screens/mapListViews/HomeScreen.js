@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Alert, View, TouchableOpacity, Text, Image, FlatList } from 'react-native';
+import { Alert, View, TouchableOpacity, Text, Image, FlatList, Modal } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
@@ -10,6 +10,7 @@ import { firestore } from '../../backend/firebase.js';
 import { collection, getDocs } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 import options from '../../backend/options.json';
+import MultipleEventsModal from './MultipleEventsModal.js'; 
 
   
 
@@ -20,6 +21,9 @@ const HomeScreen = ({  }) => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [listData, setListData] = useState([]);
     const [userLocation, setUserLocation] = useState(null);
+    const [isLocationModalVisible, setIsLocationModalVisible] = useState(false);
+    const [locationItems, setLocationItems] = useState([]);
+
 
     
     const [showMap, setShowMap] = useState(true);
@@ -177,31 +181,68 @@ const HomeScreen = ({  }) => {
     
 
     const renderMarkers = () => {
-        return listData.filter(item => item.isReport).map((item) => {
+        const itemsByLocation = listData.reduce((acc, item) => {
             const location = options.locations.find(loc => loc.name === item.location);
             if (location) {
-                const { icon, color } = getIconName(item);
+                const key = `${location.latitude}-${location.longitude}`;
+                if (!acc[key]) {
+                    acc[key] = {
+                        ...location,
+                        items: [item]
+                    };
+                } else {
+                    acc[key].items.push(item);
+                }
+            }
+            return acc;
+        }, {});
     
+        return Object.entries(itemsByLocation).map(([key, locationWithItems]) => {
+            const { latitude, longitude, items } = locationWithItems;
+            if (items.length === 1) {
+                const item = items[0];
+                const { icon, color } = getIconName(item);
                 return (
                     <Marker
                         key={item.id}
                         coordinate={{
-                            latitude: location.latitude,
-                            longitude: location.longitude
+                            latitude,
+                            longitude
                         }}
                         onPress={() => handleCalloutPress(item)}>
                         <Icon name={icon} size={30} color={color} />
                     </Marker>
                 );
+            } else {
+                const count = items.length; 
+                return (
+                    <Marker
+                    key={key}
+                    coordinate={{
+                        latitude,
+                        longitude
+                    }}
+                    onPress={() => handleMultipleItemsPress(items)}>
+                    <View style={styles.customMarker}>
+                        <Text style={styles.customMarkerText}>{count} Events/Reports</Text>
+                    </View>
+                </Marker>
+                );
             }
-            return null;
-        }).filter(marker => marker !== null);
-    }; 
+        });
+    };
     
+    // Handle press for individual item marker
     const handleCalloutPress = (item) => {
         setSelectedItem(item);
         setModalVisible(true);
     };
+
+    const handleMultipleItemsPress = (items) => {
+        setLocationItems(items); // Set the items for the selected location
+        setIsLocationModalVisible(true); // Show the modal
+    };
+    
       
 
     const goToUserLocation = async () => {
@@ -311,6 +352,15 @@ const HomeScreen = ({  }) => {
                         item={selectedItem}
                         />
 
+                        <MultipleEventsModal
+                            isLocationModalVisible={isLocationModalVisible}
+                            setIsLocationModalVisible={setIsLocationModalVisible}
+                            locationItems={locationItems}
+                            setSelectedItem={setSelectedItem}
+                            setModalVisible={setModalVisible}
+                            getIconName={getIconName}
+                        />
+
                     </View>
                 </>
             ) : (
@@ -326,4 +376,3 @@ const HomeScreen = ({  }) => {
 };
 
 export default HomeScreen;  
-
