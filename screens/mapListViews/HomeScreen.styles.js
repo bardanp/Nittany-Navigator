@@ -157,13 +157,44 @@ export default StyleSheet.create({
         color: "#ffffff",
         textAlign: "center",
       },
-      customMarker: {
-        backgroundColor: '#007bff',
-        borderRadius: 15,
-        padding: 5
+      customMarkerView: {
+        backgroundColor: "#007bff",
+        padding: 5,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#fff",
     },
     customMarkerText: {
-        color: '#fff',
-        fontWeight: 'bold'
-    }
+        color: "#fff",
+        fontWeight: "bold",
+    },
+    
+    markerIconContainer: {
+        width: 50, // Adjust based on your icon size
+        height: 50, // Adjust based on your icon size
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    markerIcon: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain',
+    },
+    badgeContainer: {
+        position: 'absolute',
+        right: -10, // Adjust for positioning
+        top: -10, // Adjust for positioning
+        backgroundColor: 'red',
+        borderRadius: 10,
+        width: 20, // Adjust based on content
+        height: 20, // Adjust based on content
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: 12, // Adjust based on content
+    },
+    
 });

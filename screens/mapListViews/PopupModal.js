@@ -17,7 +17,7 @@ const PopupModal = ({ visible, onClose, item }) => {
       const documentRef = doc(firestore, item.isEvent ? 'events' : 'reports', documentId);
       const docSnap = await getDoc(documentRef);
       if (docSnap.exists()) {
-        setModalData(docSnap.data());
+        setModalData({ ...docSnap.data(), isEvent: item.isEvent });
       } else {
         console.log('No such document!');
       }
@@ -26,9 +26,7 @@ const PopupModal = ({ visible, onClose, item }) => {
   }, [item]);
 
   const formatDate = (timestamp) => {
-    if (!timestamp) {
-      return 'N/A';
-    }
+    if (!timestamp) return 'N/A';
     const date = timestamp.toDate();
     return date.toLocaleDateString("en-US", {
       year: 'numeric',
@@ -39,13 +37,8 @@ const PopupModal = ({ visible, onClose, item }) => {
     });
   };
 
-  const createdBy = modalData?.createdBy
-    ? `Created by: ${modalData.createdBy}`
-    : 'Created by: Unknown';
-
-  const isReport = true;
-  const headerBackgroundColor = isReport ? '#F44336' : '#4CAF50';
-  const textColor = '#333';
+  const headerTitle = modalData?.isEvent ? 'Event Info' : 'Report Info';
+  const headerBackgroundColor = modalData?.isEvent ? '#4CAF50' : '#F44336';
 
   return (
     <Modal
@@ -61,9 +54,9 @@ const PopupModal = ({ visible, onClose, item }) => {
             contentContainerStyle={styles.scrollViewContainer}
           >
             <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
-              <Text style={styles.category}>{'Report Info'}</Text>
+              <Text style={styles.category}>{headerTitle}</Text>
             </View>
-            {modalData?.image ? (
+            {modalData?.image && !imageError ? (
               <Image
                 source={{ uri: modalData.image }}
                 style={styles.image}
@@ -79,22 +72,22 @@ const PopupModal = ({ visible, onClose, item }) => {
             )}
 
             <View style={styles.body}>
-              <Text style={[styles.title, { color: textColor }]}>{modalData?.title}</Text>
-              <Text style={[styles.description, { color: textColor }]}>{modalData?.description}</Text>
-              <Text style={[styles.details, { color: textColor }]}>
+              <Text style={styles.title}>{modalData?.title}</Text>
+              <Text style={styles.description}>{modalData?.description}</Text>
+              <Text style={styles.details}>
                 {`Date: ${modalData?.dateTime ? formatDate(modalData.dateTime) : 'N/A'}`}
               </Text>
-              <Text style={[styles.details, { color: textColor }]}>
+              <Text style={styles.details}>
                 {`Location: ${modalData?.location}`}
               </Text>
-              <Text style={[styles.details, { color: textColor }]}>
+              <Text style={styles.details}>
                 {`Category: ${modalData?.category}`}
               </Text>
-              <Text style={[styles.details, { color: textColor }]}>
-                {createdBy}
+              <Text style={styles.details}>
+                {`Created by: ${modalData?.createdBy || 'Unknown'}`}
               </Text>
-              {modalData?.emergency && (
-                <Text style={[styles.emergency, { color: textColor }]}>
+              {modalData?.isEvent === false && modalData?.emergency && (
+                <Text style={styles.emergency}>
                   EMERGENCY
                 </Text>
               )}
@@ -111,6 +104,7 @@ const PopupModal = ({ visible, onClose, item }) => {
     </Modal>
   );
 };
+
 
 const styles = StyleSheet.create({
   modalOverlay: {

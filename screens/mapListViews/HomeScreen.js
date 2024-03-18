@@ -216,26 +216,30 @@ const HomeScreen = ({  }) => {
             } else {
                 const count = items.length; 
                 return (
-                    <Marker
+                <Marker
                     key={key}
                     coordinate={{
                         latitude,
                         longitude
                     }}
-                    onPress={() => handleMultipleItemsPress(items)}>
-                    <View style={styles.customMarker}>
-                        <Text style={styles.customMarkerText}>{count} Events/Reports</Text>
+                    onPress={() => handleMultipleItemsPress(items)}
+                >
+                    <View style={styles.customMarkerView}>
+                        <Text style={styles.customMarkerText}>{`${count} Items`}</Text>
                     </View>
                 </Marker>
+
+
                 );
             }
         });
     };
     
-    // Handle press for individual item marker
     const handleCalloutPress = (item) => {
         setSelectedItem(item);
         setModalVisible(true);
+    
+        setTimeout(() => setSelectedItem(item), 10);
     };
 
     const handleMultipleItemsPress = (items) => {
@@ -243,7 +247,6 @@ const HomeScreen = ({  }) => {
         setIsLocationModalVisible(true); // Show the modal
     };
     
-      
 
     const goToUserLocation = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
