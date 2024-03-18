@@ -47,63 +47,66 @@ const PopupModal = ({ visible, onClose, item }) => {
       transparent
       animationType="fade"
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollViewContainer}
-          >
-            <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
-              <Text style={styles.category}>{headerTitle}</Text>
-            </View>
-            {modalData?.image && !imageError ? (
-              <Image
-                source={{ uri: modalData.image }}
-                style={styles.image}
-                resizeMode='stretch'
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <Image
-                source={noPicturesIcon}
-                style={styles.image}
-                resizeMode="contain"
-              />
-            )}
-
-            <View style={styles.body}>
-              <Text style={styles.title}>{modalData?.title}</Text>
-              <Text style={styles.description}>{modalData?.description}</Text>
-              <Text style={styles.details}>
-                {`Date: ${modalData?.dateTime ? formatDate(modalData.dateTime) : 'N/A'}`}
-              </Text>
-              <Text style={styles.details}>
-                {`Location: ${modalData?.location}`}
-              </Text>
-              <Text style={styles.details}>
-                {`Category: ${modalData?.category}`}
-              </Text>
-              <Text style={styles.details}>
-                {`Created by: ${modalData?.createdBy || 'Unknown'}`}
-              </Text>
-              {modalData?.isEvent === false && modalData?.emergency && (
-                <Text style={styles.emergency}>
-                  EMERGENCY
-                </Text>
-              )}
-            </View>
-            <TouchableOpacity
-              onPress={onClose}
-              style={[styles.closeButton, { backgroundColor: headerBackgroundColor }]}
+      {modalData && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.scrollViewContainer}
             >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </ScrollView>
+              <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
+                <Text style={styles.category}>{headerTitle}</Text>
+              </View>
+              {modalData?.image && !imageError ? (
+                <Image
+                  source={{ uri: modalData.image }}
+                  style={styles.image}
+                  resizeMode='stretch'
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <Image
+                  source={noPicturesIcon}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+              )}
+
+              <View style={styles.body}>
+                <Text style={styles.title}>{modalData?.title}</Text>
+                <Text style={styles.description}>{modalData?.description}</Text>
+                <Text style={styles.details}>
+                  {`Date: ${formatDate(modalData.dateTime)}`}
+                </Text>
+                <Text style={styles.details}>
+                  {`Location: ${modalData?.location || 'N/A'}`}
+                </Text>
+                <Text style={styles.details}>
+                  {`Category: ${modalData?.category || 'N/A'}`}
+                </Text>
+                <Text style={styles.details}>
+                  {`Created by: ${modalData?.createdBy || 'Unknown'}`}
+                </Text>
+                {modalData?.isEvent === false && modalData?.emergency && (
+                  <Text style={styles.emergency}>
+                    EMERGENCY
+                  </Text>
+                )}
+              </View>
+              <TouchableOpacity
+                onPress={onClose}
+                style={[styles.closeButton, { backgroundColor: headerBackgroundColor }]}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
         </View>
-      </View>
+      )}
     </Modal>
   );
 };
+
 
 
 const styles = StyleSheet.create({

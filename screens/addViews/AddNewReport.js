@@ -53,7 +53,7 @@ const AddNewReport = () => {
           location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
           category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
           createdBy: createdBy,
-          image: "NULL",
+          image: NULL,
           submitedOn: Timestamp.now(),
         });
   

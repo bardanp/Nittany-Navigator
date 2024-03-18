@@ -238,13 +238,11 @@ const HomeScreen = ({  }) => {
     const handleCalloutPress = (item) => {
         setSelectedItem(item);
         setModalVisible(true);
-    
-        setTimeout(() => setSelectedItem(item), 10);
     };
 
     const handleMultipleItemsPress = (items) => {
-        setLocationItems(items); // Set the items for the selected location
-        setIsLocationModalVisible(true); // Show the modal
+        setLocationItems(items); 
+        setIsLocationModalVisible(true); 
     };
     
 
@@ -349,10 +347,9 @@ const HomeScreen = ({  }) => {
 
 
                         <PopupModal
-                        visible={modalVisible}
-                        transparent={true}
-                        onClose={() => setModalVisible(false)}
-                        item={selectedItem}
+                            visible={modalVisible}
+                            onClose={() => setModalVisible(false)}
+                            item={selectedItem}
                         />
 
                         <MultipleEventsModal
