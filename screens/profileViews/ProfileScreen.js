@@ -38,7 +38,7 @@ const ProfileScreen = () => {
   }, []);
 
   const profilePicSource = userInfo.profilePicUri ? { uri: userInfo.profilePicUri } : require('../../assets/no-profile.png');
-  const isAdminUser = ['STAFF', 'FACULTY'].includes(userInfo.primaryAffiliation.toUpperCase());
+  const isAdminUser = userInfo.primaryAffiliation.toUpperCase() !== 'STUDENT';
 
 
   const profileOptions = [

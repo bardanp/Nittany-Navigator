@@ -155,7 +155,7 @@ const HomeScreen = ({  }) => {
         if (category) {
             return { icon: category.icon, color: category.color };
         } else {
-            return { icon: 'help_outline', color: '#9e9e9e' }; 
+            return { icon: 'info', color: '#9e9e9e' }; 
         }
     };
 
@@ -165,7 +165,7 @@ const HomeScreen = ({  }) => {
         } else if (item.isReport) {
             return getCategoryIcon(item.category); 
         } else {
-            return { icon: 'help_outline', color: '#9e9e9e' }; 
+            return { icon: 'info', color: '#9e9e9e' }; 
         }
     };
 
