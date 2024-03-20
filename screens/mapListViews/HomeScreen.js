@@ -12,7 +12,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import options from '../../backend/options.json';
 import MultipleEventsModal from './MultipleEventsModal.js'; 
 
-  
 
 const HomeScreen = ({  }) => {
     const navigation = useNavigation();
@@ -23,7 +22,6 @@ const HomeScreen = ({  }) => {
     const [userLocation, setUserLocation] = useState(null);
     const [isLocationModalVisible, setIsLocationModalVisible] = useState(false);
     const [locationItems, setLocationItems] = useState([]);
-
 
     
     const [showMap, setShowMap] = useState(true);
@@ -204,6 +202,7 @@ const HomeScreen = ({  }) => {
                 const { icon, color } = getIconName(item);
                 return (
                     <Marker
+                        style={{opacity: 1}}
                         key={item.id}
                         coordinate={{
                             latitude,
@@ -224,7 +223,8 @@ const HomeScreen = ({  }) => {
                     }}
                     onPress={() => handleMultipleItemsPress(items)}
                 >
-                    <View style={styles.customMarkerView}>
+                    <View style={styles.customMarkerView}
+                    >
                         <Text style={styles.customMarkerText}>{`${count} Items`}</Text>
                     </View>
                 </Marker>

@@ -125,12 +125,13 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     flexGrow: 1,
+    alignContent: 'center',
   },
   image: {
     width: '100%',
     height: 200,
-    borderColor: 'grey',
-    borderBottomWidth: 10,
+    borderColor: 'lightgrey',
+    borderWidth: 5,
   },
   header: {
     paddingVertical: 10,
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 0,
-    borderWidth: 5,
+    borderWidth: 2,
     width: 150,
     height: 50,
     justifyContent: 'center',

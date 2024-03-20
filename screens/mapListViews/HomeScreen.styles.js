@@ -170,8 +170,8 @@ export default StyleSheet.create({
     },
     
     markerIconContainer: {
-        width: 50, // Adjust based on your icon size
-        height: 50, // Adjust based on your icon size
+        width: 50, 
+        height: 50, 
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
@@ -183,18 +183,18 @@ export default StyleSheet.create({
     },
     badgeContainer: {
         position: 'absolute',
-        right: -10, // Adjust for positioning
-        top: -10, // Adjust for positioning
+        right: -10, 
+        top: -10, 
         backgroundColor: 'red',
         borderRadius: 10,
-        width: 20, // Adjust based on content
-        height: 20, // Adjust based on content
+        width: 20, 
+        height: 20, 
         justifyContent: 'center',
         alignItems: 'center',
     },
     badgeText: {
         color: 'white',
-        fontSize: 12, // Adjust based on content
+        fontSize: 12, 
     },
     
 });

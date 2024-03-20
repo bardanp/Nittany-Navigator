@@ -67,7 +67,6 @@ const AddNewReport = () => {
         const userInfo = JSON.parse(userInfoString);
         const createdBy = `${userInfo.firstName} ${userInfo.lastName.charAt(0)}.`;
   
-        // Upload image to Firebase storage if an image is selected
         let imageUrl = null;
         if (image) {
           const response = await fetch(image);

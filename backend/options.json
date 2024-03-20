@@ -13,6 +13,21 @@
     {"id": "2", "name": "School Closure", "icon": "school", "color": "#ff5722"},
     {"id": "3", "name": "Construction", "icon": "construction", "color": "#ff9800"},
     {"id": "4", "name": "Maintenance", "icon": "build", "color": "#ffeb3b"},
-    {"id": "5", "name": "Other", "icon": "info", "color": "#607d8b"}
+    {"id": "5", "name": "Other", "icon": "info", "color": "#607d8b"},
+    {"id": "6", "name": "Religious gathering", "icon": "religious", "color": "#009688"},
+    {"id": "7", "name": "Cultural celebration", "icon": "culture", "color": "#673ab7"},
+    {"id": "8", "name": "Study group", "icon": "study", "color": "#4caf50"},
+    {"id": "9", "name": "Social activity", "icon": "social", "color": "#ff6d00"},
+    {"id": "10", "name": "Career development", "icon": "career", "color": "#795548"},
+    {"id": "11", "name": "Sports and fitness", "icon": "sports", "color": "#f44336"},
+    {"id": "12", "name": "Art and creativity", "icon": "art", "color": "#ff9800"},
+    {"id": "13", "name": "Volunteering and community service", "icon": "volunteer", "color": "#673ab7"},
+    {"id": "14", "name": "Health and wellness", "icon": "health", "color": "#4caf50"},
+    {"id": "15", "name": "Technology", "icon": "technology", "color": "#03a9f4"},
+    {"id": "16", "name": "Environmental and sustainability", "icon": "environment", "color": "#8bc34a"},
+    {"id": "17", "name": "Alumni event", "icon": "alumni", "color": "#9c27b0"},
+    {"id": "18", "name": "Leadership and personal development", "icon": "leadership", "color": "#ff9800"},
+    {"id": "19", "name": "Book/reading club", "icon": "book", "color": "#2196f3"},
+    {"id": "20", "name": "Other", "icon": "info", "color": "#607d8b"}
   ]
 }
