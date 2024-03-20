@@ -151,18 +151,11 @@ const HomeScreen = ({  }) => {
     };
 
     const getCategoryIcon = (categoryName) => {
-        switch (categoryName) {
-            case 'Emergency':
-                return { icon: 'warning', color: '#ff0000' };
-            case 'School Closure':
-                return { icon: 'school', color: '#ff5722' }; 
-            case 'Construction':
-                return { icon: 'construction', color: '#ff9800' }; 
-            case 'Maintenance':
-                return { icon: 'build', color: '#ffeb3b' }; 
-            case 'Other':
-            default:
-                return { icon: 'info', color: '#607d8b' }; 
+        const category = options.categories.find(cat => cat.name === categoryName);
+        if (category) {
+            return { icon: category.icon, color: category.color };
+        } else {
+            return { icon: 'help_outline', color: '#9e9e9e' }; 
         }
     };
 
