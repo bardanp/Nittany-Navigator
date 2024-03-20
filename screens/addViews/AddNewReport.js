@@ -34,17 +34,51 @@ const AddNewReport = () => {
   const [categoryId, setCategoryId] = useState(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const navigation = useNavigation();
+
+  const CustomDateTimePickerModal = ({ isVisible, onClose, onConfirm }) => {
+    return (
+      <Modal
+        visible={isVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Select a Date and Time</Text>
+            <DateTimePickerModal
+              isVisible={isVisible}
+              mode="datetime"
+              onConfirm={onConfirm}
+              onCancel={onClose}
+            />
+          </View>
+        </View>
+      </Modal>
+    );
+  };
   
   const handleSubmit = async () => {
     console.log('Submitting report...');
     try {
-  
       const userInfoString = await AsyncStorage.getItem('userInfo');
       if (userInfoString) {
         console.log('User info found:', userInfoString);
         const userInfo = JSON.parse(userInfoString);
         const createdBy = `${userInfo.firstName} ${userInfo.lastName.charAt(0)}.`;
   
+        // Upload image to Firebase storage if an image is selected
+        let imageUrl = null;
+        if (image) {
+          const response = await fetch(image);
+          const blob = await response.blob();
+          const imageName = new Date().getTime().toString();
+          const imageRef = ref(storage, `images/${imageName}`);
+          await uploadBytes(imageRef, blob);
+          imageUrl = await getDownloadURL(imageRef);
+        }
+  
+        // Add the report to Firestore
         await addDoc(collection(firestore, 'reports'), {
           title,
           emergency,
@@ -52,9 +86,9 @@ const AddNewReport = () => {
           dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
           location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
           category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
-          createdBy: createdBy,
-          image: NULL,
-          submitedOn: Timestamp.now(),
+          createdBy,
+          image: imageUrl, // Include image URL in the Firestore document
+          submittedOn: Timestamp.now(),
         });
   
         console.log('Report added successfully!');
@@ -70,6 +104,7 @@ const AddNewReport = () => {
     }
   };
   
+  
 
   const renderImage = () => {
     if (image) {
@@ -83,6 +118,60 @@ const AddNewReport = () => {
       );
     }
     return null;
+  };
+
+  const selectImageFromGallery = () => {
+    const options = {
+      mediaType: 'photo',
+      quality: 1,
+    };
+    ImagePicker.launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        setImage(response.uri);
+      }
+    });
+  };
+
+  const takePhoto = () => {
+    const options = {
+      mediaType: 'photo',
+      quality: 1,
+    };
+    ImagePicker.launchCamera(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled taking photo');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        // Set the taken photo URI to the state
+        setImage(response.uri);
+      }
+    });
+  };
+
+  // Function to upload the selected image to Firebase storage
+  const uploadImageToFirebase = async () => {
+    try {
+      const response = await fetch(image);
+      const blob = await response.blob();
+      const imageName = new Date().getTime(); // Generate a unique name for the image
+      const imageRef = ref(storage, `images/${imageName}`);
+      await uploadBytes(imageRef, blob);
+      const url = await getDownloadURL(imageRef);
+      // Set the image URL to the state
+      setImageUrl(url);
+    } catch (error) {
+      console.error('Error uploading image to Firebase:', error);
+    }
+  };
+
+  // Function to clear the selected image
+  const clearImage = () => {
+    setImage(null);
   };
 
   const renderSelectedDate = () => {
@@ -141,14 +230,13 @@ const AddNewReport = () => {
         </Text>
         {renderSelectedDate()}
       </View>
-      <DateTimePickerModal
+      <CustomDateTimePickerModal
         isVisible={showDatePicker}
-        mode="datetime"
         onConfirm={(selectedDate) => {
           setShowDatePicker(false);
           setDate(new Date(selectedDate));
         }}
-        onCancel={() => setShowDatePicker(false)}
+        onClose={() => setShowDatePicker(false)}
       />
       <View style={styles.actionContainer}>
         <Text style={styles.actionText} onPress={() => setShowLocationPicker(true)}>
