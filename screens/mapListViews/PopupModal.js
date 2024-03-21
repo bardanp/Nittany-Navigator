@@ -13,13 +13,17 @@ const PopupModal = ({ visible, onClose, item }) => {
   useEffect(() => {
     const fetchModalData = async () => {
       if (!item) return;
+
       const documentId = item.id.split('-')[1];
       const documentRef = doc(firestore, item.isEvent ? 'events' : 'reports', documentId);
-      const docSnap = await getDoc(documentRef);
-      if (docSnap.exists()) {
-        setModalData({ ...docSnap.data(), isEvent: item.isEvent });
-      } else {
-        console.log('No such document!');
+
+      try {
+        const docSnap = await getDoc(documentRef);
+        if (docSnap.exists()) {
+          setModalData({ ...docSnap.data(), isEvent: item.isEvent });
+        }
+      } catch (error) {
+        console.error('Error fetching modal data:', error);
       }
     };
     fetchModalData();
@@ -57,21 +61,22 @@ const PopupModal = ({ visible, onClose, item }) => {
               <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
                 <Text style={styles.category}>{headerTitle}</Text>
               </View>
-              {modalData?.image && !imageError ? (
-                <Image
-                  source={{ uri: modalData.image }}
-                  style={styles.image}
-                  resizeMode='stretch'
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <Image
-                  source={noPicturesIcon}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
-              )}
-
+              <View style={styles.imageContainer}>
+                {modalData?.image && !imageError ? (
+                  <Image
+                    source={{ uri: modalData.image }}
+                    style={styles.image}
+                    resizeMode='cover'
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <Image
+                    source={noPicturesIcon}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                )}
+              </View>
               <View style={styles.body}>
                 <Text style={styles.title}>{modalData?.title}</Text>
                 <Text style={styles.description}>{modalData?.description}</Text>
@@ -107,39 +112,45 @@ const PopupModal = ({ visible, onClose, item }) => {
   );
 };
 
-
-
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
   modalContainer: {
     backgroundColor: 'white',
     borderRadius: 20,
     overflow: 'hidden',
-    width: width - 50,
+    width: '90%',
     maxWidth: 500,
   },
   scrollViewContainer: {
     flexGrow: 1,
-    alignContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 200,
+    overflow: 'hidden',
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgrey',
   },
   image: {
     width: '100%',
-    height: 200,
-    borderColor: 'lightgrey',
-    borderWidth: 5,
+    height: '100%',
+    
   },
   header: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 100,
+    backgroundColor: '#4CAF50',
   },
   category: {
-    fontSize: 20,
-    padding: 5,
+    fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',
@@ -152,37 +163,37 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     paddingTop: 20,
+    paddingBottom: 10,
   },
   description: {
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   details: {
     fontSize: 14,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   emergency: {
     color: '#D32F2F',
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 10,
   },
   closeButton: {
-    padding: 0,
-    borderWidth: 2,
-    width: 150,
+    backgroundColor: '#F44336',
+    width: '50%',
     height: 50,
     justifyContent: 'center',
-    alignContent: 'center',
-    borderRadius: 12,
+    alignItems: 'center',
+    borderRadius: 25,
     alignSelf: 'center',
     marginBottom: 20,
   },
   closeButtonText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
 });
+
 
 export default PopupModal;

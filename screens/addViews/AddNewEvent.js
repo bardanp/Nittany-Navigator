@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  Switch,
   Alert,
-  Image,
   Modal,
   StyleSheet,
   ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Platform,
   TouchableWithoutFeedback,
   FlatList,
-  TouchableOpacity,
+  Image,
 } from 'react-native';
+
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { auth, firestore, storage } from '../../backend/firebase';
@@ -37,21 +38,95 @@ const AddNewEvent = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const navigation = useNavigation();
 
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'Please allow access to your photo library to upload images.');
+        }
+      }
+    })();
+  }, []);
+
+  const handleImagePick = () => {
+    Alert.alert('Upload Photo', 'Choose an option', [
+      { text: 'Take Photo', onPress: handleTakePhoto },
+      { text: 'Choose from Gallery', onPress: handleChooseFromGallery },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
+
+  const handleTakePhoto = async () => {
+    // Request camera permissions
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraPermission.status !== 'granted') {
+      alert('Camera access is required to take a photo.');
+      return;
+    }
+
+    // Launch camera
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  const handleChooseFromGallery = async () => {
+    // Request media library permissions
+    const libraryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (libraryPermission.status !== 'granted') {
+      alert('Media library access is required to choose a photo.');
+      return;
+    }
+  
+    // Launch image library
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    
+    // Adjust for the new API
+    if (!result.canceled) {
+      // Ensure there's at least one asset and use the first one's URI
+      if (result.assets && result.assets.length > 0) {
+        setImage(result.assets[0].uri);
+      }
+    }
+  };
+  
+
   const handleSubmit = async () => {
     console.log('Submitting event...');
     try {
+      let imageUrl = '';
+      if (image) {
+        const response = await fetch(image);
+        const blob = await response.blob();
+        const imageName = `event_images/${Date.now()}`;
+        const imageRef = ref(storage, imageName);
+        const snapshot = await uploadBytes(imageRef, blob);
+        imageUrl = await getDownloadURL(snapshot.ref);
+      }
 
       const eventInfo = {
         title,
         description,
-        image: "",
+        image: imageUrl,
         dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
         location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
         organizer,
         contactEmail,
         rsvpCount,
         category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
-        submitedOn: Timestamp.now(),
+        submittedOn: Timestamp.now(),
       };
 
       await addDoc(collection(firestore, 'events'), eventInfo);
@@ -59,7 +134,6 @@ const AddNewEvent = () => {
       console.log('Event added successfully!');
       Alert.alert('Success', 'Event added successfully!');
       navigation.goBack();
-
     } catch (error) {
       console.error('Error adding event to Firestore:', error);
       Alert.alert('Error', 'Failed to add the event.');
@@ -105,6 +179,20 @@ const AddNewEvent = () => {
         multiline
         onChangeText={setDescription}
         value={description}
+        placeholderTextColor="#999"
+      />
+            <TextInput
+        style={styles.input}
+        placeholder="Organizer"
+        onChangeText={setOrganizer}
+        value={organizer}
+        placeholderTextColor="#999"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Contact Email"
+        onChangeText={setContactEmail}
+        value={contactEmail}
         placeholderTextColor="#999"
       />
       <View style={styles.actionContainer}>
@@ -202,20 +290,12 @@ const AddNewEvent = () => {
         </TouchableWithoutFeedback>
       </Modal>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Organizer"
-        onChangeText={setOrganizer}
-        value={organizer}
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Contact Email"
-        onChangeText={setContactEmail}
-        value={contactEmail}
-        placeholderTextColor="#999"
-      />
+      <TouchableWithoutFeedback onPress={handleImagePick}>
+        <View style={styles.actionContainer}>
+          <Text style={styles.actionText}>Pick Image</Text>
+        </View>
+      </TouchableWithoutFeedback>
+      {image && <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />}
 
       <TouchableWithoutFeedback onPress={handleSubmit}>
         <View style={styles.submitButton}>

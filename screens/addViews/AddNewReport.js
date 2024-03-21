@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -57,46 +57,79 @@ const AddNewReport = () => {
       </Modal>
     );
   };
+
+  const handleImagePick = async () => {
+    Alert.alert('Upload Photo', 'Choose an option', [
+      { text: 'Take Photo', onPress: takePhoto },
+      { text: 'Choose from Gallery', onPress: selectImageFromGallery },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
+        const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (cameraStatus.status !== 'granted' || galleryStatus.status !== 'granted') {
+          Alert.alert('Permission Denied', 'Please allow access to your photo library and camera to upload images.');
+        }
+      }
+    })();
+  }, []);
+
+  const selectImageFromGallery = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
   
   const handleSubmit = async () => {
     console.log('Submitting report...');
     try {
-      const userInfoString = await AsyncStorage.getItem('userInfo');
-      if (userInfoString) {
-        console.log('User info found:', userInfoString);
-        const userInfo = JSON.parse(userInfoString);
-        const createdBy = `${userInfo.firstName} ${userInfo.lastName.charAt(0)}.`;
-  
-        let imageUrl = null;
-        if (image) {
-          const response = await fetch(image);
-          const blob = await response.blob();
-          const imageName = new Date().getTime().toString();
-          const imageRef = ref(storage, `images/${imageName}`);
-          await uploadBytes(imageRef, blob);
-          imageUrl = await getDownloadURL(imageRef);
-        }
-  
-        // Add the report to Firestore
-        await addDoc(collection(firestore, 'reports'), {
-          title,
-          emergency,
-          description,
-          dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
-          location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
-          category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
-          createdBy,
-          image: imageUrl, // Include image URL in the Firestore document
-          submittedOn: Timestamp.now(),
-        });
-  
-        console.log('Report added successfully!');
-        Alert.alert('Success', 'Report added successfully!');
-        navigation.goBack();
-      } else {
-        console.log('User information not found.');
-        Alert.alert('Error', 'User information not found.');
+      let imageUrl = '';
+      if (image) {
+        const response = await fetch(image);
+        const blob = await response.blob();
+        const imageName = `report_images/${Date.now()}`;
+        const imageRef = ref(storage, imageName);
+        const snapshot = await uploadBytes(imageRef, blob);
+        imageUrl = await getDownloadURL(snapshot.ref);
       }
+
+      await addDoc(collection(firestore, 'reports'), {
+        title,
+        emergency,
+        description,
+        image: imageUrl,
+        dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
+        location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
+        category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
+        submittedOn: Timestamp.now(),
+      });
+
+      console.log('Report added successfully!');
+      Alert.alert('Success', 'Report added successfully!');
+      navigation.goBack();
     } catch (error) {
       console.error('Error adding report to Firestore:', error);
       Alert.alert('Error', 'Failed to add the report.');
@@ -119,49 +152,15 @@ const AddNewReport = () => {
     return null;
   };
 
-  const selectImageFromGallery = () => {
-    const options = {
-      mediaType: 'photo',
-      quality: 1,
-    };
-    ImagePicker.launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        setImage(response.uri);
-      }
-    });
-  };
 
-  const takePhoto = () => {
-    const options = {
-      mediaType: 'photo',
-      quality: 1,
-    };
-    ImagePicker.launchCamera(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled taking photo');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        // Set the taken photo URI to the state
-        setImage(response.uri);
-      }
-    });
-  };
-
-  // Function to upload the selected image to Firebase storage
   const uploadImageToFirebase = async () => {
     try {
       const response = await fetch(image);
       const blob = await response.blob();
-      const imageName = new Date().getTime(); // Generate a unique name for the image
+      const imageName = new Date().getTime(); 
       const imageRef = ref(storage, `images/${imageName}`);
       await uploadBytes(imageRef, blob);
       const url = await getDownloadURL(imageRef);
-      // Set the image URL to the state
       setImageUrl(url);
     } catch (error) {
       console.error('Error uploading image to Firebase:', error);
@@ -316,6 +315,13 @@ const AddNewReport = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
+      <TouchableWithoutFeedback onPress={handleImagePick}>
+        <View style={styles.actionContainer}>
+          <Text style={styles.actionText}>Pick Image</Text>
+        </View>
+      </TouchableWithoutFeedback>
+      {image && <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />}
 
       <TouchableWithoutFeedback onPress={handleSubmit}>
         <View style={styles.submitButton}>
