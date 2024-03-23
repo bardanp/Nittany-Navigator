@@ -3,6 +3,7 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Dim
 import noPicturesIcon from '../../assets/no-pictures.png';
 import { firestore } from '../../backend/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import styles from './PopupModal.styles';
 
 const { width } = Dimensions.get('window');
 
@@ -111,89 +112,5 @@ const PopupModal = ({ visible, onClose, item }) => {
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    overflow: 'hidden',
-    width: '90%',
-    maxWidth: 500,
-  },
-  scrollViewContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  imageContainer: {
-    width: '100%',
-    height: 200,
-    overflow: 'hidden',
-    borderBottomWidth: 1,
-    borderBottomColor: 'lightgrey',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    
-  },
-  header: {
-    paddingVertical: 20,
-    paddingHorizontal: 100,
-    backgroundColor: '#4CAF50',
-  },
-  category: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-  },
-  body: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    marginBottom: 15,
-  },
-  details: {
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  emergency: {
-    color: '#D32F2F',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  closeButton: {
-    backgroundColor: '#F44336',
-    width: '50%',
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 25,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
-
 
 export default PopupModal;

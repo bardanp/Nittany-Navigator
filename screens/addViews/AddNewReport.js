@@ -33,6 +33,7 @@ const AddNewReport = () => {
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [categoryId, setCategoryId] = useState(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [createdBy, setCreatedBy] = useState('');
   const navigation = useNavigation();
 
   const CustomDateTimePickerModal = ({ isVisible, onClose, onConfirm }) => {
@@ -69,13 +70,24 @@ const AddNewReport = () => {
   useEffect(() => {
     (async () => {
       if (Platform.OS !== 'web') {
-        const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-        const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (cameraStatus.status !== 'granted' || galleryStatus.status !== 'granted') {
-          Alert.alert('Permission Denied', 'Please allow access to your photo library and camera to upload images.');
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'Please allow access to your photo library to upload images.');
         }
       }
     })();
+    async function fetchUserInfo() {
+      const userInfoString = await AsyncStorage.getItem('userInfo');
+      if (userInfoString) {
+        console.log('User info found:', userInfoString);
+        const userInfo = JSON.parse(userInfoString);
+        const createdByString = `${userInfo.firstName} ${userInfo.lastName.charAt(0)}.`;
+        setCreatedBy(createdByString);
+      } else {
+        console.log('User info not found');
+      }
+    }
+    fetchUserInfo();
   }, []);
 
   const selectImageFromGallery = async () => {
@@ -125,6 +137,7 @@ const AddNewReport = () => {
         location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
         category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
         submittedOn: Timestamp.now(),
+        createdBy: createdBy, // Access createdBy state here
       });
 
       console.log('Report added successfully!');

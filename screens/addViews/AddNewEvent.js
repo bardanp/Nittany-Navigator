@@ -36,6 +36,7 @@ const AddNewEvent = () => {
   const [categoryId, setCategoryId] = useState(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [createdBy, setCreatedBy] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -47,6 +48,19 @@ const AddNewEvent = () => {
         }
       }
     })();
+    // Fetch user info and set createdBy state
+    async function fetchUserInfo() {
+      const userInfoString = await AsyncStorage.getItem('userInfo');
+      if (userInfoString) {
+        console.log('User info found:', userInfoString);
+        const userInfo = JSON.parse(userInfoString);
+        const createdByString = `${userInfo.firstName} ${userInfo.lastName.charAt(0)}.`;
+        setCreatedBy(createdByString);
+      } else {
+        console.log('User info not found');
+      }
+    }
+    fetchUserInfo();
   }, []);
 
   const handleImagePick = () => {
@@ -127,6 +141,7 @@ const AddNewEvent = () => {
         rsvpCount,
         category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
         submittedOn: Timestamp.now(),
+        createdBy: createdBy, // Access createdBy state here
       };
 
       await addDoc(collection(firestore, 'events'), eventInfo);

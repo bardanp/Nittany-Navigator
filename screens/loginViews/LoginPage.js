@@ -52,7 +52,7 @@ const LoginPage = ({ navigation }) => {
         firstName: userInfo.givenName,
         lastName: userInfo.surname,
         userType: userInfo['extension_b82288b902534da7beb676a3535134f5_extensionAttribute1'] || 'Not specified',
-        campus: userInfo['extension_b82288b902534da7beb676a3535134f5_extensionAttribute4'] || 'Not specified', // Save campus information
+        campus: userInfo['extension_b82288b902534da7beb676a3535134f5_extensionAttribute4'] || 'Not specified', 
       };
   
       await AsyncStorage.setItem('userInfo', JSON.stringify(formattedUserInfo));
