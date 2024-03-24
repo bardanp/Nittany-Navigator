@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
+import { Modal, View, Text, Pressable, ScrollView, Image, Dimensions } from 'react-native';
 import noPicturesIcon from '../../assets/no-pictures.png';
 import { firestore } from '../../backend/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import styles from './PopupModal.styles';
+import styles, { colors } from './PopupModal.styles';
 
 const { width } = Dimensions.get('window');
 
@@ -42,7 +42,7 @@ const PopupModal = ({ visible, onClose, item }) => {
     });
   };
 
-  const headerTitle = modalData?.isEvent ? 'Event Info' : 'Report Info';
+  const headerTitle = modalData?.isEvent ? 'Event' : 'Report';
   const headerBackgroundColor = modalData?.isEvent ? '#4CAF50' : '#F44336';
 
   return (
@@ -99,12 +99,17 @@ const PopupModal = ({ visible, onClose, item }) => {
                   </Text>
                 )}
               </View>
-              <TouchableOpacity
+              <Pressable
                 onPress={onClose}
-                style={[styles.closeButton, { backgroundColor: headerBackgroundColor }]}
+                style={({ pressed }) => [
+                  {
+                    backgroundColor: pressed ? '5071c4' : '5E81F4',
+                  },
+                  styles.closeButton,
+                ]}
               >
                 <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+              </Pressable>
             </ScrollView>
           </View>
         </View>

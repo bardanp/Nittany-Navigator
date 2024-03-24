@@ -2,155 +2,113 @@ import { StyleSheet, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 const modalWidth = width * 0.9;
-const primaryColor = '#4CAF50'; // Green
-const dangerColor = '#F44336'; // Red
-const textColor = '#333'; // Dark grey for text
-const borderColor = '#E0E0E0'; // Light grey for borders
-const backgroundColor = '#FFF'; // White background
 
+// New Color Palette
+const colors = {
+  background: '#FFFFFF', // White
+  primary: '#5E81F4', // Base
+  primaryDark: '#5071c4', // Darker shade for pressed button state
+  primaryLight: '#7a9ef7', // Lighter tint for hover state
+  secondary: '#F5F5F7', // Light grey for backgrounds and elements
+  textPrimary: '#333333', // Almost black for primary text
+  textSecondary: '#4F4F4F', // Dark grey for secondary text
+  border: '#E0E0E0', // Light grey for borders
+  success: '#4CAF50', // Success or confirmation actions
+  danger: '#FF5252', // Alerts, errors, or important actions
+  warning: '#FFC107', // Warnings or caution needed
+  
+};
+
+// Updated Styles
 export default StyleSheet.create({
-  // Overlay for modal background
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Softer overlay
   },
-
-  // Container for modal content
   modalContainer: {
-    backgroundColor: backgroundColor,
-    borderRadius: 20,
-    overflow: 'hidden',
+    backgroundColor: colors.background,
+    borderRadius: 12, // Rounded corners
     width: modalWidth,
     maxHeight: height * 0.8,
-    elevation: 5, // Adds shadow for Android
-    shadowColor: '#000', // Shadow for iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 12,
   },
-
-  // Container for scrollable content
   scrollViewContainer: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingVertical: 20,
   },
-
-  // Image container styles
-  imageContainer: {
+  header: {
     width: '100%',
-    height: 200,
-    overflow: 'hidden',
-    borderBottomWidth: 1,
-    borderBottomColor: borderColor,
+    padding: 20, 
+    backgroundColor: colors.primary, // Primary color for header
+    alignItems: 'center',
+    borderTopLeftRadius: 12, 
+    borderTopRightRadius: 12,
   },
-
-  // Image styles
+  category: {
+    fontSize: 26,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
   image: {
     width: '100%',
     height: '100%',
+    resizeMode: 'contain'
   },
-
-  // Header styles
-  header: {
+  imageContainer: {
     width: '100%',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: primaryColor,
-    alignItems: 'center',
+    height: 300,
     justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-
-  // Category text within header
-  category: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFF',
-  },
-
-  // Container for body content
   body: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-
-  // Title text style
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: textColor,
     paddingTop: 20,
-    paddingBottom: 10,
   },
-
-  // Description text style
+  title: {
+    fontFamily: 'Montserrat', // Or 'Montserrat', 'Noto Sans', 'Open Sans', 'Source Sans Pro'
+    fontWeight: '500',
+    fontSize: 26,
+    color: colors.textPrimary,
+  },
   description: {
-    fontSize: 16,
-    color: textColor,
-    marginBottom: 15,
+    fontFamily: 'Montserrat', // Or 'Montserrat', 'Noto Sans', 'Open Sans', 'Source Sans Pro'
+    fontWeight: '400', // Normal weight for description to make it slightly heavier for better readability
+    fontSize: 20,
+    color: colors.textSecondary,
   },
-
-  // Details text style
   details: {
-    fontSize: 14,
-    color: textColor,
+    fontSize: 16,
+    fontWeight: '400',
+    color: colors.textSecondary,
     marginBottom: 10,
   },
   emergency: {
-    color: dangerColor,
+    color: colors.danger,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   closeButton: {
-    backgroundColor: dangerColor,
-    width: '80%',
-    height: 50,
+    backgroundColor: colors.danger,
+    width: '60%',
+    height: 48, // Touch-friendly button height
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 25,
+    borderRadius: 24, // Fully rounded corners
     alignSelf: 'center',
+    marginTop: 20,
     marginBottom: 20,
   },
   closeButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '600',
   },
-  inputContainer: {
-    backgroundColor: '#F0F0F0',
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    marginVertical: 10,
-  },
-
-  input: {
-    fontSize: 16,
-    color: textColor,
-  },
-
-  buttonPrimary: {
-    backgroundColor: primaryColor,
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
-  },
-  buttonText: {
-    fontSize: 18,
-    color: '#FFF',
-    fontWeight: '500',
-  },
-  mt: { marginTop: 10 },
-  mb: { marginBottom: 10 },
-  ml: { marginLeft: 10 },
-  mr: { marginRight: 10 },
-  pt: { paddingTop: 10 },
-  pb: { paddingBottom: 10 },
-  pl: { paddingLeft: 10 },
-  pr: { paddingRight: 10 },
 });

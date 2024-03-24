@@ -34,6 +34,7 @@ const AddNewEvent = () => {
   const [contactEmail, setContactEmail] = useState('');
   const [rsvpCount, setRsvpCount] = useState(0);
   const [categoryId, setCategoryId] = useState(null);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [createdBy, setCreatedBy] = useState('');
@@ -61,6 +62,7 @@ const AddNewEvent = () => {
       }
     }
     fetchUserInfo();
+    setCategoryOptions(options.categories);
   }, []);
 
   const handleImagePick = () => {
@@ -187,7 +189,7 @@ const AddNewEvent = () => {
   const renderSelectedCategory = () => {
     const selectedCategory = categoryId ? options.categories.find((cat) => cat.id === categoryId) : null;
     if (selectedCategory) {
-      return <Text style={styles.selectedText}>Selected Category: {selectedCategory.name}</Text>;
+      return <Text style={styles.selectedText}>Selected Event Category: {selectedCategory.name}</Text>;
     }
     return null;
   };
@@ -281,7 +283,7 @@ const AddNewEvent = () => {
 
       <View style={styles.actionContainer}>
         <Text style={styles.actionText} onPress={() => setShowCategoryPicker(true)}>
-          Select Category
+          Select Event Category
         </Text>
         {renderSelectedCategory()}
       </View>
@@ -296,19 +298,19 @@ const AddNewEvent = () => {
             <View style={styles.modalView}>
               <Text style={styles.modalTitle}>Select Category</Text>
               <FlatList
-                data={options.categories}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TouchableWithoutFeedback
-                    onPress={() => {
-                      setCategoryId(item.id);
-                      setShowCategoryPicker(false);
-                    }}
-                  >
-                    <Text style={styles.item}>{item.name}</Text>
-                  </TouchableWithoutFeedback>
-                )}
-              />
+                    data={categoryOptions}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                      <TouchableWithoutFeedback
+                        onPress={() => {
+                          setCategoryId(item.id);
+                          setShowCategoryPicker(false);
+                        }}
+                      >
+                        <Text style={styles.item}>{item.name}</Text>
+                      </TouchableWithoutFeedback>
+                    )}
+                  />
               <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>
                 <View style={[styles.modalButton, styles.closeButton]}>
                   <Text style={styles.modalButtonText}>Close</Text>
@@ -319,22 +321,24 @@ const AddNewEvent = () => {
         </TouchableWithoutFeedback>
       </Modal>
 
-      <TouchableWithoutFeedback onPress={handleImagePick}>
+      <TouchableOpacity onPress={handleImagePick}>
         <View style={styles.actionContainer}>
           <Text style={styles.actionText}>Pick Image</Text>
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
       {renderImage()}
       {image && (
       <TouchableOpacity style={styles.clearButton} onPress={clearImage}>
         <Text style={styles.clearButtonText}>Clear Image</Text>
       </TouchableOpacity>
       )}
-      <TouchableWithoutFeedback onPress={handleSubmit}>
+
+
+      <TouchableOpacity onPress={handleSubmit}>
         <View style={styles.submitButton}>
           <Text style={styles.buttonText}>Submit Event</Text>
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -403,9 +407,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   actionText: {
-    color: '#3498db',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#3498db',
     marginBottom: 10,
   },
   selectedText: {
@@ -434,7 +438,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     padding: 25,
     alignItems: 'center',
-    maxHeight: '80%',
+    maxHeight: '60%',
     alignSelf: 'center',
     marginTop: 'auto',
     marginBottom: 'auto',

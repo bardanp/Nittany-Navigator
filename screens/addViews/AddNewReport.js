@@ -33,6 +33,7 @@ const AddNewReport = () => {
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [categoryId, setCategoryId] = useState(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [reportCategories, setReportCategories] = useState([]);
   const [createdBy, setCreatedBy] = useState('');
   const navigation = useNavigation();
 
@@ -88,6 +89,7 @@ const AddNewReport = () => {
       }
     }
     fetchUserInfo();
+    setReportCategories(options.reportCategories); 
   }, []);
 
   const selectImageFromGallery = async () => {
@@ -194,7 +196,7 @@ const AddNewReport = () => {
   };
 
   const renderSelectedCategory = () => {
-    const selectedCategory = categoryId ? options.categories.find((cat) => cat.id === categoryId) : null;
+    const selectedCategory = categoryId ? reportCategories.find((cat) => cat.id === categoryId) : null;
     if (selectedCategory) {
       return <Text style={styles.selectedText}>Selected Category: {selectedCategory.name}</Text>;
     }
@@ -284,7 +286,7 @@ const AddNewReport = () => {
 
       <View style={styles.actionContainer}>
         <Text style={styles.actionText} onPress={() => setShowCategoryPicker(true)}>
-          Select Category
+          Select Report Category
         </Text>
         {renderSelectedCategory()}
       </View>
@@ -297,9 +299,9 @@ const AddNewReport = () => {
         <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalTitle}>Select Category</Text>
+              <Text style={styles.modalTitle}>Select Report Category</Text>
               <FlatList
-                data={options.categories}
+                data={reportCategories}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <TouchableWithoutFeedback
@@ -432,12 +434,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalView: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 12,
     elevation: 5,
     padding: 25,
     alignItems: 'center',
-    maxHeight: '80%',
+    maxHeight: '60%',
     alignSelf: 'center',
     marginTop: 'auto',
     marginBottom: 'auto',
