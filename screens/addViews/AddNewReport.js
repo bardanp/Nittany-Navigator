@@ -98,10 +98,11 @@ const AddNewReport = () => {
       quality: 1,
     });
     
-    if (!result.cancelled) {
-      setImage(result.uri);
+    if (!result.canceled && result.assets) {
+      setImage(result.assets[0].uri);
     }
   };
+  
 
   const takePhoto = async () => {
     let result = await ImagePicker.launchCameraAsync({
@@ -109,26 +110,40 @@ const AddNewReport = () => {
       aspect: [4, 3],
       quality: 1,
     });
-
-    if (!result.cancelled) {
-      setImage(result.uri);
+  
+    if (!result.canceled && result.assets) {
+      setImage(result.assets[0].uri);
+      console.log(result.assets[0].uri); 
+      
     }
   };
   
+  
   const handleSubmit = async () => {
     console.log('Submitting report...');
+    if (!title || !description || !date) {
+      Alert.alert('Missing Fields', 'Please ensure all fields are filled and an image is selected.');
+      return; 
+    }
+  
     try {
       let imageUrl = '';
       if (image) {
-        const response = await fetch(image);
-        const blob = await response.blob();
-        const imageName = `report_images/${Date.now()}`;
-        const imageRef = ref(storage, imageName);
-        const snapshot = await uploadBytes(imageRef, blob);
-        imageUrl = await getDownloadURL(snapshot.ref);
+        try {
+          const response = await fetch(image);
+          const blob = await response.blob();
+          const imageName = `report_images/${Date.now()}`;
+          const imageRef = ref(storage, imageName);
+          const snapshot = await uploadBytes(imageRef, blob);
+          imageUrl = await getDownloadURL(snapshot.ref);
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          Alert.alert('Upload Error', 'Failed to upload image.');
+          return; 
+        }
       }
-
-      await addDoc(collection(firestore, 'reports'), {
+      
+      const reportData = {
         title,
         emergency,
         description,
@@ -137,50 +152,28 @@ const AddNewReport = () => {
         location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
         category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
         submittedOn: Timestamp.now(),
-        createdBy: createdBy, // Access createdBy state here
-      });
-
+        createdBy: createdBy,
+      };
+      await addDoc(collection(firestore, 'reports'), reportData);
       console.log('Report added successfully!');
-      Alert.alert('Success', 'Report added successfully!');
-      navigation.goBack();
+      navigation.navigate('SubmitSuccessScreen');
     } catch (error) {
       console.error('Error adding report to Firestore:', error);
       Alert.alert('Error', 'Failed to add the report.');
     }
   };
   
-  
 
   const renderImage = () => {
-    if (image) {
-      return (
-        <View>
-          <Image source={{ uri: image }} style={styles.image} />
-          <TouchableOpacity onPress={clearImage} style={styles.clearButton}>
-            <Text style={styles.clearButtonText}>Remove Image</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
+  if (image) {
+    console.log("Rendering image with URI:", image); 
+    return (
+      <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
+    );
+  }
     return null;
   };
 
-
-  const uploadImageToFirebase = async () => {
-    try {
-      const response = await fetch(image);
-      const blob = await response.blob();
-      const imageName = new Date().getTime(); 
-      const imageRef = ref(storage, `images/${imageName}`);
-      await uploadBytes(imageRef, blob);
-      const url = await getDownloadURL(imageRef);
-      setImageUrl(url);
-    } catch (error) {
-      console.error('Error uploading image to Firebase:', error);
-    }
-  };
-
-  // Function to clear the selected image
   const clearImage = () => {
     setImage(null);
   };
@@ -334,7 +327,12 @@ const AddNewReport = () => {
           <Text style={styles.actionText}>Pick Image</Text>
         </View>
       </TouchableWithoutFeedback>
-      {image && <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />}
+      {renderImage()}
+      {image && (
+      <TouchableOpacity style={styles.clearButton} onPress={clearImage}>
+        <Text style={styles.clearButtonText}>Clear Image</Text>
+      </TouchableOpacity>
+      )}
 
       <TouchableWithoutFeedback onPress={handleSubmit}>
         <View style={styles.submitButton}>
@@ -368,7 +366,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff6347',
     padding: 10,
     borderRadius: 5,
-    marginTop: 5,
   },
   clearButtonText: {
     color: '#fff',
@@ -424,6 +421,9 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     marginBottom: 20,
+    borderColor: 'red', // Temporary for visibility
+    borderWidth: 2, // Temporary for visibility
+    backgroundColor: 'lightgrey', // Temporary to show the area
   },
   centeredView: {
     flex: 1,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 20,
   },
   buttonText: {
     color: '#fff',

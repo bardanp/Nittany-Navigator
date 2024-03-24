@@ -115,6 +115,20 @@ const AddNewEvent = () => {
       }
     }
   };
+
+  const renderImage = () => {
+    if (image) {
+      console.log("Rendering image with URI:", image); 
+      return (
+        <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
+      );
+    }
+      return null;
+    };
+  
+    const clearImage = () => {
+      setImage(null);
+    };
   
 
   const handleSubmit = async () => {
@@ -310,8 +324,12 @@ const AddNewEvent = () => {
           <Text style={styles.actionText}>Pick Image</Text>
         </View>
       </TouchableWithoutFeedback>
-      {image && <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />}
-
+      {renderImage()}
+      {image && (
+      <TouchableOpacity style={styles.clearButton} onPress={clearImage}>
+        <Text style={styles.clearButtonText}>Clear Image</Text>
+      </TouchableOpacity>
+      )}
       <TouchableWithoutFeedback onPress={handleSubmit}>
         <View style={styles.submitButton}>
           <Text style={styles.buttonText}>Submit Event</Text>
@@ -400,6 +418,9 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     marginBottom: 20,
+    borderColor: 'red', // Temporary for visibility
+    borderWidth: 2, // Temporary for visibility
+    backgroundColor: 'lightgrey', // Temporary to show the area
   },
   centeredView: {
     flex: 1,
@@ -462,7 +483,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 20,
   },
   buttonText: {
     color: '#fff',
