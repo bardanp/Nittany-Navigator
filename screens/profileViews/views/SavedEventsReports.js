@@ -2,14 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const EventHistory = () => {
+const SavedEventsReports = () => {
     const navigation = useNavigation();
-
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Event History</Text>
-            <Text>This page displays all of the Events from the user</Text>
+            <Text style={styles.header}>Report History</Text>
+            <Text>This page displays all of the Reports from the user</Text>
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                 <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
@@ -49,4 +48,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default EventHistory;
+export default SavedEventsReports;

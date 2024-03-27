@@ -1,31 +1,39 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import * as Font from 'expo-font'; 
 
 const { width, height } = Dimensions.get('window');
 const modalWidth = width * 0.9;
 
-// New Color Palette
 const colors = {
-  background: '#FFFFFF', // White
-  primary: '#5E81F4', // Base
-  primaryDark: '#5071c4', // Darker shade for pressed button state
-  primaryLight: '#7a9ef7', // Lighter tint for hover state
-  secondary: '#F5F5F7', // Light grey for backgrounds and elements
-  textPrimary: '#333333', // Almost black for primary text
-  textSecondary: '#4F4F4F', // Dark grey for secondary text
-  border: '#E0E0E0', // Light grey for borders
-  success: '#4CAF50', // Success or confirmation actions
-  danger: '#FF5252', // Alerts, errors, or important actions
-  warning: '#FFC107', // Warnings or caution needed
-  
+  background: '#FFFFFF', 
+  primary: '#5E81F4', 
+  primaryDark: '#5071c4', 
+  primaryLight: '#7a9ef7', 
+  secondary: '#F5F5F7', 
+  textPrimary: '#333333', 
+  textSecondary: '#4F4F4F', 
+  border: '#E0E0E0', 
+  success: '#4CAF50', 
+  danger: '#FF5252',
+  warning: '#FFC107', 
 };
 
-// Updated Styles
+async function loadFonts() {
+  await Font.loadAsync({
+    Montserrat: require('../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf'),
+    'Montserrat-Bold': require('../../assets/fonts/Montserrat/static/Montserrat-Bold.ttf'), 
+  });
+}
+
+loadFonts();
+
+
 export default StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Softer overlay
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
   modalContainer: {
     backgroundColor: colors.background,
@@ -45,7 +53,7 @@ export default StyleSheet.create({
   header: {
     width: '100%',
     padding: 20, 
-    backgroundColor: colors.primary, // Primary color for header
+    backgroundColor: colors.primary, 
     alignItems: 'center',
     borderTopLeftRadius: 12, 
     borderTopRightRadius: 12,
@@ -73,14 +81,14 @@ export default StyleSheet.create({
     paddingTop: 20,
   },
   title: {
-    fontFamily: 'Montserrat', // Or 'Montserrat', 'Noto Sans', 'Open Sans', 'Source Sans Pro'
+    fontFamily: 'Montserrat', 
     fontWeight: '500',
     fontSize: 26,
     color: colors.textPrimary,
   },
   description: {
-    fontFamily: 'Montserrat', // Or 'Montserrat', 'Noto Sans', 'Open Sans', 'Source Sans Pro'
-    fontWeight: '400', // Normal weight for description to make it slightly heavier for better readability
+    fontFamily: 'Montserrat', 
+    fontWeight: '400', 
     fontSize: 20,
     color: colors.textSecondary,
   },
@@ -98,10 +106,10 @@ export default StyleSheet.create({
   closeButton: {
     backgroundColor: colors.danger,
     width: '60%',
-    height: 48, // Touch-friendly button height
+    height: 48, 
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 24, // Fully rounded corners
+    borderRadius: 24, 
     alignSelf: 'center',
     marginTop: 20,
     marginBottom: 20,

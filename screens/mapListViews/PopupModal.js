@@ -11,6 +11,12 @@ const PopupModal = ({ visible, onClose, item }) => {
   const [modalData, setModalData] = useState(null);
   const [imageError, setImageError] = useState(false);
 
+
+  useEffect(() => {
+    console.log("Modal visibility changed:", visible);
+  }, [visible]);
+  
+
   useEffect(() => {
     const fetchModalData = async () => {
       if (!item) return;
@@ -99,6 +105,17 @@ const PopupModal = ({ visible, onClose, item }) => {
                   </Text>
                 )}
               </View>
+              
+              <View style={styles.commentContainer}>
+                <Text style={styles.comments}>
+                  [Comments will be go here]
+                </Text>
+                {modalData.comments && modalData.comments.map((comment, index) => (
+                  <Text key={index} style={styles.commentText}>{comment}</Text>
+                ))}
+              </View>
+
+
               <Pressable
                 onPress={onClose}
                 style={({ pressed }) => [

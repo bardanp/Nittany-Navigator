@@ -42,8 +42,8 @@ const ProfileScreen = () => {
 
 
   const profileOptions = [
-      { title: 'Event History', description: 'View past events and their details.', iconName: 'history', handler: 'EventHistory' },
-      { title: 'Report History', description: 'View past reports and their details.', iconName: 'report', handler: 'ReportHistory' },
+      { title: 'My Events & Reports', description: 'View events and reports made by you.', iconName: 'history', handler: 'UserEventsReports' },
+      { title: 'Saved Events & Reports', description: 'View events and reports saved by you.', iconName: 'menu', handler: 'SavedEventsReports' },
       { title: 'About', description: 'Learn more about the application and its creators.', iconName: 'info', handler: 'About' },
       { title: 'Settings', description: 'Adjust profile settings and preferences.', iconName: 'settings', handler: 'Settings' },
     ];

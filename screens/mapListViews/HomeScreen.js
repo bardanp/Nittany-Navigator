@@ -237,6 +237,11 @@ const HomeScreen = ({  }) => {
         setLocationItems(items); 
         setIsLocationModalVisible(true); 
     };
+
+    const handleDesc = (item) => {
+        setSelectedItem(item);
+        setModalVisible(true);
+    };
     
 
     const goToUserLocation = async () => {
@@ -274,34 +279,35 @@ const HomeScreen = ({  }) => {
                 console.log('Location not found for:', item.location);
             }
         };
-    
-        const handleDesc = () => {
-            setSelectedItem(item);
-            setModalVisible(true);
-        };
-    
+        
+
         return (
-            <View style={styles.eventItem}>
-                <View style={[styles.iconContainer, { backgroundColor: color }]}>
-                    <Icon name={icon} size={24} color="#fff" />
+            <TouchableOpacity style={styles.eventItem} onPress={() => handleCalloutPress(item)}>
+                <View style={[styles.iconContainer, { backgroundColor: item.color || '#007bff' }]}>
+                    <Icon name={getIconName(item).icon} size={24} color="#fff" />
                 </View>
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, justifyContent: "center" }}>
                     <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.info}>{`Date: ${item.dateTime ? formatDate(item.dateTime) : 'N/A'}`}</Text>
-                    <Text style={styles.info}>{`Location: ${item.location}`}</Text>
-                    {item.participants && <Text style={styles.info}>{`Participants: ${item.participants}`}</Text>}
+                    <Text style={styles.description}>{`Date: ${item.dateTime ? formatDate(item.dateTime) : 'N/A'}`}</Text>
+                    <Text style={styles.description}>{`Location: ${item.location}`}</Text>
+                    {item.participants && <Text style={styles.description}>{`Participants: ${item.participants}`}</Text>}
                 </View>
                 <View style={styles.buttonsContainer}>
                     <TouchableOpacity onPress={handleMap} style={styles.button}>
                         <Icon name="map" size={20} color="#fff" />
                     </TouchableOpacity>
-    
-                    <TouchableOpacity onPress={handleDesc} style={styles.button}>
-                        <Icon name="info" size={20} color="#fff" />
-                    </TouchableOpacity>
-                </View>
-            </View>
+                    
+                    <PopupModal
+                            visible={modalVisible}
+                            onClose={() => setModalVisible(false)}
+                            item={selectedItem}
+                        />
+                 </View>
+            </TouchableOpacity>
+            
+            
         );
+        
     };
     
 
@@ -338,12 +344,12 @@ const HomeScreen = ({  }) => {
                             <Icon name="my-location" size={25} color="#000" /> 
                         </TouchableOpacity>
 
-
                         <PopupModal
                             visible={modalVisible}
                             onClose={() => setModalVisible(false)}
                             item={selectedItem}
                         />
+
 
                         <MultipleEventsModal
                             isLocationModalVisible={isLocationModalVisible}

@@ -8,11 +8,12 @@ import ProfileScreen from "./screens/profileViews/ProfileScreen";
 import SettingsScreen from "./screens/profileViews/views/SettingScreen";
 import SubmitSuccessScreen from "./screens/addViews/SubmitSuccessScreen";
 import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
+import SavedEventsReports from "./screens/profileViews/views/SavedEventsReports";
+import UserEventsReports from "./screens/profileViews/views/UserEventsReports";
+
 
 import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
-import EventHistory from "./screens/profileViews/views/EventHistory";
-import ReportHistory from "./screens/profileViews/views/ReportHistory";
 import About from "./screens/profileViews/views/About";
 
 
@@ -76,13 +77,13 @@ const App = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="EventHistory"
-          component={EventHistory}
+          name="SavedEventsReports"
+          component={SavedEventsReports}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="ReportHistory"
-          component={ReportHistory}
+          name="UserEventsReports"
+          component={UserEventsReports}
           options={{ headerShown: false }}
         />
         <Stack.Screen
