@@ -10,6 +10,8 @@ import SubmitSuccessScreen from "./screens/addViews/SubmitSuccessScreen";
 import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
 import SavedEventsReports from "./screens/profileViews/views/SavedEventsReports";
 import UserEventsReports from "./screens/profileViews/views/UserEventsReports";
+import HomeScreen from "./screens/mapListViews/HomeScreen"
+
 
 
 import { firestore } from "./backend/firebase";

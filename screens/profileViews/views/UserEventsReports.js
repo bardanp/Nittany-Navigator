@@ -5,6 +5,8 @@ import { firestore } from '../../../backend/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PopupModal from '../../mapListViews/PopupModal';
+import options from '../../../backend/options.json';
+
 
 const UserEventsReports = () => {
     const navigation = useNavigation();
@@ -58,9 +60,15 @@ const UserEventsReports = () => {
     };
 
     const handleItemPress = (item) => {
+        if (!item || typeof item.id !== 'string') {
+            console.error('Invalid item passed to PopupModal', item);
+            return;
+        }
         setSelectedItem(item);
-        setModalVisible(true); // This will show the modal
+        setModalVisible(true); 
     };
+    
+    
 
     const handleRemoveItem = async (itemId, type) => {
         try {
@@ -79,60 +87,34 @@ const UserEventsReports = () => {
         (filter === 'events' && item.type === 'event') ||
         (filter === 'reports' && item.type === 'report')
     );
-    // Mock implementation of getIconName function
-// Adjust this function according to your actual implementation
-    const getIconName = (item) => {
-    // Example logic: return icon name based on the item's type
-    switch (item.type) {
-        case 'event':
-            return { icon: 'event', color: '#1976d2' };
-        case 'report':
-            return { icon: 'report-problem', color: '#d32f2f' };
-        default:
-            return { icon: 'info', color: '#9e9e9e' };
-    }
-};
 
 
 
     const renderItem = ({ item }) => {
         if (!item || !item.type) {
             console.error('Item or item.type is undefined', item);
-            return null; // Return null or some placeholder component
-          }
-
-        const { icon, color } = getIconName(item);
-    
-        const handleMap = () => {
-            const location = options.locations.find(loc => loc.name === item.location);
-    
-            if (location) {
-                setMapRegion({
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    latitudeDelta: 0.005,
-                    longitudeDelta: 0.005,
-                });
-                setShowMap(true);
-            } else {
-                console.log('Location not found for:', item.location);
-            }
-        };
-        
+            return null; 
+        }
 
         return (
-            <TouchableOpacity style={styles.listItem} onPress={() => handleItemPress(item)}>
+            <View style={styles.listItem}>
                 <View style={styles.itemDetails}>
                     <Text style={styles.listItemHeader}>{item.title}</Text>
                     <Text style={styles.listItemText}>Location: {item.location}</Text>
                     <Text style={styles.listItemText}>Date: {item.date}</Text>
                 </View>
-                <TouchableOpacity onPress={() => handleRemoveItem(item.id, item.type)} style={styles.removeButton}>
-                    <Text style={styles.removeButtonText}>Remove</Text>
-                </TouchableOpacity>
-            </TouchableOpacity>
+                <View style={styles.listItemActions}>
+                    <TouchableOpacity onPress={() => handleRemoveItem(item.id, item.type)} style={styles.removeButton}>
+                        <Text style={styles.removeButtonText}>Delete {item.type}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleItemPress(item)} style={styles.viewInfo}>
+                        <Text style={styles.viewInfoText}>View Details</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         );
     };
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -166,6 +148,12 @@ const UserEventsReports = () => {
             data={filteredItems}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => renderItem({ item })}
+            />
+
+            <PopupModal 
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                item={selectedItem}
             />
         </SafeAreaView>
     );
@@ -243,9 +231,9 @@ const styles = StyleSheet.create({
     },
     removeButton: {
         backgroundColor: '#FF3B30',
-        paddingHorizontal: 15,
-        paddingVertical: 8,
+        padding: 10,
         borderRadius: 8,
+        margin: 4,
     },
     removeButtonText: {
         color: '#FFFFFF',
@@ -253,6 +241,16 @@ const styles = StyleSheet.create({
     },
     listContentContainer: {
         paddingBottom: 20,
+    },
+    viewInfo: {
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 8,
+        margin: 4,
+    },
+    viewInfoText: {
+        color: '#FFFFFF',
+        fontSize: 14,
     },
 });
 

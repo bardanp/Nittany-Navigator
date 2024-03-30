@@ -25,23 +25,38 @@ const PopupModal = ({ visible, onClose, item }) => {
   
 
   useEffect(() => {
-    const fetchModalData = async () => {
-      if (!item) return;
-
+    const fetchModalDataAndCheckSavedStatus = async () => {
+      if (!item || !item.id) return;
+  
       const documentId = item.id.split('-')[1];
-      const documentRef = doc(firestore, item.isEvent ? 'events' : 'reports', documentId);
-
-      try {
-        const docSnap = await getDoc(documentRef);
+        const documentRef = doc(firestore, item.type === 'event' ? 'events' : 'reports', item.id);
+      
+        try {
+          const docSnap = await getDoc(documentRef);
         if (docSnap.exists()) {
           setModalData({ ...docSnap.data(), isEvent: item.isEvent });
+          const userInfoString = await AsyncStorage.getItem('userInfo');
+          if (userInfoString) {
+            const { email } = JSON.parse(userInfoString);
+            const userRef = doc(firestore, 'users', email);
+            const userDoc = await getDoc(userRef);
+  
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              const fieldToCheck = item.isEvent ? 'savedEvents' : 'savedReports';
+              const isCurrentlySaved = userData[fieldToCheck]?.includes(documentId);
+  
+              setIsSaved(isCurrentlySaved); 
+            }
+          }
         }
       } catch (error) {
         console.error('Error fetching modal data:', error);
       }
     };
-    fetchModalData();
+    fetchModalDataAndCheckSavedStatus();
   }, [item]);
+  
 
   const formatDate = (timestamp) => {
     if (!timestamp) return 'N/A';
@@ -56,43 +71,60 @@ const PopupModal = ({ visible, onClose, item }) => {
   };
 
   const saveToUser = async (documentId, isEvent) => {
+    if (!documentId) {
+      console.error('documentId is undefined');
+      return;
+    }
     try {
-      const userInfo = await AsyncStorage.getItem('userInfo');
-      const { email } = JSON.parse(userInfo);
-  
+      const userInfoString = await AsyncStorage.getItem('userInfo');
+      if (!userInfoString) {
+        console.error('User info not found');
+        return;
+      }
+      const { email } = JSON.parse(userInfoString);
+    
       const userRef = doc(firestore, 'users', email);
-  
       const fieldToUpdate = isEvent ? 'savedEvents' : 'savedReports';
-  
+    
       await updateDoc(userRef, {
-        [fieldToUpdate]: arrayUnion(documentId)
+        [fieldToUpdate]: arrayUnion(item.id) 
       });
-  
-      console.log(`Saved ${isEvent ? 'event' : 'report'} with ID: ${documentId} to user ${email}`);
+    
+      console.log(`Saved ${isEvent ? 'event' : 'report'} with ID: ${item.id} to user ${email}`);
       setIsSaved(true);
     } catch (error) {
       console.error('Error saving to user:', error);
     }
   };
 
-  const unsaveFromUser = async (documentId, isEvent) => {
+  const unsaveFromUser = async (isEvent) => {
+    if (!item || !item.id) {
+      console.error('Invalid item or item ID');
+      return;
+    }
+  
     try {
-      const userInfo = await AsyncStorage.getItem('userInfo');
-      const { email } = JSON.parse(userInfo);
+      const userInfoString = await AsyncStorage.getItem('userInfo');
+      if (!userInfoString) {
+        console.error('User info not found');
+        return;
+      }
+      const { email } = JSON.parse(userInfoString);
   
       const userRef = doc(firestore, 'users', email);
       const fieldToUpdate = isEvent ? 'savedEvents' : 'savedReports';
   
       await updateDoc(userRef, {
-        [fieldToUpdate]: arrayRemove(documentId)
+        [fieldToUpdate]: arrayRemove(item.id)
       });
   
-      console.log(`Unsaved ${isEvent ? 'event' : 'report'} with ID: ${documentId} from user ${email}`);
+      console.log(`Removed bookmark for ${isEvent ? 'event' : 'report'} with ID: ${item.id} from user ${email}`);
       setIsSaved(false);
     } catch (error) {
-      console.error('Error unsaving from user:', error);
+      console.error('Error removing bookmark from user:', error);
     }
   };
+  
 
   const headerTitle = modalData?.isEvent ? 'Event' : 'Report';
   const headerBackgroundColor = modalData?.isEvent ? '#4CAF50' : '#F44336';
@@ -116,9 +148,10 @@ const PopupModal = ({ visible, onClose, item }) => {
                 
                 <BookmarkButton
                   isSaved={isSaved}
-                  onSave={() => saveToUser(item.id.split('-')[1], item.isEvent)}
-                  onUnsave={() => unsaveFromUser(item.id.split('-')[1], item.isEvent)}
+                  onSave={() => saveToUser(item.id, item.isEvent)} 
+                  onUnsave={() => unsaveFromUser(item.id, item.isEvent)} 
                 />
+
               </View>
 
               <View style={styles.imageContainer}>

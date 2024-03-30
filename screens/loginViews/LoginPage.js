@@ -74,7 +74,7 @@ const LoginPage = ({ navigation }) => {
     if (!docSnap.exists()) {
       await setDoc(userRef, {
         campus: userInfo.campus || 'Not specified',
-        createdAt: now, 
+        firstCreated: now, 
         displayName: userInfo.displayName || `${userInfo.givenName} ${userInfo.surname}`,
         email: userInfo.email,
         lastLogin: now,
@@ -88,8 +88,8 @@ const LoginPage = ({ navigation }) => {
           theme: 'light', 
         },
         profilePicture: '', 
-        savedEvents: {}, 
-        savedReports: {},
+        savedEvents: [], 
+        savedReports: [],
         userType: userInfo.userType || 'STUDENT', 
       });
       console.log(`Added new user with ID: ${userDocId}`);

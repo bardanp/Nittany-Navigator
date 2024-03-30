@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firestore } from '../../../backend/firebase';
-import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PopupModal from '../../mapListViews/PopupModal';
 
@@ -13,14 +13,13 @@ const UserEventsReports = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
 
-
     useEffect(() => {
         const fetchUserInfoAndData = async () => {
             try {
                 const userInfoString = await AsyncStorage.getItem('userInfo');
                 if (userInfoString) {
                     const userInfo = JSON.parse(userInfoString);
-                    await fetchEventsAndReports(`${userInfo.firstName} ${userInfo.lastName.charAt(0)}.`);
+                    await fetchSavedEventsAndReports(userInfo.email);
                 } else {
                     console.log('User info not found');
                 }
@@ -32,45 +31,127 @@ const UserEventsReports = () => {
         fetchUserInfoAndData();
     }, []);
 
-    const fetchEventsAndReports = async (createdBy) => {
+
+    const fetchSavedEventsAndReports = async (userEmail) => {
         try {
-            const eventsQuery = query(collection(firestore, 'events'), where('createdBy', '==', createdBy));
-            const reportsQuery = query(collection(firestore, 'reports'), where('createdBy', '==', createdBy));
+            const userRef = doc(firestore, 'users', userEmail);
+            const userDoc = await getDoc(userRef);
+            if (!userDoc.exists()) {
+                console.log('No such document!');
+                return;
+            }
+            const userData = userDoc.data();
+            console.log('UserData:', userData); 
+            const savedEventsIds = Array.isArray(userData.savedEvents) ? userData.savedEvents : [];
+            const savedReportsIds = Array.isArray(userData.savedReports) ? userData.savedReports : [];
+            
+            console.log('Saved Events IDs:', savedEventsIds); 
+            console.log('Saved Reports IDs:', savedReportsIds); 
+    
+            const eventsReportsData = [];
 
-            const [eventsSnapshot, reportsSnapshot] = await Promise.all([getDocs(eventsQuery), getDocs(reportsQuery)]);
-
-            const fetchedEvents = eventsSnapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id,
-                type: 'event',
-            }));
-
-            const fetchedReports = reportsSnapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id,
-                type: 'report',
-            }));
-
-            setEventsReports([...fetchedEvents, ...fetchedReports]);
+            for (const eventId of savedEventsIds) {
+                console.log('Fetching event:', eventId); 
+                const eventDoc = await getDoc(doc(firestore, 'events', eventId));
+                if (eventDoc.exists()) {
+                    eventsReportsData.push({
+                        ...eventDoc.data(),
+                        id: eventDoc.id,
+                        type: 'event',
+                    });
+                }
+            }
+            
+            for (const reportId of savedReportsIds) {
+                console.log('Fetching report:', reportId);
+                const reportDoc = await getDoc(doc(firestore, 'reports', reportId));
+                if (reportDoc.exists()) {
+                    eventsReportsData.push({
+                        ...reportDoc.data(),
+                        id: reportDoc.id,
+                        type: 'report',
+                    });
+                }
+            }
+    
+            setEventsReports(eventsReportsData);
         } catch (error) {
-            console.error('Error fetching events and reports:', error);
+            console.error('Error fetching saved events and reports:', error);
+        }
+    };
+    
+    const handleItemPress = async (item) => {
+        setSelectedItem(item);
+        setModalVisible(true);
+    
+        if (!isSaved(item.id, item.isEvent)) {
+            await saveToUser(item.id, item.isEvent);
+            console.log('Bookmark added:', item.id);
         }
     };
 
-    const handleItemPress = (item) => {
-        setSelectedItem(item);
-        setModalVisible(true); // This will show the modal
+    const isSaved = (documentId, isEvent) => {
+        if (!documentId) return false;
+    
+        const savedItems = isEvent ? savedEvents : savedReports;
+        return savedItems.includes(documentId);
     };
+
+    const unsaveFromUser = async (documentId, isEvent) => {
+        try {
+            const userInfoString = await AsyncStorage.getItem('userInfo');
+            if (!userInfoString) {
+                console.error('User info not found');
+                return;
+            }
+            const { email } = JSON.parse(userInfoString);
+    
+            const userRef = doc(firestore, 'users', email);
+            const fieldToUpdate = isEvent ? 'savedEvents' : 'savedReports';
+    
+            await updateDoc(userRef, {
+                [fieldToUpdate]: arrayRemove(documentId)
+            });
+    
+            console.log(`Removed bookmark for ${isEvent ? 'event' : 'report'} with ID: ${documentId} from user ${email}`);
+            
+            await fetchSavedEventsAndReports(email);
+        } catch (error) {
+            console.error('Error removing bookmark from user:', error);
+        }
+    };
+    
+
+    const handleRemoveBookmark = async (documentId, isEvent) => {
+        const item = { id: documentId, isEvent };
+    
+        Alert.alert(
+            'Remove Bookmark',
+            'Are you sure you want to remove this bookmark?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Remove',
+                    onPress: async () => {
+                        await unsaveFromUser(item.isEvent);
+                        console.log('Bookmark removed:', item.id);
+                    },
+                },
+            ],
+            { cancelable: true }
+        );
+    };
+
 
     const filteredItems = eventsReports.filter(item =>
         filter === 'both' ||
         (filter === 'events' && item.type === 'event') ||
         (filter === 'reports' && item.type === 'report')
     );
-    // Mock implementation of getIconName function
-// Adjust this function according to your actual implementation
     const getIconName = (item) => {
-    // Example logic: return icon name based on the item's type
     switch (item.type) {
         case 'event':
             return { icon: 'event', color: '#1976d2' };
@@ -83,46 +164,46 @@ const UserEventsReports = () => {
 
 
 
-    const renderItem = ({ item }) => {
-        if (!item || !item.type) {
-            console.error('Item or item.type is undefined', item);
-            return null; 
-          }
+const renderItem = ({ item }) => {
+    if (!item || !item.type) {
+        console.error('Item or item type is undefined', item);
+        return null;
+    }
 
-        const { icon, color } = getIconName(item);
-    
-        const handleMap = () => {
-            const location = options.locations.find(loc => loc.name === item.location);
-    
-            if (location) {
-                setMapRegion({
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    latitudeDelta: 0.005,
-                    longitudeDelta: 0.005,
-                });
-                setShowMap(true);
-            } else {
-                console.log('Location not found for:', item.location);
-            }
-        };
-        
-
-        return (
-            <TouchableOpacity style={styles.listItem} onPress={() => handleItemPress(item)}>
-                <View style={styles.itemDetails}>
-                    <Text style={styles.listItemHeader}>{item.title}</Text>
-                    <Text style={styles.listItemText}>Location: {item.location}</Text>
-                    <Text style={styles.listItemText}>Date: {item.date}</Text>
-                </View>
-            </TouchableOpacity>
-        );
-    };
+    return (
+        <View style={styles.listItem}>
+            <View style={styles.itemDetails}>
+                <Text style={styles.listItemHeader}>{item.title}</Text>
+                <Text style={styles.listItemText}>Location: {item.location}</Text>
+                <Text style={styles.listItemText}>Date: {item.date}</Text>
+            </View>
+            <View style={styles.listItemActions}>
+                <TouchableOpacity
+                    onPress={() => handleRemoveBookmark(item.id, item.type === 'event')}
+                    style={styles.removeButton}
+                >
+                    <Text style={styles.removeButtonText}>Remove Bookmark</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => handleItemPress(item)}
+                    style={styles.viewInfo}
+                >
+                    <Text style={styles.viewInfoText}>View Details</Text>
+                </TouchableOpacity>
+            </View>
+            <PopupModal 
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                item={selectedItem}
+            />
+        </View>
+    );
+};
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.headerContainer}>
-                <Text style={styles.header}>Your Events and Reports</Text>
+                <Text style={styles.header}>Saved Events and Reports</Text>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Text style={styles.backButtonText}>Back</Text>
                 </TouchableOpacity>
@@ -239,6 +320,16 @@ const styles = StyleSheet.create({
     },
     listContentContainer: {
         paddingBottom: 20,
+    },
+    viewInfo: {
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 8,
+        margin: 4,
+    },
+    viewInfoText: {
+        color: '#FFFFFF',
+        fontSize: 14,
     },
 });
 

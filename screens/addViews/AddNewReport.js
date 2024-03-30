@@ -60,13 +60,31 @@ const AddNewReport = () => {
     );
   };
 
-  const handleImagePick = async () => {
+  const handleImagePick = () => {
     Alert.alert('Upload Photo', 'Choose an option', [
-      { text: 'Take Photo', onPress: takePhoto },
-      { text: 'Choose from Gallery', onPress: selectImageFromGallery },
+      { text: 'Take Photo', onPress: handleTakePhoto },
+      { text: 'Choose from Gallery', onPress: handleChooseFromGallery },
       { text: 'Cancel', style: 'cancel' },
     ]);
   };
+
+  const handleChooseFromGallery = async () => {
+    const libraryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (libraryPermission.status !== 'granted') {
+      alert('Media library access is required to choose a photo.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
 
   useEffect(() => {
     (async () => {
@@ -106,17 +124,19 @@ const AddNewReport = () => {
   };
   
 
-  const takePhoto = async () => {
-    let result = await ImagePicker.launchCameraAsync({
+  const handleTakePhoto = async () => {
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraPermission.status !== 'granted') {
+      alert('Camera access is required to take a photo.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-  
-    if (!result.canceled && result.assets) {
-      setImage(result.assets[0].uri);
-      console.log(result.assets[0].uri); 
-      
+    if (!result.cancelled) {
+      setImage(result.uri);
     }
   };
   
@@ -138,6 +158,7 @@ const AddNewReport = () => {
           const imageRef = ref(storage, imageName);
           const snapshot = await uploadBytes(imageRef, blob);
           imageUrl = await getDownloadURL(snapshot.ref);
+        
         } catch (error) {
           console.error('Error uploading image:', error);
           Alert.alert('Upload Error', 'Failed to upload image.');
@@ -158,7 +179,7 @@ const AddNewReport = () => {
       };
       await addDoc(collection(firestore, 'reports'), reportData);
       console.log('Report added successfully!');
-      navigation.navigate('SubmitSuccessScreen');
+      navigation.goBack();
     } catch (error) {
       console.error('Error adding report to Firestore:', error);
       Alert.alert('Error', 'Failed to add the report.');
@@ -423,9 +444,9 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     marginBottom: 20,
-    borderColor: 'red', // Temporary for visibility
-    borderWidth: 2, // Temporary for visibility
-    backgroundColor: 'lightgrey', // Temporary to show the area
+    borderColor: 'red', 
+    borderWidth: 2, 
+    backgroundColor: 'lightgrey', 
   },
   centeredView: {
     flex: 1,

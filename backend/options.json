@@ -8,38 +8,39 @@
     {"id": "6", "name": "Courtyard", "latitude": 40.204657, "longitude": -76.741640},
     {"id": "7", "name": "Library", "latitude": 40.204268, "longitude": -76.741330}
   ],
-  "categories": [
-    { "id": "1", "name": "Religious gathering", "icon": "place", "color": "#009688" },
-    { "id": "2", "name": "Cultural celebration", "icon": "festival", "color": "#673ab7" },
-    { "id": "3", "name": "Study group", "icon": "group", "color": "#4caf50" },
-    { "id": "4", "name": "Social activity", "icon": "people", "color": "#ff6d00" },
-    { "id": "5", "name": "Career development", "icon": "work", "color": "#795548" },
-    { "id": "6", "name": "Sports and fitness", "icon": "fitness_center", "color": "#f44336" },
-    { "id": "7", "name": "Art and creativity", "icon": "brush", "color": "#ff9800" },
-    { "id": "8", "name": "Volunteering and community service", "icon": "group", "color": "#673ab7" },
-    { "id": "9", "name": "Health and wellness", "icon": "local_hospital", "color": "#4caf50" },
-    { "id": "10", "name": "Technology", "icon": "computer", "color": "#03a9f4" },
-    { "id": "11", "name": "Environmental and sustainability", "icon": "eco", "color": "#8bc34a" },
-    { "id": "12", "name": "Alumni event", "icon": "school", "color": "#9c27b0" },
-    { "id": "13", "name": "Leadership and personal development", "icon": "leaderboard", "color": "#ff9800" },
-    { "id": "14", "name": "Book/reading club", "icon": "book", "color": "#2196f3" },
-    { "id": "15", "name": "Music and Performance", "icon": "music_note", "color": "#e91e63" },
-    { "id": "16", "name": "Film and Media", "icon": "movie", "color": "#00bcd4" },
-    { "id": "17", "name": "Literary and Poetry Readings", "icon": "menu_book", "color": "#9e9e9e" },
-    { "id": "18", "name": "Science and Research", "icon": "science", "color": "#3f51b5" },
-    { "id": "19", "name": "Entrepreneurship and Startups", "icon": "lightbulb", "color": "#ffc107" },
-    { "id": "20", "name": "Civic Engagement and Politics", "icon": "gavel", "color": "#cddc39" },
-    { "id": "21", "name": "Food and Cooking Classes", "icon": "restaurant", "color": "#ff5722" }
-  ],
-  "reportCategories": [
-    { "id": "1", "name": "Emergency", "icon": "warning", "color": "#ff0000" },
-    { "id": "2", "name": "School Closure", "icon": "school", "color": "#ff5722" },
-    { "id": "3", "name": "Construction", "icon": "construction", "color": "#ff9800" },
-    { "id": "4", "name": "Maintenance", "icon": "build", "color": "#ffeb3b" },
-    { "id": "5", "name": "Other", "icon": "info", "color": "#607d8b" },
-    { "id": "6", "name": "Lost and Found", "icon": "search", "color": "#ff1744" },
-    { "id": "7", "name": "Transportation", "icon": "directions_bus", "color": "#304ffe" },
-    { "id": "8", "name": "Weather Alert", "icon": "storm", "color": "#00e5ff" },
-    { "id": "9", "name": "IT and Network Issues", "icon": "network_check", "color": "#ff3d00" }
-  ]
+    "categories": [
+      { "id": "1", "name": "Religious gathering", "icon": "place-of-worship", "color": "#009688" },
+      { "id": "2", "name": "Cultural celebration", "icon": "celebration", "color": "#673ab7" },
+      { "id": "3", "name": "Study group", "icon": "book-open", "color": "#4caf50" },
+      { "id": "4", "name": "Social activity", "icon": "people-alt", "color": "#ff6d00" },
+      { "id": "5", "name": "Career development", "icon": "business-center", "color": "#795548" },
+      { "id": "6", "name": "Sports and fitness", "icon": "sports-basketball", "color": "#f44336" },
+      { "id": "7", "name": "Art and creativity", "icon": "palette", "color": "#ff9800" },
+      { "id": "8", "name": "Volunteering and community service", "icon": "volunteer-activism", "color": "#673ab7" },
+      { "id": "9", "name": "Health and wellness", "icon": "healing", "color": "#4caf50" },
+      { "id": "10", "name": "Technology", "icon": "memory", "color": "#03a9f4" },
+      { "id": "11", "name": "Environmental and sustainability", "icon": "park", "color": "#8bc34a" },
+      { "id": "12", "name": "Alumni event", "icon": "school", "color": "#9c27b0" },
+      { "id": "13", "name": "Leadership and personal development", "icon": "emoji-people", "color": "#ff9800" },
+      { "id": "14", "name": "Book/reading club", "icon": "local-library", "color": "#2196f3" },
+      { "id": "15", "name": "Music and Performance", "icon": "music-off", "color": "#e91e63" },
+      { "id": "16", "name": "Film and Media", "icon": "theaters", "color": "#00bcd4" },
+      { "id": "17", "name": "Literary and Poetry Readings", "icon": "import-contacts", "color": "#9e9e9e" },
+      { "id": "18", "name": "Science and Research", "icon": "biotech", "color": "#3f51b5" },
+      { "id": "19", "name": "Entrepreneurship and Startups", "icon": "startup", "color": "#ffc107" },
+      { "id": "20", "name": "Civic Engagement and Politics", "icon": "how-to-vote", "color": "#cddc39" },
+      { "id": "21", "name": "Food and Cooking Classes", "icon": "restaurant-menu", "color": "#ff5722" }
+    ],
+    "reportCategories": [
+      { "id": "1", "name": "Emergency", "icon": "warning-amber", "color": "#ff0000" },
+      { "id": "2", "name": "School Closure", "icon": "cancel-presentation", "color": "#ff5722" },
+      { "id": "3", "name": "Construction", "icon": "construction", "color": "#ff9800" },
+      { "id": "4", "name": "Maintenance", "icon": "handyman", "color": "#ffeb3b" },
+      { "id": "5", "name": "Other", "icon": "info-outline", "color": "#607d8b" },
+      { "id": "6", "name": "Lost and Found", "icon": "find-in-page", "color": "#ff1744" },
+      { "id": "7", "name": "Transportation", "icon": "directions-bus-filled", "color": "#304ffe" },
+      { "id": "8", "name": "Weather Alert", "icon": "thunderstorm", "color": "#00e5ff" },
+      { "id": "9", "name": "IT and Network Issues", "icon": "router", "color": "#ff3d00" }
+    ]
+  
 }
