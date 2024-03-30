@@ -3,19 +3,20 @@ import * as Font from 'expo-font';
 
 const { width, height } = Dimensions.get('window');
 const modalWidth = width * 0.9;
-
 const colors = {
-  background: '#FFFFFF', 
-  primary: '#5E81F4', 
-  primaryDark: '#5071c4', 
-  primaryLight: '#7a9ef7', 
-  secondary: '#F5F5F7', 
-  textPrimary: '#333333', 
-  textSecondary: '#4F4F4F', 
-  border: '#E0E0E0', 
-  success: '#4CAF50', 
-  danger: '#FF5252',
-  warning: '#FFC107', 
+  background: '#FFFFFF',
+  primary: '#0A47A0',
+  primaryDark: '#002C5F', 
+  primaryLight: '#74A0E8', 
+  secondary: '#F5F5F7',
+  textPrimary: '#0A47A0',
+  textSecondary: '#4F4F4F',
+  border: '#E0E0E0',
+  success: '#28A745', 
+  danger: '#DC3545', 
+  warning: '#FFC107',
+  actionBlue: '#0A47A0', 
+  white: '#FFFFFF', 
 };
 
 async function loadFonts() {
@@ -37,7 +38,7 @@ export default StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: colors.background,
-    borderRadius: 12, // Rounded corners
+    borderRadius: 16,
     width: modalWidth,
     maxHeight: height * 0.8,
     shadowColor: '#000',
@@ -50,11 +51,26 @@ export default StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
   },
+  actionContainer: {
+    position: 'absolute', 
+    top: 5,
+    right: 5, 
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 4,
+    width: 70,
+    height: 60,
+
+  },
   header: {
     width: '100%',
     padding: 20, 
-    backgroundColor: colors.primary, 
+    backgroundColor: '#0A47A0', 
     alignItems: 'center',
+    justifyContent: 'space-between', 
+    flexDirection: 'row', 
     borderTopLeftRadius: 12, 
     borderTopRightRadius: 12,
   },
@@ -75,6 +91,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    borderWidth: .5,
   },
   body: {
     paddingHorizontal: 20,
@@ -91,6 +108,8 @@ export default StyleSheet.create({
     fontWeight: '400', 
     fontSize: 20,
     color: colors.textSecondary,
+    marginBottom: 10,
+    padding: 10,
   },
   details: {
     fontSize: 16,
@@ -103,13 +122,56 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.success, 
+    backgroundColor: colors.success, 
+    margin: 10,
+  },
+  saveButtonText: {
+    fontFamily: 'Montserrat',
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#FFFFFF', 
+    fontWeight: '500',
+  },
+  saveButtonDisabled: {
+    backgroundColor: colors.border, 
+  },
+unsaveButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 16,
+  borderWidth: 1,
+  borderColor: colors.danger, 
+  backgroundColor: colors.danger, 
+  marginTop: 10,
+  paddingVertical: 10,
+},
+
+  unsaveButtonText: {
+    fontFamily: 'Montserrat',
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#FFFFFF', 
+    fontWeight: '500',
+  },
   closeButton: {
     backgroundColor: colors.danger,
     width: '60%',
     height: 48, 
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 24, 
+    borderRadius: 16, 
     alignSelf: 'center',
     marginTop: 20,
     marginBottom: 20,
@@ -119,4 +181,9 @@ export default StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
   },
+  
+
 });
+
+
+export { colors };

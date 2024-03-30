@@ -163,11 +163,10 @@ const UserEventsReports = () => {
             </View>
 
             <FlatList
-  data={filteredItems}
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => renderItem({ item })}
-/>
-
+            data={filteredItems}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => renderItem({ item })}
+            />
         </SafeAreaView>
     );
 };

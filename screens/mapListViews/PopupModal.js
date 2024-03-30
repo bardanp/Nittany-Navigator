@@ -3,13 +3,20 @@ import { Modal, View, Text, Pressable, ScrollView, Image, Dimensions } from 'rea
 import noPicturesIcon from '../../assets/no-pictures.png';
 import { firestore } from '../../backend/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import styles, { colors } from './PopupModal.styles';
+import { arrayRemove } from 'firebase/firestore';
+import styles from './PopupModal.styles';
+import { colors } from './PopupModal.styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { updateDoc, arrayUnion } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
+import BookmarkButton from './BookmarkButton';
 
 const { width } = Dimensions.get('window');
 
 const PopupModal = ({ visible, onClose, item }) => {
   const [modalData, setModalData] = useState(null);
   const [imageError, setImageError] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
 
   useEffect(() => {
@@ -48,6 +55,45 @@ const PopupModal = ({ visible, onClose, item }) => {
     });
   };
 
+  const saveToUser = async (documentId, isEvent) => {
+    try {
+      const userInfo = await AsyncStorage.getItem('userInfo');
+      const { email } = JSON.parse(userInfo);
+  
+      const userRef = doc(firestore, 'users', email);
+  
+      const fieldToUpdate = isEvent ? 'savedEvents' : 'savedReports';
+  
+      await updateDoc(userRef, {
+        [fieldToUpdate]: arrayUnion(documentId)
+      });
+  
+      console.log(`Saved ${isEvent ? 'event' : 'report'} with ID: ${documentId} to user ${email}`);
+      setIsSaved(true);
+    } catch (error) {
+      console.error('Error saving to user:', error);
+    }
+  };
+
+  const unsaveFromUser = async (documentId, isEvent) => {
+    try {
+      const userInfo = await AsyncStorage.getItem('userInfo');
+      const { email } = JSON.parse(userInfo);
+  
+      const userRef = doc(firestore, 'users', email);
+      const fieldToUpdate = isEvent ? 'savedEvents' : 'savedReports';
+  
+      await updateDoc(userRef, {
+        [fieldToUpdate]: arrayRemove(documentId)
+      });
+  
+      console.log(`Unsaved ${isEvent ? 'event' : 'report'} with ID: ${documentId} from user ${email}`);
+      setIsSaved(false);
+    } catch (error) {
+      console.error('Error unsaving from user:', error);
+    }
+  };
+
   const headerTitle = modalData?.isEvent ? 'Event' : 'Report';
   const headerBackgroundColor = modalData?.isEvent ? '#4CAF50' : '#F44336';
 
@@ -66,8 +112,15 @@ const PopupModal = ({ visible, onClose, item }) => {
               contentContainerStyle={styles.scrollViewContainer}
             >
               <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
-                <Text style={styles.category}>{headerTitle}</Text>
+                <Text style={styles.category}>{modalData?.title}</Text>
+                
+                <BookmarkButton
+                  isSaved={isSaved}
+                  onSave={() => saveToUser(item.id.split('-')[1], item.isEvent)}
+                  onUnsave={() => unsaveFromUser(item.id.split('-')[1], item.isEvent)}
+                />
               </View>
+
               <View style={styles.imageContainer}>
                 {modalData?.image && !imageError ? (
                   <Image
@@ -85,7 +138,6 @@ const PopupModal = ({ visible, onClose, item }) => {
                 )}
               </View>
               <View style={styles.body}>
-                <Text style={styles.title}>{modalData?.title}</Text>
                 <Text style={styles.description}>{modalData?.description}</Text>
                 <Text style={styles.details}>
                   {`Date: ${formatDate(modalData.dateTime)}`}

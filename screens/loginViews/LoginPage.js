@@ -7,6 +7,8 @@ import keys from '../../keys.json';
 import { jwtDecode } from 'jwt-decode'; 
 import { decode, encode } from "base-64";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firestore } from '../../backend/firebase';
+import { doc, setDoc, getDoc, Timestamp } from 'firebase/firestore';
 
 if (!global.atob) {
   global.atob = decode;
@@ -56,8 +58,43 @@ const LoginPage = ({ navigation }) => {
       };
   
       await AsyncStorage.setItem('userInfo', JSON.stringify(formattedUserInfo));
+      await checkUserAndAddToFirestore(formattedUserInfo);
     } catch (e) {
       console.error('Fetching user info from Microsoft Graph API failed', e);
+    }
+  };
+
+  const checkUserAndAddToFirestore = async (userInfo) => {
+    const userDocId = userInfo.email; 
+    const userRef = doc(firestore, 'users', userDocId);
+    const docSnap = await getDoc(userRef);
+  
+    const now = Timestamp.now(); 
+  
+    if (!docSnap.exists()) {
+      await setDoc(userRef, {
+        campus: userInfo.campus || 'Not specified',
+        createdAt: now, 
+        displayName: userInfo.displayName || `${userInfo.givenName} ${userInfo.surname}`,
+        email: userInfo.email,
+        lastLogin: now,
+        lastUpdated: now,
+        preferences: {
+          language: 'English', 
+          notifications: {
+            app: true, 
+            events: true, 
+          },
+          theme: 'light', 
+        },
+        profilePicture: '', 
+        savedEvents: {}, 
+        savedReports: {},
+        userType: userInfo.userType || 'STUDENT', 
+      });
+      console.log(`Added new user with ID: ${userDocId}`);
+    } else {
+      console.log(`User with ID ${userDocId} already exists.`);
     }
   };
   
