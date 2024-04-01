@@ -229,9 +229,11 @@ const HomeScreen = ({  }) => {
     };
     
     const handleCalloutPress = (item) => {
+        console.log('Marker pressed', item); // Debugging line
         setSelectedItem(item);
         setModalVisible(true);
     };
+    
 
     const handleMultipleItemsPress = (items) => {
         setLocationItems(items); 
@@ -368,8 +370,12 @@ const HomeScreen = ({  }) => {
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
             />
-            )}
-
+        )}
+            <PopupModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                item={selectedItem}
+            />
         </View>
     );
 };
