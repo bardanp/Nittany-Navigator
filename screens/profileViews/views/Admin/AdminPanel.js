@@ -22,8 +22,6 @@ const AdminPanel = ({ navigation }) => {
     const testBardan = async () => {
         try {
             await testSubmitEvent();
-            console.log('Bardan Test completed successfully.');
-            Alert.alert('Success', 'Bardan Test completed successfully.');
         } catch (error) {
             console.error('Bardan Test failed:', error);
             Alert.alert('Error', 'Bardan Test failed. Check console for details.');
