@@ -1,40 +1,54 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { testSubmitEvent } from '../../../../Tests/Bardan' // Make sure this path is correct
 
 const AdminPanel = ({ navigation }) => {
-
-    // Placeholder functions for admin actions
-    const handleUserManagement = () => {
-        console.log('Navigating to User Management...');
-        // navigation.navigate('UserManagement');
+    const testMaliha = () => {
+        console.log('Running Malihas Test...');
+        // Additional logic for Maliha's test
     };
 
-    const handleContentModeration = () => {
-        console.log('Navigating to Content Moderation...');
-        // navigation.navigate('ContentModeration');
+    const testSiri = () => {
+        console.log('Running Siris Test...');
+        // Additional logic for Siri's test
     };
 
-    const handleViewAnalytics = () => {
-        console.log('Navigating to View Analytics...');
-        // navigation.navigate('ViewAnalytics');
+    const testVy = () => {
+        console.log('Running Vys Test...');
+        // Additional logic for Vy's test
+    };
+
+    // Defined function for running Bardan's test
+    const testBardan = async () => {
+        try {
+            await testSubmitEvent();
+            console.log('Bardan Test completed successfully.');
+            Alert.alert('Success', 'Bardan Test completed successfully.');
+        } catch (error) {
+            console.error('Bardan Test failed:', error);
+            Alert.alert('Error', 'Bardan Test failed. Check console for details.');
+        }
     };
 
     return (
         <View style={styles.container}>
             <Text style={styles.header}>Admin Panel</Text>
-            <TouchableOpacity onPress={handleUserManagement} style={styles.button}>
-                <Text style={styles.buttonText}>User Management</Text>
+            <TouchableOpacity onPress={testBardan} style={styles.button}>
+                <Text style={styles.buttonText}>Run Bardan Test</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleContentModeration} style={styles.button}>
-                <Text style={styles.buttonText}>Content Moderation</Text>
+
+            <TouchableOpacity onPress={testMaliha} style={styles.button}>
+                <Text style={styles.buttonText}>Maliha Test</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleViewAnalytics} style={styles.button}>
-                <Text style={styles.buttonText}>View Analytics</Text>
+            <TouchableOpacity onPress={testSiri} style={styles.button}>
+                <Text style={styles.buttonText}>Siri Test</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={testVy} style={styles.button}>
+                <Text style={styles.buttonText}>Vy Test</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                 <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
-        
         </View>
     );
 };

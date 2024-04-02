@@ -15,24 +15,11 @@ import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import About from "./screens/profileViews/views/About";
 
-//Testing
-import { testSubmitEvent } from "./Tests/Bardan";
-
 
 const Stack = createStackNavigator();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-
-  // TESTING
-    console.log("About to test event submission...");
-    testSubmitEvent().then(result => {
-      console.log("Test submission result:", result ? "Success" : "Failure");
-    }).catch(error => {
-      console.error("Test submission error:", error);
-    });
-  // END TESTING
 
   useEffect(() => {
     const checkAuthStatus = async () => {

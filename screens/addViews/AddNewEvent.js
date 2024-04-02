@@ -162,12 +162,12 @@ const AddNewEvent = () => {
 
       await addDoc(collection(firestore, 'events'), eventInfo);
 
-      console.log('Event added successfully!');
-      Alert.alert('Success', 'Event added successfully!');
+      // console.log('Event added successfully!');
+      // Alert.alert('Success', 'Event added successfully!');
       navigation.goBack();
     } catch (error) {
-      console.error('Error adding event to Firestore:', error);
-      Alert.alert('Error', 'Failed to add the event.');
+      // console.error('Error adding event to Firestore:', error);
+      // Alert.alert('Error', 'Failed to add the event.');
     }
   };
 
