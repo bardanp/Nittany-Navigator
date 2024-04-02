@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { exchangeCodeAsync, makeRedirectUri, useAuthRequest, useAutoDiscovery } from 'expo-auth-session';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,7 +37,6 @@ const LoginPage = ({ navigation }) => {
     },
     discovery
   );
-  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const saveUserInfo = async (accessToken) => {
     try {
@@ -101,8 +100,6 @@ const LoginPage = ({ navigation }) => {
   
 
   const handleLoginPress = () => {
-    setButtonDisabled(true); // Disable the button immediately when clicked
-    setTimeout(() => setButtonDisabled(false), 5000); // Re-enable the button after 5 seconds
 
     promptAsync().then((codeResponse) => {
       if (request && codeResponse?.type === 'success' && discovery) {
@@ -120,11 +117,9 @@ const LoginPage = ({ navigation }) => {
           if (res.accessToken) {
             setToken(res.accessToken);
             saveUserInfo(res.accessToken);
-            navigation.navigate('MainMenu');
+            navigation.navigate('MainMenu'); 
           }
         }).catch(error => console.error('Exchange code async error:', error));
-      } else if (codeResponse?.type === 'cancel') {
-        Alert.alert('Login Cancelled', 'You have cancelled the login process, you must login to use the app.');
       }
     }).catch(error => console.error('Prompt async error:', error));
   };
