@@ -11,19 +11,28 @@ import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
 import SavedEventsReports from "./screens/profileViews/views/SavedEventsReports";
 import UserEventsReports from "./screens/profileViews/views/UserEventsReports";
 import HomeScreen from "./screens/mapListViews/HomeScreen"
-
-
-
 import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import About from "./screens/profileViews/views/About";
 
+//Testing
+import { testSubmitEvent } from "./Tests/Bardan";
 
 
 const Stack = createStackNavigator();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+
+  // TESTING
+    console.log("About to test event submission...");
+    testSubmitEvent().then(result => {
+      console.log("Test submission result:", result ? "Success" : "Failure");
+    }).catch(error => {
+      console.error("Test submission error:", error);
+    });
+  // END TESTING
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -36,9 +45,9 @@ const App = () => {
     const checkFirestoreConnection = async () => {
       try {
         const querySnapshot = await getDocs(collection(firestore, "reports"));
-        console.log("Connected to Firestore");
+        // console.log("Connected to Firestore");
       } catch (error) {
-        console.error("Error connecting to Firestore:", error);
+        // console.error("Error connecting to Firestore:", error);
       }
     };
 
