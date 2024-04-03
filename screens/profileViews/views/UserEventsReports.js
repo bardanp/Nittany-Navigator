@@ -68,7 +68,6 @@ const UserEventsReports = () => {
         setModalVisible(true); 
     };
     
-    
 
     const handleRemoveItem = async (itemId, type) => {
         try {

@@ -50,8 +50,8 @@ const ProfileScreen = () => {
 
     if (!isAdminUser) {
       profileOptions.push({
-        title: 'AdminPanel',
-        description: 'AdminPanel',
+        title: 'Testing Functions',
+        description: 'Made for testing purposes only.',
         iconName: 'admin-panel-settings',
         handler: 'AdminPanel', 
       });

@@ -10,6 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { updateDoc, arrayUnion } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import BookmarkButton from './BookmarkButton';
+import CommentsSection from './CommentsSection';
+import { StackView } from '@react-navigation/stack';
 
 const { width } = Dimensions.get('window');
 
@@ -127,23 +129,12 @@ const PopupModal = ({ visible, onClose, item }) => {
   };
   
 
-  const headerTitle = modalData?.isEvent ? 'Event' : 'Report';
-  const headerBackgroundColor = modalData?.isEvent ? '#4CAF50' : '#F44336';
-
   return (
     <Modal
-      visible={visible}
-      onRequestClose={onClose}
-      transparent
-      animationType="fade"
-    >
+      visible={visible} onRequestClose={onClose} transparent animationType="fade" >
       {modalData && (
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollViewContainer}
-          >
             <View style={styles.header}>
               <Text style={styles.category}>{item?.title}</Text>
                 
@@ -185,29 +176,13 @@ const PopupModal = ({ visible, onClose, item }) => {
                 <Text style={styles.emergency}>EMERGENCY</Text>
               )}
             </View>
-              
-              <View style={styles.commentContainer}>
-                <Text style={styles.comments}>
-                  [Comments will be go here]
-                </Text>
-                {modalData.comments && modalData.comments.map((comment, index) => (
-                  <Text key={index} style={styles.commentText}>{comment}</Text>
-                ))}
-              </View>
+            <CommentsSection itemId={item.id} />
+            <Pressable
+              onPress={onClose} style={({ pressed }) => [{ backgroundColor: pressed ? '5071c4' : '5E81F4', }, styles.closeButton,]}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
 
 
-              <Pressable
-                onPress={onClose}
-                style={({ pressed }) => [
-                  {
-                    backgroundColor: pressed ? '5071c4' : '5E81F4',
-                  },
-                  styles.closeButton,
-                ]}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </Pressable>
-            </ScrollView>
           </View>
         </View>
       )}

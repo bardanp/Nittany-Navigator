@@ -87,18 +87,18 @@ const styles = StyleSheet.create({
     header: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#333', // Darker color for better readability
-        paddingVertical: 20, // Added padding for spacing
+        color: '#333', 
+        paddingVertical: 20, 
     },
     button: {
         backgroundColor: '#007AFF',
-        paddingHorizontal: 20, // Adjusted padding for better touch area
-        paddingVertical: 10, // Adjusted padding for better touch area
-        borderRadius: 25, // More rounded corners for a modern look
-        marginVertical: 8, // Reduced vertical margin for tighter grouping
-        minWidth: '60%', // Minimum width for consistency
+        paddingHorizontal: 20, 
+        paddingVertical: 10, 
+        borderRadius: 25, 
+        marginVertical: 8, 
+        minWidth: '60%',
         alignItems: 'center',
-        shadowColor: '#000', // Shadow for depth
+        shadowColor: '#000', 
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 3,
@@ -107,13 +107,12 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: '500', // Medium font weight for clarity
+        fontWeight: '500', 
     },
     backButton: {
-        backgroundColor: '#FF6347', // A contrasting color for the back button
+        backgroundColor: '#FF6347', 
         paddingHorizontal: 20,
         paddingVertical: 10,
-        borderRadius: 25, // Rounded corners to match other buttons
         marginTop: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
