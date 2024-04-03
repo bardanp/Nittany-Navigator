@@ -21,8 +21,21 @@ const PopupModal = ({ visible, onClose, item }) => {
 
   useEffect(() => {
     console.log("Modal visibility changed:", visible);
+    console.log("Item Info: ", item);
   }, [visible]);
   
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString("en-US", {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
 
   useEffect(() => {
     const fetchModalDataAndCheckSavedStatus = async () => {
@@ -57,18 +70,6 @@ const PopupModal = ({ visible, onClose, item }) => {
     fetchModalDataAndCheckSavedStatus();
   }, [item]);
   
-
-  const formatDate = (timestamp) => {
-    if (!timestamp) return 'N/A';
-    const date = timestamp.toDate();
-    return date.toLocaleDateString("en-US", {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
 
   const saveToUser = async (documentId, isEvent) => {
     if (!documentId) {
@@ -139,12 +140,12 @@ const PopupModal = ({ visible, onClose, item }) => {
       {modalData && (
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.scrollViewContainer}
-            >
-              <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
-                <Text style={styles.category}>{modalData?.title}</Text>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollViewContainer}
+          >
+            <View style={styles.header}>
+              <Text style={styles.category}>{item?.title}</Text>
                 
                 <BookmarkButton
                   isSaved={isSaved}
@@ -164,32 +165,26 @@ const PopupModal = ({ visible, onClose, item }) => {
                   />
                 ) : (
                   <Image
-                    source={noPicturesIcon}
-                    style={styles.image}
-                    resizeMode="contain"
-                  />
+                  source={{ uri: item?.image || noPicturesIcon }}
+                  style={styles.image}
+                  resizeMode='cover'
+                  onError={(e) => e.currentTarget.src = noPicturesIcon}
+                />
                 )}
               </View>
               <View style={styles.body}>
-                <Text style={styles.description}>{modalData?.description}</Text>
-                <Text style={styles.details}>
-                  {`Date: ${formatDate(modalData.dateTime)}`}
-                </Text>
-                <Text style={styles.details}>
-                  {`Location: ${modalData?.location || 'N/A'}`}
-                </Text>
-                <Text style={styles.details}>
-                  {`Category: ${modalData?.category || 'N/A'}`}
-                </Text>
-                <Text style={styles.details}>
-                  {`Created by: ${modalData?.createdBy || 'Unknown'}`}
-                </Text>
-                {modalData?.isEvent === false && modalData?.emergency && (
-                  <Text style={styles.emergency}>
-                    EMERGENCY
-                  </Text>
-                )}
-              </View>
+              <Text style={styles.description}>{item?.description}</Text>
+              <Text style={styles.details}>{`Date: ${formatDate(item.dateTime)}`}</Text>
+              <Text style={styles.details}>{`Location: ${item?.location || 'N/A'}`}</Text>
+              <Text style={styles.details}>{`Category: ${item?.category || 'N/A'}`}</Text>
+              <Text style={styles.details}>{`Organizer: ${item?.organizer || 'N/A'}`}</Text>
+              <Text style={styles.details}>{`Contact: ${item?.contactEmail || 'N/A'}`}</Text>
+              <Text style={styles.details}>{`RSVP Count: ${item?.rsvpCount || 0}`}</Text>
+              <Text style={styles.details}>{`Created by: ${item?.createdBy || 'Unknown'}`}</Text>
+              {item?.isEvent === false && item?.emergency && (
+                <Text style={styles.emergency}>EMERGENCY</Text>
+              )}
+            </View>
               
               <View style={styles.commentContainer}>
                 <Text style={styles.comments}>

@@ -7,13 +7,13 @@ import MainMenu from "./screens/loginViews/MainMenu";
 import ProfileScreen from "./screens/profileViews/ProfileScreen";
 import SettingsScreen from "./screens/profileViews/views/SettingScreen";
 import SubmitSuccessScreen from "./screens/addViews/SubmitSuccessScreen";
-import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
 import SavedEventsReports from "./screens/profileViews/views/SavedEventsReports";
 import UserEventsReports from "./screens/profileViews/views/UserEventsReports";
 import HomeScreen from "./screens/mapListViews/HomeScreen"
 import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import About from "./screens/profileViews/views/About";
+import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
 
 
 const Stack = createStackNavigator();

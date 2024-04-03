@@ -1,52 +1,77 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { testSubmitEvent } from '../../../../Tests/Bardan' // Make sure this path is correct
+import { fetchDummyEvent, fetchDummyReport, testSubmitEvent } from '../../../../Tests/Bardan';
+
+import PopupModal from '../../../mapListViews/PopupModal'
 
 const AdminPanel = ({ navigation }) => {
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [modalItem, setModalItem] = useState(null);
+
+
     const testMaliha = () => {
         console.log('Running Malihas Test...');
-        // Additional logic for Maliha's test
     };
 
     const testSiri = () => {
         console.log('Running Siris Test...');
-        // Additional logic for Siri's test
     };
 
     const testVy = () => {
         console.log('Running Vys Test...');
-        // Additional logic for Vy's test
     };
 
-    // Defined function for running Bardan's test
-    const testBardan = async () => {
+    const submitEventTest = async () => {
         try {
             await testSubmitEvent();
         } catch (error) {
             console.error('Bardan Test failed:', error);
-            Alert.alert('Error', 'Bardan Test failed. Check console for details.');
         }
     };
+
+    const openEventInfoTest = async () => {
+        const event = await fetchDummyEvent();
+        console.log('Event Info Test:', event);
+        setModalItem(event);
+        setModalVisible(true);
+        Alert.alert('Event Info Test', 'Event data fetched successfully,\nCheck console for details.');
+    };
+
+    const openReportInfoTest = async () => {
+        const report = await fetchDummyReport();
+        console.log('Report Info Test:', report);
+        setModalItem(report);
+        setModalVisible(true);
+        Alert.alert('Report Info Test', 'Report data fetched successfully,\nCheck console for details.');
+    }
+    
 
     return (
         <View style={styles.container}>
             <Text style={styles.header}>Admin Panel</Text>
-            <TouchableOpacity onPress={testBardan} style={styles.button}>
-                <Text style={styles.buttonText}>Run Bardan Test</Text>
+            <TouchableOpacity onPress={submitEventTest} style={styles.button}>
+                <Text style={styles.buttonText}>Run Bardan Test 'submitEvent'</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={openEventInfoTest} style={styles.button}>
+                <Text style={styles.buttonText}>Run Bardan Test 'openEventInfo'</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={openReportInfoTest} style={styles.button}>
+                <Text style={styles.buttonText}>Run Bardan Test 'openReportInfo'</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={testMaliha} style={styles.button}>
-                <Text style={styles.buttonText}>Maliha Test</Text>
+                <Text style={styles.buttonText}>Run Maliha Test</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={testSiri} style={styles.button}>
-                <Text style={styles.buttonText}>Siri Test</Text>
+                <Text style={styles.buttonText}>Run Siri Test</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={testVy} style={styles.button}>
-                <Text style={styles.buttonText}>Vy Test</Text>
+                <Text style={styles.buttonText}>Run Vy Test</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                 <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
+            <PopupModal visible={isModalVisible} onClose={() => setModalVisible(false)} item={modalItem} />
         </View>
     );
 };
@@ -54,46 +79,54 @@ const AdminPanel = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         alignItems: 'center',
-        backgroundColor: '#F5FCFF',
+        backgroundColor: '#ffffff',
+        padding: 20,
     },
     header: {
-        fontSize: 22,
-        marginBottom: 20,
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333', // Darker color for better readability
+        paddingVertical: 20, // Added padding for spacing
     },
     button: {
         backgroundColor: '#007AFF',
-        padding: 15,
-        borderRadius: 5,
-        marginVertical: 10,
-        width: '80%',
+        paddingHorizontal: 20, // Adjusted padding for better touch area
+        paddingVertical: 10, // Adjusted padding for better touch area
+        borderRadius: 25, // More rounded corners for a modern look
+        marginVertical: 8, // Reduced vertical margin for tighter grouping
+        minWidth: '60%', // Minimum width for consistency
         alignItems: 'center',
+        shadowColor: '#000', // Shadow for depth
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
     },
     buttonText: {
-        color: 'white',
+        color: '#FFFFFF',
         fontSize: 16,
+        fontWeight: '500', // Medium font weight for clarity
     },
     backButton: {
-        backgroundColor: '#007AFF',
-        width: 150,
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#FF6347', // A contrasting color for the back button
         paddingHorizontal: 20,
         paddingVertical: 10,
-        borderRadius: 5,
-        marginTop: 20,
-        alignSelf: 'center',
+        borderRadius: 25, // Rounded corners to match other buttons
+        marginTop: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 4,
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
     },
     backButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
+        fontWeight: '500',
     },
 });
+
 
 export default AdminPanel;

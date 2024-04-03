@@ -83,6 +83,7 @@ const UserEventsReports = () => {
     const handleItemPress = async (item) => {
         setSelectedItem(item);
         setModalVisible(true);
+        console.log('Selected item:', item);
     
         if (!isSaved(item.id, item.isEvent)) {
             await saveToUser(item.id, item.isEvent);

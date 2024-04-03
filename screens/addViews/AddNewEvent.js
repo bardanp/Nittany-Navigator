@@ -49,7 +49,6 @@ const AddNewEvent = () => {
         }
       }
     })();
-    // Fetch user info and set createdBy state
     async function fetchUserInfo() {
       const userInfoString = await AsyncStorage.getItem('userInfo');
       if (userInfoString) {
@@ -74,14 +73,12 @@ const AddNewEvent = () => {
   };
 
   const handleTakePhoto = async () => {
-    // Request camera permissions
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
     if (cameraPermission.status !== 'granted') {
       alert('Camera access is required to take a photo.');
       return;
     }
 
-    // Launch camera
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
@@ -94,24 +91,20 @@ const AddNewEvent = () => {
   };
 
   const handleChooseFromGallery = async () => {
-    // Request media library permissions
     const libraryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (libraryPermission.status !== 'granted') {
       alert('Media library access is required to choose a photo.');
       return;
     }
-  
-    // Launch image library
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-    
-    // Adjust for the new API
+
     if (!result.canceled) {
-      // Ensure there's at least one asset and use the first one's URI
       if (result.assets && result.assets.length > 0) {
         setImage(result.assets[0].uri);
       }
@@ -133,43 +126,52 @@ const AddNewEvent = () => {
     };
   
 
-  const handleSubmit = async () => {
-    console.log('Submitting event...');
-    try {
-      let imageUrl = '';
-      if (image) {
-        const response = await fetch(image);
-        const blob = await response.blob();
-        const imageName = `event_images/${Date.now()}`;
-        const imageRef = ref(storage, imageName);
-        const snapshot = await uploadBytes(imageRef, blob);
-        imageUrl = await getDownloadURL(snapshot.ref);
+    const handleSubmit = async () => {
+      console.log('Submitting event...');
+      if (!title || !description || !locationId || !categoryId || !createdBy) {
+        Alert.alert('Missing Information', 'Please fill in all required fields.');
+        return; 
       }
-
-      const eventInfo = {
-        title,
-        description,
-        image: imageUrl,
-        dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
-        location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
-        organizer,
-        contactEmail,
-        rsvpCount,
-        category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
-        submittedOn: Timestamp.now(),
-        createdBy: createdBy, // Access createdBy state here
-      };
-
-      await addDoc(collection(firestore, 'events'), eventInfo);
-
-      // console.log('Event added successfully!');
-      // Alert.alert('Success', 'Event added successfully!');
-      navigation.goBack();
-    } catch (error) {
-      // console.error('Error adding event to Firestore:', error);
-      // Alert.alert('Error', 'Failed to add the event.');
-    }
-  };
+    
+      const selectedLocation = options.locations.find(loc => loc.id === locationId);
+      const selectedCategory = options.categories.find(cat => cat.id === categoryId);
+      if (!selectedLocation || !selectedCategory) {
+        Alert.alert('Invalid Selection', 'Please select a valid location and category.');
+      }
+    
+      try {
+        let imageUrl = '';
+        if (image) {
+          const response = await fetch(image);
+          const blob = await response.blob();
+          const imageName = `event_images/${Date.now()}`;
+          const imageRef = ref(storage, imageName);
+          const snapshot = await uploadBytes(imageRef, blob);
+          imageUrl = await getDownloadURL(snapshot.ref);
+        }
+    
+        const eventInfo = {
+          title,
+          description,
+          image: imageUrl,
+          dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
+          location: selectedLocation.name,
+          organizer,
+          contactEmail,
+          rsvpCount,
+          category: selectedCategory.name,
+          submittedOn: Timestamp.now(),
+          createdBy,
+        };
+    
+        await addDoc(collection(firestore, 'events'), eventInfo);
+        Alert.alert('Success', 'Event added successfully!');
+        navigation.goBack();
+      } catch (error) {
+        Alert.alert('Error', 'Failed to add the event.');
+      }
+    };
+    
 
   const renderSelectedDate = () => {
     if (date) {
@@ -422,9 +424,9 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     marginBottom: 20,
-    borderColor: 'red', // Temporary for visibility
-    borderWidth: 2, // Temporary for visibility
-    backgroundColor: 'lightgrey', // Temporary to show the area
+    borderColor: 'red',
+    borderWidth: 2,
+    backgroundColor: 'lightgrey',
   },
   centeredView: {
     flex: 1,
