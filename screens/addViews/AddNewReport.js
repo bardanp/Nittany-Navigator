@@ -143,7 +143,7 @@ const AddNewReport = () => {
   
   const handleSubmit = async () => {
     console.log('Submitting report...');
-    if (!title || !description || !date) {
+    if (!title || !description || !date, !locationId, !categoryId) {
       Alert.alert('Missing Fields', 'Please ensure all fields are filled and an image is selected.');
       return; 
     }
