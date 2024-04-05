@@ -21,7 +21,7 @@ const CommentsSection = ({ itemId }) => {
     const fetchCurrentUserEmail = async () => {
         setIsLoadingUser(true);
         const userInfoString = await AsyncStorage.getItem('userInfo');
-        console.log("User Info String:", userInfoString);
+        // console.log("User Info String:", userInfoString);
         if (userInfoString) {
         const userInfo = JSON.parse(userInfoString);
         setCurrentUserEmail(userInfo.email);
@@ -54,7 +54,7 @@ const CommentsSection = ({ itemId }) => {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("Fetched Comments:", fetchedComments);
+        // console.log("Fetched Comments:", fetchedComments);
         setComments(fetchedComments);
       };
       fetchComments();
@@ -136,6 +136,7 @@ const CommentsSection = ({ itemId }) => {
           <View style={styles.commentContainer}>
             <View style={styles.commentHeader}>
             <Text style={styles.commentAuthor}>{item.createdBy}</Text>
+            <Text style={styles.commentDate}>{formatDate(item.createdAt)}</Text>
               {item.createdBy === currentUserEmail && (
                 <TouchableOpacity onPress={() => handleDeleteComment(item.id)}>
                   <Ionicons name="trash-bin-outline" size={20} style={styles.deleteButton} />
@@ -143,7 +144,6 @@ const CommentsSection = ({ itemId }) => {
               )}
             </View>
             <Text style={styles.commentText}>{item.text}</Text>
-            <Text style={styles.commentDate}>{formatDate(item.createdAt)}</Text>
           </View>
         )}
       />

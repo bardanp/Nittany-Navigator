@@ -52,14 +52,14 @@ const HomeScreen = ({  }) => {
                 const eventsSnapshot = await getDocs(eventsCollectionRef);
                 const fetchedEvents = eventsSnapshot.docs.map(doc => ({
                     ...doc.data(),
-                    id: `event-${doc.id}`,
+                    id: `${doc.id}`,
                     isEvent: true,
                 }));
     
                 const reportsSnapshot = await getDocs(reportsCollectionRef);
                 const fetchedReports = reportsSnapshot.docs.map(doc => ({
                     ...doc.data(),
-                    id: `report-${doc.id}`,
+                    id: `${doc.id}`,
                     isReport: true,
                 }));
 

@@ -6,25 +6,25 @@ import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PopupModal from '../../mapListViews/PopupModal';
 
-const UserEventsReports = () => {
+const SavedEventsReports = () => {
     const navigation = useNavigation();
     const [eventsReports, setEventsReports] = useState([]);
     const [filter, setFilter] = useState('both');
     const [selectedItem, setSelectedItem] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const [savedEventsIds, setSavedEventsIds] = useState([]);
-    const [savedReportsIds, setSavedReportsIds] = useState([]);
-
 
     useEffect(() => {
         const fetchUserInfoAndData = async () => {
             try {
                 const userInfoString = await AsyncStorage.getItem('userInfo');
                 if (userInfoString) {
-                    const userInfo = JSON.parse(userInfoString);
-                    await fetchSavedEventsAndReports(userInfo.email);
-                } else {
-                    console.log('User info not found');
+                    const { email } = JSON.parse(userInfoString);
+                    const userRef = doc(firestore, 'users', email);
+                    const userDoc = await getDoc(userRef);
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        fetchSavedItems(userData.savedItems || []);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching user info:', error);
@@ -35,77 +35,26 @@ const UserEventsReports = () => {
     }, []);
 
 
-    const fetchSavedEventsAndReports = async (userEmail) => {
-        try {
-            const userRef = doc(firestore, 'users', userEmail);
-            const userDoc = await getDoc(userRef);
-            if (!userDoc.exists()) {
-                console.log('No such document!');
-                return;
+    const fetchSavedItems = async (savedItemsIds) => {
+        const itemsData = await Promise.all(savedItemsIds.map(async (itemId) => {
+            const isEvent = itemId.startsWith('E'); // Assuming event IDs start with 'E', adjust as needed
+            const collection = isEvent ? 'events' : 'reports';
+            const itemRef = doc(firestore, collection, itemId);
+            const itemSnap = await getDoc(itemRef);
+            if (itemSnap.exists()) {
+                return { ...itemSnap.data(), id: itemSnap.id, type: isEvent ? 'event' : 'report' };
             }
-            const userData = userDoc.data();
-            console.log('UserData:', userData); 
-            const savedEventsIds = Array.isArray(userData.savedEvents) ? userData.savedEvents : [];
-            const savedReportsIds = Array.isArray(userData.savedReports) ? userData.savedReports : [];
-            
-            console.log('Saved Events IDs:', savedEventsIds); 
-            console.log('Saved Reports IDs:', savedReportsIds); 
-            
-            setSavedEventsIds(savedEventsIds);
-            setSavedReportsIds(savedReportsIds);
-
-    
-            const eventsReportsData = [];
-
-            for (const eventId of savedEventsIds) {
-                console.log('Fetching event:', eventId); 
-                const eventDoc = await getDoc(doc(firestore, 'events', eventId));
-                if (eventDoc.exists()) {
-                    eventsReportsData.push({
-                        ...eventDoc.data(),
-                        id: eventDoc.id,
-                        type: 'event',
-                    });
-                }
-            }
-            
-            for (const reportId of savedReportsIds) {
-                console.log('Fetching report:', reportId);
-                const reportDoc = await getDoc(doc(firestore, 'reports', reportId));
-                if (reportDoc.exists()) {
-                    eventsReportsData.push({
-                        ...reportDoc.data(),
-                        id: reportDoc.id,
-                        type: 'report',
-                    });
-                }
-            }
-    
-            setEventsReports(eventsReportsData);
-        } catch (error) {
-            console.error('Error fetching saved events and reports:', error);
-        }
+            return null;
+        }));
+        
+        setEventsReports(itemsData.filter(Boolean)); 
     };
-    
-    const handleItemPress = async (item) => {
+
+    const handleItemPress = (item) => {
         setSelectedItem(item);
         setModalVisible(true);
-        console.log('Selected item:', item);
-    
-        if (!isSaved(item.id, item.isEvent, savedEventsIds, savedReportsIds)) {
-            await saveToUser(item.id, item.isEvent);
-            console.log('Bookmark added:', item.id);
-        }
-        
     };
 
-    const isSaved = (documentId, isEvent, savedEvents, savedReports) => {
-        if (!documentId) return false;
-    
-        const savedItems = isEvent ? savedEvents : savedReports;
-        return savedItems && savedItems.includes(documentId);
-    };
-    
 
     const unsaveFromUser = async (documentId, isEvent) => {
         try {
@@ -202,11 +151,11 @@ const renderItem = ({ item }) => {
                     <Text style={styles.viewInfoText}>View Details</Text>
                 </TouchableOpacity>
             </View>
-            <PopupModal 
+            <PopupModal
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
                 item={selectedItem}
-            />
+                />
         </View>
     );
 };
@@ -244,7 +193,6 @@ const renderItem = ({ item }) => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => renderItem({ item })}
                 />
-
         </SafeAreaView>
     );
 };
@@ -344,4 +292,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default UserEventsReports;
+export default SavedEventsReports;

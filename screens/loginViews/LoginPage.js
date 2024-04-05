@@ -88,8 +88,7 @@ const LoginPage = ({ navigation }) => {
           theme: 'light', 
         },
         profilePicture: '', 
-        savedEvents: [], 
-        savedReports: [],
+        savedItems: [], 
         userType: userInfo.userType || 'STUDENT', 
       });
       console.log(`Added new user with ID: ${userDocId}`);

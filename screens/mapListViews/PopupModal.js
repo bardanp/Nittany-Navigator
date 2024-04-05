@@ -21,12 +21,6 @@ const PopupModal = ({ visible, onClose, item }) => {
 
 
   useEffect(() => {
-    console.log("Modal visibility changed:", visible);
-    console.log("PopupModal item prop:", item);
-
-  }, [visible]);
-
-  useEffect(() => {
     setModalData(item);
   }, [item]);
   
@@ -44,31 +38,14 @@ const PopupModal = ({ visible, onClose, item }) => {
 
 
   useEffect(() => {
-    
     const fetchModalDataAndCheckSavedStatus = async () => {
       if (!item || !item.id) return;
   
-      const documentId = item.id.split('-')[1];
-        const documentRef = doc(firestore, item.type === 'event' ? 'events' : 'reports', item.id);
-      
-        try {
-          const docSnap = await getDoc(documentRef);
+      const documentRef = doc(firestore, item.type === 'event' ? 'events' : 'reports', item.id);
+      try {
+        const docSnap = await getDoc(documentRef);
         if (docSnap.exists()) {
           setModalData({ ...docSnap.data(), isEvent: item.isEvent });
-          const userInfoString = await AsyncStorage.getItem('userInfo');
-          if (userInfoString) {
-            const { email } = JSON.parse(userInfoString);
-            const userRef = doc(firestore, 'users', email);
-            const userDoc = await getDoc(userRef);
-  
-            if (userDoc.exists()) {
-              const userData = userDoc.data();
-              const fieldToCheck = item.isEvent ? 'savedEvents' : 'savedReports';
-              const isCurrentlySaved = userData[fieldToCheck]?.includes(documentId);
-  
-              setIsSaved(isCurrentlySaved); 
-            }
-          }
         }
       } catch (error) {
         console.error('Error fetching modal data:', error);
@@ -78,61 +55,12 @@ const PopupModal = ({ visible, onClose, item }) => {
   }, [item]);
 
 
-  
-
-  const saveToUser = async (documentId, isEvent) => {
-    if (!documentId) {
-      console.error('documentId is undefined');
-      return;
-    }
-    try {
-      const userInfoString = await AsyncStorage.getItem('userInfo');
-      if (!userInfoString) {
-        console.error('User info not found');
-        return;
-      }
-      const { email } = JSON.parse(userInfoString);
-    
-      const userRef = doc(firestore, 'users', email);
-      const fieldToUpdate = isEvent ? 'savedEvents' : 'savedReports';
-    
-      await updateDoc(userRef, {
-        [fieldToUpdate]: arrayUnion(item.id) 
-      });
-    
-      console.log(`Saved ${isEvent ? 'event' : 'report'} with ID: ${item.id} to user ${email}`);
-      setIsSaved(true);
-    } catch (error) {
-      console.error('Error saving to user:', error);
-    }
-  };
-
-  const unsaveFromUser = async (isEvent) => {
-    if (!item || !item.id) {
-      console.error('Invalid item or item ID');
-      return;
-    }
-  
-    try {
-      const userInfoString = await AsyncStorage.getItem('userInfo');
-      if (!userInfoString) {
-        console.error('User info not found');
-        return;
-      }
-      const { email } = JSON.parse(userInfoString);
-  
-      const userRef = doc(firestore, 'users', email);
-      const fieldToUpdate = isEvent ? 'savedEvents' : 'savedReports';
-  
-      await updateDoc(userRef, {
-        [fieldToUpdate]: arrayRemove(item.id)
-      });
-  
-      console.log(`Removed bookmark for ${isEvent ? 'event' : 'report'} with ID: ${item.id} from user ${email}`);
-      setIsSaved(false);
-    } catch (error) {
-      console.error('Error removing bookmark from user:', error);
-    }
+  const onBookmarkChange = async (email, itemId, isEvent, action) => {
+    const userRef = doc(firestore, 'users', email);
+    const updateAction = action === 'add' ? arrayUnion : arrayRemove;
+    await updateDoc(userRef, {
+      [isEvent ? 'savedEvents' : 'savedReports']: updateAction(itemId),
+    });
   };
   
 
@@ -147,12 +75,13 @@ const PopupModal = ({ visible, onClose, item }) => {
        <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
         <View style={styles.header}>                
-          <BookmarkButton
-                  isSaved={isSaved}
-                  onSave={() => saveToUser(item.id, item.isEvent)} 
-                  onUnsave={() => unsaveFromUser(item.id, item.isEvent)} 
-                />
-                          <Text style={styles.category}>{modalData.title}</Text>
+        <BookmarkButton
+          itemId={item.id}
+          isEvent={item.isEvent}
+          onBookmarkChange={onBookmarkChange}
+        />
+
+              <Text style={styles.category}>{modalData.title}</Text>
               <Pressable onPress={onClose} style={styles.closeIconContainer}>
                 <Ionicons name="close" size={28} color={colors.closeIcon} />
               </Pressable>
