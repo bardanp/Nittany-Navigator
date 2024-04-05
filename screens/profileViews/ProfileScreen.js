@@ -48,7 +48,7 @@ const ProfileScreen = () => {
       { title: 'Settings', description: 'Adjust profile settings and preferences.', iconName: 'settings', handler: 'Settings' },
     ];
 
-    if (!isAdminUser) {
+    if (isAdminUser) {
       profileOptions.push({
         title: 'Testing Functions',
         description: 'Made for testing purposes only.',
