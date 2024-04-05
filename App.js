@@ -32,9 +32,9 @@ const App = () => {
     const checkFirestoreConnection = async () => {
       try {
         const querySnapshot = await getDocs(collection(firestore, "reports"));
-        // console.log("Connected to Firestore");
+        console.log("Connected to Firestore");
       } catch (error) {
-        // console.error("Error connecting to Firestore:", error);
+        console.error("Error connecting to Firestore:", error);
       }
     };
 

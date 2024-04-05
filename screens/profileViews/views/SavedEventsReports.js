@@ -12,6 +12,9 @@ const UserEventsReports = () => {
     const [filter, setFilter] = useState('both');
     const [selectedItem, setSelectedItem] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [savedEventsIds, setSavedEventsIds] = useState([]);
+    const [savedReportsIds, setSavedReportsIds] = useState([]);
+
 
     useEffect(() => {
         const fetchUserInfoAndData = async () => {
@@ -47,6 +50,10 @@ const UserEventsReports = () => {
             
             console.log('Saved Events IDs:', savedEventsIds); 
             console.log('Saved Reports IDs:', savedReportsIds); 
+            
+            setSavedEventsIds(savedEventsIds);
+            setSavedReportsIds(savedReportsIds);
+
     
             const eventsReportsData = [];
 
@@ -85,18 +92,20 @@ const UserEventsReports = () => {
         setModalVisible(true);
         console.log('Selected item:', item);
     
-        if (!isSaved(item.id, item.isEvent)) {
+        if (!isSaved(item.id, item.isEvent, savedEventsIds, savedReportsIds)) {
             await saveToUser(item.id, item.isEvent);
             console.log('Bookmark added:', item.id);
         }
+        
     };
 
-    const isSaved = (documentId, isEvent) => {
+    const isSaved = (documentId, isEvent, savedEvents, savedReports) => {
         if (!documentId) return false;
     
         const savedItems = isEvent ? savedEvents : savedReports;
-        return savedItems.includes(documentId);
+        return savedItems && savedItems.includes(documentId);
     };
+    
 
     const unsaveFromUser = async (documentId, isEvent) => {
         try {
@@ -137,9 +146,10 @@ const UserEventsReports = () => {
                 {
                     text: 'Remove',
                     onPress: async () => {
-                        await unsaveFromUser(item.isEvent);
-                        console.log('Bookmark removed:', item.id);
+                        await unsaveFromUser(documentId, isEvent);
+                        console.log('Bookmark removed:', documentId);
                     },
+                    
                 },
             ],
             { cancelable: true }

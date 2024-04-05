@@ -1,45 +1,98 @@
-import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Animated, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const BookmarkButton = ({ isSaved, onSave, onUnsave }) => {
-  const handlePress = () => {
-    if (isSaved) {
-      onUnsave();
-    } else {
-      onSave();
+  const scale = new Animated.Value(1);
+  const [loading, setLoading] = useState(false);
+
+  const animatePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const animatePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      friction: 3,
+      tension: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePress = async () => {
+    setLoading(true);
+    animatePressOut();
+    try {
+      if (isSaved) {
+        await onUnsave();
+        Alert.alert('Bookmark removed');
+      } else {
+        await onSave();
+        Alert.alert('Bookmark added');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'There was an issue updating the bookmark.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const animatedStyle = {
+    transform: [{ scale }],
+  };
+
   return (
-    <Pressable onPress={handlePress} style={isSaved ? styles.buttonSaved : styles.buttonUnsaved}>
-      <Ionicons
-        name={isSaved ? "bookmark" : "bookmark-outline"}
-        size={28} 
-        color={isSaved ? '#FFFFFF' : '#FFFFFF'}
-      />
-    </Pressable>
+    <Animated.View style={animatedStyle}>
+      <Pressable
+        onPress={handlePress}
+        onPressIn={animatePressIn}
+        onPressOut={animatePressOut}
+        style={({ pressed }) => [
+          styles.button,
+          isSaved ? styles.buttonSaved : styles.buttonUnsaved,
+          loading && styles.buttonLoading,
+          { opacity: pressed ? 0.7 : 1 },
+        ]}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color="#FFFFFF" />
+        ) : (
+          <Ionicons
+            name={isSaved ? "ios-bookmark" : "ios-bookmark-outline"} 
+            size={28}
+            color={isSaved ? '#34C759' : '#007AFF'} 
+          />
+        )}
+      </Pressable>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  buttonUnsaved: {
-    backgroundColor: '#5E81F4', 
+  button: {
     padding: 10,
-    borderRadius: 15, 
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    shadowColor: '#000000',
-    shadowOffset: { height: 1, width: 0 },
+    borderRadius: 20,
+    width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: '#000',
+    shadowOffset: { height: 2, width: 0 },
+    elevation: 5,
+  },
+  buttonUnsaved: {
+    backgroundColor: 'white',
   },
   buttonSaved: {
-    backgroundColor: '#74A0E8', 
-    padding: 10,
-    borderRadius: 15,
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    shadowColor: '#000000',
-    shadowOffset: { height: 1, width: 0 },
+    backgroundColor: 'transparent',
+  },
+  buttonLoading: {
+    backgroundColor: '#FFD700',
   },
 });
 

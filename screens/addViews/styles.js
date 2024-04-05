@@ -3,15 +3,15 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8', // Light grey background
+    backgroundColor: '#F8F8F8', 
     padding: 20,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'center', // Center the content horizontally
+    justifyContent: 'center', 
     alignItems: 'center',
     marginBottom: 20,
-    position: 'relative', // Ensure the positioning context
+    position: 'relative', 
     paddingBottom: 20,
   },
   backButton: {
@@ -22,24 +22,24 @@ export default StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#444', // Dark grey
+    color: '#444', 
     position: 'absolute',
     left: 0,
     right: 0,
-    textAlign: 'center', // Center the text horizontally
+    textAlign: 'center', 
   },
   input: {
-    backgroundColor: '#FFF', // White
+    backgroundColor: '#FFF',
     borderWidth: 1,
-    borderColor: '#DDD', // Light grey border
+    borderColor: '#DDD', 
     borderRadius: 8,
     paddingVertical: 14,
     paddingHorizontal: 18,
     marginBottom: 15,
     fontSize: 16,
     width: '100%',
-    color: '#555', // Dark grey text
-    shadowColor: '#000', // Black shadow
+    color: '#555', 
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -50,7 +50,7 @@ export default StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#FF6347', // Tomato button
+    backgroundColor: '#FF6347', 
     borderRadius: 8,
     paddingVertical: 14,
     paddingHorizontal: 18,
@@ -58,14 +58,14 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
-    shadowColor: '#FF6347', // Tomato shadow
+    shadowColor: '#FF6347', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 3,
   },
   buttonText: {
-    color: '#FFF', // White text
+    color: '#FFF', 
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -73,7 +73,7 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#555', // Dark grey text
+    color: '#555', 
   },
   optionContainer: {
     ...this.input,
@@ -84,21 +84,21 @@ export default StyleSheet.create({
   },
   optionText: {
     fontSize: 18,
-    color: '#FF6347', // Tomato text
+    color: '#FF6347', 
     marginLeft: 10,
   },
   centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
   },
   modalView: {
-    backgroundColor: '#FFF', // White modal background
+    backgroundColor: '#FFF', 
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000', // Black shadow
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -107,7 +107,7 @@ export default StyleSheet.create({
     maxWidth: 400,
   },
   formSubmitButton: {
-    backgroundColor: '#4682B4', // Steel Blue button
+    backgroundColor: '#4682B4', 
     borderRadius: 5,
     paddingVertical: 10,
     width: '100%',
@@ -115,7 +115,7 @@ export default StyleSheet.create({
     marginTop: 10,
   },
   formSubmitButtonText: {
-    color: '#FFF', // White text
+    color: '#FFF', 
     fontSize: 18,
     fontWeight: 'bold',
   },

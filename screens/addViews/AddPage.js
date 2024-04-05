@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-// Constants for route names to reduce typos and improve maintainability
 const Routes = {
   ADD_NEW_EVENT: 'addNewEvent',
   ADD_NEW_REPORT: 'addNewReport',
@@ -42,7 +41,7 @@ const AddPage = () => {
   );
 };
 
-// Consider moving to a separate file if styles grow
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -55,7 +54,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     marginVertical: 10,
-    width: '90%', // Increased width for better usability
+    width: '90%', 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -78,7 +77,7 @@ const styles = StyleSheet.create({
   optionText: {
     color: '#fff',
     fontSize: 18,
-    textAlign: 'center', // Center text for better appearance
+    textAlign: 'center', 
   },
 });
 

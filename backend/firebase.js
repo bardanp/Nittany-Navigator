@@ -1,4 +1,3 @@
-// firebase.js
 import { firebaseConfig } from '../keys.json';
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore'; 

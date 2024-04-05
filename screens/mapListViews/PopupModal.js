@@ -17,14 +17,18 @@ const { width } = Dimensions.get('window');
 
 const PopupModal = ({ visible, onClose, item }) => {
   const [modalData, setModalData] = useState(null);
-  const [imageError, setImageError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
 
   useEffect(() => {
     console.log("Modal visibility changed:", visible);
-    console.log("Item Info: ", item);
+    console.log("PopupModal item prop:", item);
+
   }, [visible]);
+
+  useEffect(() => {
+    setModalData(item);
+  }, [item]);
   
 
   const formatDate = (timestamp) => {
@@ -40,6 +44,7 @@ const PopupModal = ({ visible, onClose, item }) => {
 
 
   useEffect(() => {
+    
     const fetchModalDataAndCheckSavedStatus = async () => {
       if (!item || !item.id) return;
   
@@ -71,6 +76,8 @@ const PopupModal = ({ visible, onClose, item }) => {
     };
     fetchModalDataAndCheckSavedStatus();
   }, [item]);
+
+
   
 
   const saveToUser = async (documentId, isEvent) => {
@@ -130,59 +137,50 @@ const PopupModal = ({ visible, onClose, item }) => {
   
 
   return (
-    <Modal
-      visible={visible} onRequestClose={onClose} transparent animationType="fade" >
+      <Modal
+        visible={visible}
+        onRequestClose={onClose}
+        transparent
+        animationType="fade"
+      >
       {modalData && (
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.header}>
-              <Text style={styles.category}>{item?.title}</Text>
-                
-                <BookmarkButton
+       <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+        <View style={styles.header}>                
+          <BookmarkButton
                   isSaved={isSaved}
                   onSave={() => saveToUser(item.id, item.isEvent)} 
                   onUnsave={() => unsaveFromUser(item.id, item.isEvent)} 
                 />
-
+                          <Text style={styles.category}>{modalData.title}</Text>
+              <Pressable onPress={onClose} style={styles.closeIconContainer}>
+                <Ionicons name="close" size={28} color={colors.closeIcon} />
+              </Pressable>
               </View>
 
               <View style={styles.imageContainer}>
-                {modalData?.image && !imageError ? (
-                  <Image
-                    source={{ uri: modalData.image }}
-                    style={styles.image}
-                    resizeMode='cover'
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <Image
-                  source={{ uri: item?.image || noPicturesIcon }}
-                  style={styles.image}
-                  resizeMode='cover'
-                  onError={(e) => e.currentTarget.src = noPicturesIcon}
-                />
-                )}
+              <Image
+                source={{ uri: modalData.image || noPicturesIcon }}
+                style={styles.image}
+                resizeMode='cover'
+                onError={() => setImageError(true)}
+              />
               </View>
+
               <View style={styles.body}>
-              <Text style={styles.description}>{item?.description}</Text>
-              <Text style={styles.details}>{`Date: ${formatDate(item.dateTime)}`}</Text>
-              <Text style={styles.details}>{`Location: ${item?.location || 'N/A'}`}</Text>
-              <Text style={styles.details}>{`Category: ${item?.category || 'N/A'}`}</Text>
-              <Text style={styles.details}>{`Organizer: ${item?.organizer || 'N/A'}`}</Text>
-              <Text style={styles.details}>{`Contact: ${item?.contactEmail || 'N/A'}`}</Text>
-              <Text style={styles.details}>{`RSVP Count: ${item?.rsvpCount || 0}`}</Text>
-              <Text style={styles.details}>{`Created by: ${item?.createdBy || 'Unknown'}`}</Text>
-              {item?.isEvent === false && item?.emergency && (
+              <Text style={styles.description}>{modalData.description}</Text>
+              <Text style={styles.details}>{`Date: ${formatDate(modalData.dateTime)}`}</Text>
+              <Text style={styles.details}>{`Location: ${modalData.location || 'N/A'}`}</Text>
+              <Text style={styles.details}>{`Category: ${modalData.category || 'N/A'}`}</Text>
+              <Text style={styles.details}>{`Organizer: ${modalData.organizer || 'N/A'}`}</Text>
+              <Text style={styles.details}>{`Contact: ${modalData.contactEmail || 'N/A'}`}</Text>
+              <Text style={styles.details}>{`RSVP Count: ${modalData.RSVP || 0}`}</Text>
+              <Text style={styles.details}>{`Created by: ${modalData.createdBy || 'Unknown'}`}</Text>
+              {modalData.isEvent === false && modalData.emergency && (
                 <Text style={styles.emergency}>EMERGENCY</Text>
               )}
             </View>
             <CommentsSection itemId={item.id} />
-            <Pressable
-              onPress={onClose} style={({ pressed }) => [{ backgroundColor: pressed ? '5071c4' : '5E81F4', }, styles.closeButton,]}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </Pressable>
-
-
           </View>
         </View>
       )}
@@ -191,3 +189,4 @@ const PopupModal = ({ visible, onClose, item }) => {
 };
 
 export default PopupModal;
+

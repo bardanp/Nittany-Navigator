@@ -1,28 +1,28 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import * as Font from 'expo-font'; 
+import * as Font from 'expo-font';
 
 const { width, height } = Dimensions.get('window');
 const modalWidth = width * 0.9;
 const colors = {
   background: '#FFFFFF',
   primary: '#0A47A0',
-  primaryDark: '#002C5F', 
-  primaryLight: '#74A0E8', 
+  primaryDark: '#002C5F',
+  primaryLight: '#74A0E8',
   secondary: '#F5F5F7',
   textPrimary: '#0A47A0',
   textSecondary: '#4F4F4F',
   border: '#E0E0E0',
-  success: '#28A745', 
-  danger: '#DC3545', 
+  success: '#28A745',
+  danger: '#DC3545',
   warning: '#FFC107',
-  actionBlue: '#0A47A0', 
-  white: '#FFFFFF', 
+  actionBlue: '#0A47A0',
+  white: '#FFFFFF',
 };
 
 async function loadFonts() {
   await Font.loadAsync({
     Montserrat: require('../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf'),
-    'Montserrat-Bold': require('../../assets/fonts/Montserrat/static/Montserrat-Bold.ttf'), 
+    'Montserrat-Bold': require('../../assets/fonts/Montserrat/static/Montserrat-Bold.ttf'),
   });
 }
 
@@ -34,27 +34,28 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
     backgroundColor: colors.background,
     borderRadius: 16,
     width: modalWidth,
-    maxHeight: height * 0.8,
+    maxHeight: height * 0.85,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 12,
+    overflow: 'hidden',
   },
   scrollViewContainer: {
     flexGrow: 1,
     alignItems: 'center',
   },
   actionContainer: {
-    position: 'absolute', 
+    position: 'absolute',
     top: 5,
-    right: 5, 
+    right: 5,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -64,20 +65,25 @@ export default StyleSheet.create({
     height: 60,
 
   },
+  bookmarkButton: {
+    position: 'absolute',
+    left: 10, // Place it on the left
+    top: '50%',
+    marginTop: -20, 
+    zIndex: 10,
+  },
   header: {
-    width: '100%',
-    padding: 20, 
-    backgroundColor: '#0A47A0', 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'space-between', 
-    flexDirection: 'row', 
-    borderTopLeftRadius: 12, 
-    borderTopRightRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: colors.primary,
   },
   category: {
-    fontSize: 26,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontFamily: 'Montserrat-Bold',
+    fontSize: 24,
+    color: colors.white,
   },
   image: {
     width: '100%',
@@ -95,27 +101,26 @@ export default StyleSheet.create({
   },
   body: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
   },
   title: {
-    fontFamily: 'Montserrat', 
-    fontWeight: '500',
-    fontSize: 26,
-    color: colors.textPrimary,
+    fontFamily: 'Montserrat',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.white,
   },
   description: {
-    fontFamily: 'Montserrat', 
-    fontWeight: '400', 
-    fontSize: 20,
+    fontFamily: 'Montserrat',
+    fontSize: 16,
     color: colors.textSecondary,
     marginBottom: 10,
-    padding: 10,
   },
   details: {
-    fontSize: 16,
-    fontWeight: '400',
+    fontFamily: 'Montserrat',
+    fontSize: 14,
     color: colors.textSecondary,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   emergency: {
     color: colors.danger,
@@ -130,30 +135,29 @@ export default StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.success, 
-    backgroundColor: colors.success, 
+    borderColor: colors.success,
+    backgroundColor: colors.success,
     margin: 10,
   },
   saveButtonText: {
     fontFamily: 'Montserrat',
     marginLeft: 10,
     fontSize: 16,
-    color: '#FFFFFF', 
+    color: '#FFFFFF',
     fontWeight: '500',
   },
   saveButtonDisabled: {
-    backgroundColor: colors.border, 
+    backgroundColor: colors.border,
   },
 unsaveButton: {
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  paddingVertical: 10,
   paddingHorizontal: 20,
   borderRadius: 16,
   borderWidth: 1,
-  borderColor: colors.danger, 
-  backgroundColor: colors.danger, 
+  borderColor: colors.danger,
+  backgroundColor: colors.danger,
   marginTop: 10,
   paddingVertical: 10,
 },
@@ -162,27 +166,37 @@ unsaveButton: {
     fontFamily: 'Montserrat',
     marginLeft: 10,
     fontSize: 16,
-    color: '#FFFFFF', 
+    color: '#FFFFFF',
     fontWeight: '500',
   },
   closeButton: {
-    backgroundColor: colors.danger,
-    width: '60%',
-    height: 48, 
-    justifyContent: 'center',
+    backgroundColor: colors.closeButton,
+    padding: 8,
+    borderRadius: 16,
+    elevation: 6,
+    shadowRadius: 4,
+    shadowOpacity: 0.1,
+    shadowColor: '#000',
+    shadowOffset: { height: 2, width: 2 },
+  },
+  closeIcon: {
+    fontSize: 24,
+    color: '#fff', 
+  },
+  shadow: {
+    shadowOpacity: 0.7,
+    shadowRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: { height: 2, width: 2 },
+    elevation: 5, 
+  },
+  closeIconContainer: {
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: 'red',
     alignItems: 'center',
-    borderRadius: 16, 
-    alignSelf: 'center',
-    marginTop: 20,
-    marginBottom: 20,
+    justifyContent: 'center',
   },
-  closeButtonText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '600',
-  },
-  
-
 });
 
 
