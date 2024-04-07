@@ -11,7 +11,7 @@
     "categories": [
       { "id": "1", "name": "Religious gathering", "icon": "place-of-worship", "color": "#009688" },
       { "id": "2", "name": "Cultural celebration", "icon": "celebration", "color": "#673ab7" },
-      { "id": "3", "name": "Study group", "icon": "book-open", "color": "#4caf50" },
+      { "id": "3", "name": "Study group", "icon": "groups", "color": "#4caf50" },
       { "id": "4", "name": "Social activity", "icon": "people-alt", "color": "#ff6d00" },
       { "id": "5", "name": "Career development", "icon": "business-center", "color": "#795548" },
       { "id": "6", "name": "Sports and fitness", "icon": "sports-basketball", "color": "#f44336" },

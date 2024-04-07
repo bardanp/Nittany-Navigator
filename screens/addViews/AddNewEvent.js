@@ -13,6 +13,7 @@ import {
   FlatList,
   Image,
 } from 'react-native';
+import { VStack } from 'native-base';
 
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';

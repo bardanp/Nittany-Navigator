@@ -14,6 +14,8 @@ import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import About from "./screens/profileViews/views/About";
 import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
+import { NativeBaseProvider } from 'native-base';
+
 
 
 const Stack = createStackNavigator();
@@ -42,6 +44,7 @@ const App = () => {
   }, []);
 
   return (
+    <NativeBaseProvider>
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -91,6 +94,7 @@ const App = () => {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </NativeBaseProvider>
   );
 };
 
