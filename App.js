@@ -15,6 +15,7 @@ import { collection, getDocs } from "firebase/firestore";
 import About from "./screens/profileViews/views/About";
 import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
 import { NativeBaseProvider } from 'native-base';
+import customTheme from './customTheme'
 
 
 
@@ -44,7 +45,7 @@ const App = () => {
   }, []);
 
   return (
-    <NativeBaseProvider>
+    <NativeBaseProvider theme={customTheme}>
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
