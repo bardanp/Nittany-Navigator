@@ -3,6 +3,7 @@ import * as Font from 'expo-font';
 
 const { width, height } = Dimensions.get('window');
 const modalWidth = width * 0.9;
+
 const colors = {
   background: '#FFFFFF',
   primary: '#0A47A0',
@@ -19,17 +20,14 @@ const colors = {
   white: '#FFFFFF',
 };
 
-async function loadFonts() {
-  await Font.loadAsync({
-    Montserrat: require('../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf'),
-    'Montserrat-Bold': require('../../assets/fonts/Montserrat/static/Montserrat-Bold.ttf'),
-  });
-}
+const scale = (size) => (width / 428) * size;
 
-loadFonts();
+Font.loadAsync({
+  'Montserrat': require('../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf'),
+  'Montserrat-Bold': require('../../assets/fonts/Montserrat/static/Montserrat-Bold.ttf'),
+});
 
-
-export default StyleSheet.create({
+const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -38,7 +36,7 @@ export default StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: colors.background,
-    borderRadius: 16,
+    borderRadius: scale(16),
     width: modalWidth,
     maxHeight: height * 0.85,
     shadowColor: '#000',
@@ -54,35 +52,34 @@ export default StyleSheet.create({
   },
   actionContainer: {
     position: 'absolute',
-    top: 5,
-    right: 5,
+    top: scale(5),
+    right: scale(5),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
-    borderRadius: 4,
-    width: 70,
-    height: 60,
-
+    padding: scale(10),
+    borderRadius: scale(4),
+    width: scale(70),
+    height: scale(60),
   },
   bookmarkButton: {
     position: 'absolute',
-    left: 10, // Place it on the left
+    left: scale(10),
     top: '50%',
-    marginTop: -20, 
+    marginTop: scale(-20),
     zIndex: 10,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
     backgroundColor: colors.primary,
   },
   category: {
     fontFamily: 'Montserrat-Bold',
-    fontSize: 24,
+    fontSize: scale(24),
     color: colors.white,
   },
   image: {
@@ -92,112 +89,110 @@ export default StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: 300,
+    height: scale(300),
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderBottomWidth: scale(0.5),
     borderBottomColor: colors.border,
-    borderWidth: .5,
   },
   body: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
+    paddingHorizontal: scale(20),
+    paddingTop: scale(10),
+    paddingBottom: scale(20),
   },
   title: {
     fontFamily: 'Montserrat',
-    fontSize: 20,
+    fontSize: scale(20),
     fontWeight: 'bold',
-    color: colors.white,
+    color: colors.textPrimary,
   },
   description: {
     fontFamily: 'Montserrat',
-    fontSize: 16,
+    fontSize: scale(16),
     color: colors.textSecondary,
-    marginBottom: 10,
+    marginBottom: scale(10),
   },
   details: {
     fontFamily: 'Montserrat',
-    fontSize: 14,
+    fontSize: scale(14),
     color: colors.textSecondary,
-    marginBottom: 5,
+    marginBottom: scale(5),
   },
   emergency: {
     color: colors.danger,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: scale(10),
   },
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    borderWidth: 1,
+    paddingVertical: scale(10),
+    paddingHorizontal: scale(20),
+    borderRadius: scale(16),
+    borderWidth: scale(1),
     borderColor: colors.success,
     backgroundColor: colors.success,
-    margin: 10,
+    margin: scale(10),
   },
   saveButtonText: {
     fontFamily: 'Montserrat',
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#FFFFFF',
+    marginLeft: scale(10),
+    fontSize: scale(16),
+    color: colors.white,
     fontWeight: '500',
   },
   saveButtonDisabled: {
     backgroundColor: colors.border,
   },
-unsaveButton: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  paddingHorizontal: 20,
-  borderRadius: 16,
-  borderWidth: 1,
-  borderColor: colors.danger,
-  backgroundColor: colors.danger,
-  marginTop: 10,
-  paddingVertical: 10,
-},
-
+  unsaveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: scale(20),
+    borderRadius: scale(16),
+    borderWidth: scale(1),
+    borderColor: colors.danger,
+    backgroundColor: colors.danger,
+    marginTop: scale(10),
+    paddingVertical: scale(10),
+  },
   unsaveButtonText: {
     fontFamily: 'Montserrat',
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#FFFFFF',
+    marginLeft: scale(10),
+    fontSize: scale(16),
+    color: colors.white,
     fontWeight: '500',
   },
   closeButton: {
     backgroundColor: colors.closeButton,
-    padding: 8,
-    borderRadius: 16,
-    elevation: 6,
-    shadowRadius: 4,
+    padding: scale(8),
+    borderRadius: scale(16),
+    elevation: scale(6),
+    shadowRadius: scale(4),
     shadowOpacity: 0.1,
     shadowColor: '#000',
     shadowOffset: { height: 2, width: 2 },
   },
   closeIcon: {
-    fontSize: 24,
-    color: '#fff', 
+    fontSize: scale(24),
+    color: '#fff',
   },
   shadow: {
     shadowOpacity: 0.7,
-    shadowRadius: 5,
+    shadowRadius: scale(5),
     shadowColor: '#000',
     shadowOffset: { height: 2, width: 2 },
-    elevation: 5, 
+    elevation: scale(5),
   },
   closeIconContainer: {
-    padding: 10,
-    borderRadius: 20,
+    padding: scale(10),
+    borderRadius: scale(20),
     backgroundColor: 'red',
     alignItems: 'center',
     justifyContent: 'center',
   },
 });
 
-
+export default styles;
 export { colors };

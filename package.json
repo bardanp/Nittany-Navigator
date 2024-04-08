@@ -42,7 +42,6 @@
     "firebase-admin": "^12.0.0",
     "jwt-decode": "^4.0.0",
     "metro-core": "^0.80.6",
-    "native-base": "^3.4.28",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-native": "0.72.10",
@@ -62,7 +61,8 @@
     "react-native-svg": "^13.9.0",
     "react-native-vector-icons": "^10.0.3",
     "react-native-web": "^0.19.10",
-    "react-navigation": "^5.0.0"
+    "react-navigation": "^5.0.0",
+    "tamagui": "^1.94.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { Dimensions, View, Text, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
@@ -89,6 +89,8 @@ const ProfileScreen = () => {
   );
 };
 
+const { width, height } = Dimensions.get('window');
+const scale = size => (width / 428) * size;
 
 const styles = StyleSheet.create({
   container: {
@@ -96,59 +98,59 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F7FA',
   },
   scrollViewContainer: {
-    padding: 20,
+      padding: scale(20),
   },
   profileHeader: {
-    alignItems: 'center',
+      alignItems: 'center',
   },
   profileIcon: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 20,
+      width: scale(120),
+      height: scale(120),
+      borderRadius: scale(60),
+      marginBottom: scale(20),
   },
   userInfo: {
-    alignItems: 'center',
+      alignItems: 'center',
   },
   username: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+      fontSize: scale(24),
+      fontWeight: 'bold',
+      color: '#333',
+      marginBottom: scale(8),
   },
   userDetail: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 4,
+      fontSize: scale(16),
+      color: '#555',
+      marginBottom: scale(4),
   },
   profileOptions: {
-    marginTop: 20,
+      marginTop: scale(20),
   },
   optionContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 2,
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FFFFFF',
+      borderRadius: scale(12),
+      marginBottom: scale(16),
+      padding: scale(16),
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: scale(2) },
+      shadowOpacity: 0.1,
+      shadowRadius: scale(8),
+      elevation: scale(2),
   },
   optionTextContainer: {
-    marginLeft: 16,
-    flex: 1,
+      marginLeft: scale(16),
+      flex: 1,
   },
   optionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A202C',
+      fontSize: scale(18),
+      fontWeight: '600',
+      color: '#1A202C',
   },
   optionDescription: {
-    fontSize: 14,
-    color: '#718096',
+      fontSize: scale(14),
+      color: '#718096',
   },
 });
 

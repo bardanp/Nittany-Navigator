@@ -89,11 +89,12 @@ const PopupModal = ({ visible, onClose, item }) => {
 
               <View style={styles.imageContainer}>
               <Image
-                source={{ uri: modalData.image || noPicturesIcon }}
+                source={modalData.image ? { uri: modalData.image } : require('../../assets/no-pictures.png')}
                 style={styles.image}
                 resizeMode='cover'
                 onError={() => setImageError(true)}
               />
+
               </View>
 
               <View style={styles.body}>

@@ -20,6 +20,7 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import options from '../../backend/options.json';
 import { useNavigation } from '@react-navigation/native';
+import SubmitSuccessScreen from './SubmitSuccessScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddNewReport = () => {
@@ -178,8 +179,8 @@ const AddNewReport = () => {
         createdBy: createdBy,
       };
       await addDoc(collection(firestore, 'reports'), reportData);
-      console.log('Report added successfully!');
-      navigation.goBack();
+      Alert.alert('Success', 'Report added successfully!');
+      navigation.navigate('SubmitSuccessScreen');
     } catch (error) {
       console.error('Error adding report to Firestore:', error);
       Alert.alert('Error', 'Failed to add the report.');

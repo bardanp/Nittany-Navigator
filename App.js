@@ -9,19 +9,32 @@ import SettingsScreen from "./screens/profileViews/views/SettingScreen";
 import SubmitSuccessScreen from "./screens/addViews/SubmitSuccessScreen";
 import SavedEventsReports from "./screens/profileViews/views/SavedEventsReports";
 import UserEventsReports from "./screens/profileViews/views/UserEventsReports";
-import HomeScreen from "./screens/mapListViews/HomeScreen"
 import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import About from "./screens/profileViews/views/About";
 import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
-import { NativeBaseProvider } from 'native-base';
-import customTheme from './customTheme'
-
-
+import { TamaguiProvider } from '@tamagui/core'
+import config from '../tamagui.config';
 
 const Stack = createStackNavigator();
 
 const App = () => {
+
+  useEffect(() => {
+    const originalWarn = console.warn;
+    console.warn = (message, ...args) => {
+      if (message.indexOf('SSRProvider') === -1) {
+        originalWarn.call(console, message, ...args);
+      }
+    };
+  
+    return () => {
+      console.warn = originalWarn;
+    };
+  }, []);
+  
+  
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -45,7 +58,7 @@ const App = () => {
   }, []);
 
   return (
-    <NativeBaseProvider theme={customTheme}>
+    <TamaguiProvider config={config}>
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -95,7 +108,7 @@ const App = () => {
         />
       </Stack.Navigator>
     </NavigationContainer>
-    </NativeBaseProvider>
+    </TamaguiProvider>
   );
 };
 

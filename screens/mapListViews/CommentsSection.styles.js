@@ -1,12 +1,15 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
-export default StyleSheet.create({
+const { width: screenWidth } = Dimensions.get('window');
+const scale = (size) => (screenWidth / 428) * size;
+
+const styles = StyleSheet.create({
   sectionHeader: {
-    fontSize: 18,
+    fontSize: scale(18),
     fontWeight: 'bold',
     color: '#333',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(16),
     backgroundColor: '#f5f5f5',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
@@ -14,8 +17,8 @@ export default StyleSheet.create({
     borderBottomColor: '#e0e0e0',
   },
   commentContainer: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(16),
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: '#fff',
@@ -26,52 +29,52 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   commentAuthor: {
-    fontSize: 16,
+    fontSize: scale(16),
     fontWeight: 'bold',
     color: '#007bff',
   },
   commentText: {
-    marginTop: 4,
-    fontSize: 14,
+    marginTop: scale(4),
+    fontSize: scale(14),
     color: '#333',
   },
   commentDate: {
-    marginTop: 4,
-    fontSize: 12,
+    marginTop: scale(4),
+    fontSize: scale(12),
     color: '#666',
   },
   deleteButton: {
-    marginLeft: 12,
-    padding: 8,
+    marginLeft: scale(12),
+    padding: scale(8),
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    marginTop: scale(12),
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(8),
     backgroundColor: '#f8f9fa',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
   },
   input: {
     flex: 1,
-    marginRight: 8,
-    padding: 10,
+    marginRight: scale(8),
+    padding: scale(10),
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ced4da',
-    borderRadius: 20,
-    fontSize: 14,
+    borderRadius: scale(20),
+    fontSize: scale(14),
     color: '#495057',
   },
   button: {
-    padding: 10,
+    padding: scale(10),
     backgroundColor: '#007bff',
-    borderRadius: 20,
+    borderRadius: scale(20),
   },
   buttonText: {
-    fontSize: 14,
+    fontSize: scale(14),
     color: '#fff',
     fontWeight: 'bold',
   },
@@ -79,3 +82,5 @@ export default StyleSheet.create({
     backgroundColor: '#6c757d',
   },
 });
+
+export default styles;

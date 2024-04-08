@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
+import { View, Dimensions, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firestore } from '../../../backend/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PopupModal from '../../mapListViews/PopupModal';
-import options from '../../../backend/options.json';
 
 
 const UserEventsReports = () => {
@@ -158,6 +157,9 @@ const UserEventsReports = () => {
     );
 };
 
+const { width } = Dimensions.get('window');
+const scale = size => (width / 428) * size;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -167,37 +169,37 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: 20,
-        paddingBottom: 10,
+        paddingHorizontal: scale(20),
+        paddingTop: scale(20),
+        paddingBottom: scale(10),
     },
     header: {
-        fontSize: 24,
+        fontSize: scale(24),
         fontWeight: 'bold',
         color: '#333',
     },
     backButton: {
-        paddingVertical: 10,
+        paddingVertical: scale(10),
     },
     backButtonText: {
         color: '#5A67D8',
-        fontSize: 16,
+        fontSize: scale(16),
     },
     filterContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        paddingBottom: 20,
-        paddingHorizontal: 20,
+        paddingBottom: scale(20),
+        paddingHorizontal: scale(20),
     },
     filterButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 25,
+        paddingVertical: scale(10),
+        paddingHorizontal: scale(20),
+        borderRadius: scale(25),
         backgroundColor: '#5A67D8',
     },
     filterButtonText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: scale(16),
         textAlign: 'center',
     },
     filterButtonActive: {
@@ -208,10 +210,10 @@ const styles = StyleSheet.create({
     },
     listItem: {
         backgroundColor: '#F4F6FA',
-        padding: 20,
-        borderRadius: 15,
-        marginBottom: 20,
-        marginHorizontal: 20,
+        padding: scale(20),
+        borderRadius: scale(15),
+        marginBottom: scale(20),
+        marginHorizontal: scale(20),
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -220,36 +222,36 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     listItemHeader: {
-        fontSize: 18,
+        fontSize: scale(18),
         fontWeight: '600',
         color: '#333',
     },
     listItemText: {
         color: '#6B7280',
-        marginTop: 5,
+        marginTop: scale(5),
     },
     removeButton: {
         backgroundColor: '#FF3B30',
-        padding: 10,
-        borderRadius: 8,
-        margin: 4,
+        padding: scale(10),
+        borderRadius: scale(8),
+        margin: scale(4),
     },
     removeButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: scale(14),
     },
     listContentContainer: {
-        paddingBottom: 20,
+        paddingBottom: scale(20),
     },
     viewInfo: {
         backgroundColor: '#007bff',
-        padding: 10,
-        borderRadius: 8,
-        margin: 4,
+        padding: scale(10),
+        borderRadius: scale(8),
+        margin: scale(4),
     },
     viewInfoText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: scale(14),
     },
 });
 

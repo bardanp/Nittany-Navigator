@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native';
+import { View, Dimensions, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -69,60 +69,63 @@ const SettingScreen = () => {
   );
 };
 
+const { width } = Dimensions.get('window');
+const scale = size => (width / 428) * size;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F4F7FA',
   },
   scrollViewContainer: {
-    padding: 20,
-    paddingTop: 50,
+    padding: scale(20),
+    paddingTop: scale(50),
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: scale(30),
     position: 'relative',
   },
   title: {
-    fontSize: 26,
+    fontSize: scale(26),
     fontWeight: '600',
     color: '#1A202C',
   },
   backButton: {
     position: 'absolute',
     left: 0,
-    top: 5,
-    padding: 12,
+    top: scale(5),
+    padding: scale(12),
   },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 16,
-    padding: 16,
+    borderRadius: scale(12),
+    marginBottom: scale(16),
+    padding: scale(16),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: scale(4) },
     shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 1,
+    shadowRadius: scale(12),
+    elevation: scale(1),
   },
   optionIcon: {
-    marginRight: 16,
+    marginRight: scale(16),
   },
   optionTextContainer: {
     flex: 1,
   },
   optionTitle: {
-    fontSize: 18,
+    fontSize: scale(18),
     fontWeight: '600',
     color: '#1A202C',
-    marginBottom: 2,
+    marginBottom: scale(2),
   },
   optionDescription: {
-    fontSize: 14,
+    fontSize: scale(14),
     color: '#718096',
   },
   logoutButton: {
@@ -132,7 +135,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoutText: {
-    fontSize: 18,
+    fontSize: scale(18),
     fontWeight: '600',
     color: '#FFFFFF',
     textAlign: 'center',

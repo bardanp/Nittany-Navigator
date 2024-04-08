@@ -35,7 +35,6 @@ const customTheme = extendTheme({
       variants: {},
     },
     Button: {
-      // Customizing button components globally
       baseStyle: {
         rounded: 'md',
       },
@@ -59,7 +58,6 @@ const customTheme = extendTheme({
       },
     },
     VStack: {
-      // Customizing VStack components globally
       baseStyle: {
         space: 4,
         alignItems: 'center',
