@@ -13,7 +13,6 @@ import {
   FlatList,
   Image,
 } from 'react-native';
-import { VStack } from 'native-base';
 
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -485,6 +484,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   submitButton: {
+    marginTop: 20,
     backgroundColor: '#27ae60',
     paddingVertical: 12,
     paddingHorizontal: 25,

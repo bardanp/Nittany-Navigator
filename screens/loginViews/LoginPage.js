@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Dimensions, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { exchangeCodeAsync, makeRedirectUri, useAuthRequest, useAutoDiscovery } from 'expo-auth-session';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +19,9 @@ if (!global.btoa) {
 }
 
 WebBrowser.maybeCompleteAuthSession();
+
+const { width } = Dimensions.get('window');
+const scale = (size) => (width / 428) * size;
 
 const LoginPage = ({ navigation }) => {
   const tenantId = keys.tenantId;
@@ -125,7 +128,7 @@ const LoginPage = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Ionicons name="school" size={100} color="#2f80ed" style={styles.logo} />
+      <Ionicons name="school" size={scale(100)} color="#2f80ed" style={styles.logo} />
       <Text style={styles.title}>Welcome to Nittany Navigator</Text>
       <Text style={styles.description}>Your go-to for a connected, informed, and safe campus journey.</Text>
       <TouchableOpacity style={styles.button} onPress={handleLoginPress} disabled={!request}>
@@ -143,32 +146,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   logo: {
-    marginBottom: 30,
+    marginBottom: scale(30),
   },
   title: {
-    fontSize: 24,
+    fontSize: scale(24),
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: scale(10),
     color: '#333',
   },
   description: {
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: scale(16),
+    marginBottom: scale(20),
     textAlign: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: scale(20),
     color: '#555',
   },
   button: {
     backgroundColor: '#2f80ed',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 6,
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(24),
+    borderRadius: scale(6),
     alignContent: 'center',
     justifyContent: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: scale(16),
     fontWeight: 'bold',
     alignContent: 'center',
     justifyContent: 'center',

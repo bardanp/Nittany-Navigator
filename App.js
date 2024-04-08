@@ -14,7 +14,7 @@ import { collection, getDocs } from "firebase/firestore";
 import About from "./screens/profileViews/views/About";
 import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
 import { TamaguiProvider } from '@tamagui/core'
-import config from '../tamagui.config';
+import config from './tamagui.config'
 
 const Stack = createStackNavigator();
 
