@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Pressable, StyleSheet, Animated, ActivityIndicator, Alert, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { firestore } from '../../backend/firebase';
+import { firestore } from '../../../backend/firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     width: scale(60),
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#007AFF',
     shadowOpacity: 0.2,
     shadowRadius: scale(4),
     shadowColor: '#000',

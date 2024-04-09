@@ -1,64 +1,72 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import { colors } from './PopupModal.styles';
 
 const { width: screenWidth } = Dimensions.get('window');
 const scale = (size) => (screenWidth / 428) * size;
 
 const styles = StyleSheet.create({
-  sectionHeader: {
-    fontSize: scale(12),
-    fontWeight: 'bold',
-    color: '#333',
-    paddingVertical: scale(10),
-    paddingHorizontal: scale(14),
-    backgroundColor: '#f5f5f5',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
   commentContainer: {
-    paddingVertical: scale(10),
-    paddingHorizontal: scale(14),
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(16),
+    width: screenWidth, 
+    maxHeight: '100%',
+    backgroundColor: '#f8f9fa',
   },
   commentHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: scale(4),
   },
   commentAuthor: {
-    fontSize: scale(14),
+    fontSize: scale(16),
     fontWeight: 'bold',
-    color: '#007bff',
+    color: colors.primary,
   },
   commentText: {
-    marginTop: scale(2),
-    fontSize: scale(12),
+    fontSize: scale(14),
     color: '#333',
+    lineHeight: scale(20),
   },
   commentDate: {
-    marginTop: scale(2),
-    fontSize: scale(10),
+    fontSize: scale(12),
     color: '#666',
+    marginTop: scale(4),
+    fontStyle: 'italic',
   },
   deleteButton: {
     marginLeft: scale(10),
     padding: scale(6),
   },
+  errorText: {
+    color: 'red', 
+    fontSize: scale(14), 
+    textAlign: 'center', 
+    marginTop: scale(10), 
+  },
+  noCommentsText: {
+    fontSize: scale(16), 
+    fontStyle: 'italic', 
+    color: '#555', 
+    textAlign: 'center', 
+    backgroundColor: 'white',
+  },
   inputContainer: {
     flexDirection: 'row',
+    height: scale(80), 
     alignItems: 'center',
     marginTop: scale(10),
     paddingHorizontal: scale(14),
     paddingVertical: scale(6),
     backgroundColor: '#f8f9fa',
-    borderTopWidth: 1,
+    borderTopWidth: 5,
     borderTopColor: '#e0e0e0',
+    marginBottom: scale(20),
   },
   input: {
     flex: 1,
+    height: scale(50), 
     marginRight: scale(6),
     padding: scale(8),
     backgroundColor: '#fff',

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { firestore } from '../../../backend/firebase';
 import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import PopupModal from '../../mapListViews/PopupModal';
+import PopupModal from '../../mapListViews/detailsView/PopupModal';
 
 const SavedEventsReports = () => {
     const navigation = useNavigation();

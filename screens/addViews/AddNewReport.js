@@ -42,7 +42,7 @@ const AddNewReport = () => {
     return (
       <Modal
         visible={isVisible}
-        transparent={true}
+        transparent={false}
         animationType="slide"
         onRequestClose={onClose}
       >
@@ -275,7 +275,7 @@ const AddNewReport = () => {
       <Modal
         visible={showLocationPicker}
         animationType="slide"
-        transparent={true}
+        transparent={false}
         onRequestClose={() => setShowLocationPicker(false)}
       >
         <TouchableWithoutFeedback onPress={() => setShowLocationPicker(false)}>
@@ -315,7 +315,7 @@ const AddNewReport = () => {
       <Modal
         visible={showCategoryPicker}
         animationType="slide"
-        transparent={true}
+        transparent={false}
         onRequestClose={() => setShowCategoryPicker(false)}
       >
         <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>

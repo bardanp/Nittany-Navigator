@@ -5,12 +5,12 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import styles from './HomeScreen.styles.js';
 import * as Location from 'expo-location';
-import PopupModal from './PopupModal.js';
 import { firestore } from '../../backend/firebase.js'; 
 import { collection, getDocs } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 import options from '../../backend/options.json';
-import MultipleEventsModal from './MultipleEventsModal.js'; 
+import MultipleEventsModal from './MultipleEventsModal.js';
+import PopupModal from "./detailsView/PopupModal";
 
 
 const HomeScreen = ({  }) => {
@@ -296,12 +296,12 @@ const HomeScreen = ({  }) => {
                     <TouchableOpacity onPress={handleMap} style={styles.button}>
                         <Icon name="map" size={20} color="#fff" />
                     </TouchableOpacity>
-                    
+
                     <PopupModal
-                            visible={modalVisible}
-                            onClose={() => setModalVisible(false)}
-                            item={selectedItem}
-                        />
+                        visible={modalVisible}
+                        onClose={() => setModalVisible(false)}
+                        item={selectedItem}
+                    />
                  </View>
             </TouchableOpacity>
             
