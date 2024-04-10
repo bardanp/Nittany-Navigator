@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   closeIconContainer: {
     padding: scale(8),
-    borderRadius: scale(50),
+    borderRadius: scale(8),
     backgroundColor: 'red',
     alignItems: 'center',
     justifyContent: 'center',

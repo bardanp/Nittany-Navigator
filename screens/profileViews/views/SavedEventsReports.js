@@ -37,7 +37,7 @@ const SavedEventsReports = () => {
 
     const fetchSavedItems = async (savedItemsIds) => {
         const itemsData = await Promise.all(savedItemsIds.map(async (itemId) => {
-            const isEvent = itemId.startsWith('E'); // Assuming event IDs start with 'E', adjust as needed
+            const isEvent = itemId.startsWith('E'); 
             const collection = isEvent ? 'events' : 'reports';
             const itemRef = doc(firestore, collection, itemId);
             const itemSnap = await getDoc(itemRef);
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     filterButton: {
         paddingVertical: scale(10),
         paddingHorizontal: scale(20),
-        borderRadius: scale(25),
+        borderRadius: scale(8),
         backgroundColor: '#5A67D8',
     },
     filterButtonText: {
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     listItem: {
         backgroundColor: '#F4F6FA',
         padding: scale(20),
-        borderRadius: scale(15),
+        borderRadius: scale(8),
         marginBottom: scale(20),
         marginHorizontal: scale(20),
         flexDirection: 'row',

@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     filterButton: {
         paddingVertical: scale(10),
         paddingHorizontal: scale(20),
-        borderRadius: scale(25),
+        borderRadius: scale(8),
         backgroundColor: '#5A67D8',
     },
     filterButtonText: {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     listItem: {
         backgroundColor: '#F4F6FA',
         padding: scale(20),
-        borderRadius: scale(15),
+        borderRadius: scale(8),
         marginBottom: scale(20),
         marginHorizontal: scale(20),
         flexDirection: 'row',
