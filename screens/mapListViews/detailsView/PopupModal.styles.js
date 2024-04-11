@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   description: {
     fontFamily: 'Montserrat-Bold',
     fontSize: scale(16),
-    color: colors.textSecondary,
+    color: colors.primary,
     lineHeight: scale(20),
     marginBottom: scale(12),
   },

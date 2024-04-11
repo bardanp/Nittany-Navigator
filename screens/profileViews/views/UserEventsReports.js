@@ -86,21 +86,35 @@ const UserEventsReports = () => {
         (filter === 'reports' && item.type === 'report')
     );
 
+    const formatDate = (timestamp) => {
+        if (!timestamp) {
+            return '';
+        }
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toLocaleDateString("en-US", {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
 
 
     const renderItem = ({ item }) => {
-        if (!item || !item.type) {
-            console.error('Item or item.type is undefined', item);
-            return null; 
+        if (!item) {
+            console.error('Item is undefined: ', item);
+            return null;
         }
 
         return (
             <View style={styles.listItem}>
-                <View style={styles.itemDetails}>
-                    <Text style={styles.listItemHeader}>{item.title}</Text>
-                    <Text style={styles.listItemText}>Location: {item.location}</Text>
-                    <Text style={styles.listItemText}>Date: {item.date}</Text>
-                </View>
+            <View style={styles.itemDetails}>
+                <Text style={styles.listItemHeader}>{item.title}</Text>
+                <Text style={styles.listItemText}>Type: {item.type}</Text>
+                <Text style={styles.listItemText}>Location: {item.locationDetails}</Text>
+                <Text style={styles.listItemText}>Date: {formatDate(item.dateTime)}</Text>
+            </View>
                 <View style={styles.listItemActions}>
                     <TouchableOpacity onPress={() => handleRemoveItem(item.id, item.type)} style={styles.removeButton}>
                         <Text style={styles.removeButtonText}>Delete {item.type}</Text>

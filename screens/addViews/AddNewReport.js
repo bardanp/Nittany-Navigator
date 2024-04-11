@@ -180,7 +180,7 @@ const AddNewReport = () => {
       };
       await addDoc(collection(firestore, 'reports'), reportData);
       Alert.alert('Success', 'Report added successfully!');
-      navigation.navigate('SubmitSuccessScreen');
+      navigation.goBack();
     } catch (error) {
       console.error('Error adding report to Firestore:', error);
       Alert.alert('Error', 'Failed to add the report.');

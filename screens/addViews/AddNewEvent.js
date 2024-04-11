@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     minHeight: 100,
-    textAlign: 'top',
+    textAlign: 'auto',
     width: '100%',
     backgroundColor: '#f9f9f9',
     marginBottom: 12,

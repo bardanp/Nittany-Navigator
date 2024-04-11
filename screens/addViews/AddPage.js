@@ -39,7 +39,7 @@ const AddPage = () => {
         <OptionCard
           title="Add a Report"
           description="Report incidents with details like title, urgency level, location, and more."
-          onPress={navigateTo(Routes.ADD_NEW_REPORT)}
+          // onPress={navigateTo(Routes.ADD_NEW_REPORT)}
         />
         <TouchableOpacity style={styles.backButton} onPress={navigateTo(Routes.HOME)}>
           <Text style={styles.backButtonText}>Back to Home</Text>

@@ -89,7 +89,6 @@ const PopupModal = ({ visible, onClose, item }) => {
                 </TouchableOpacity>
               </View>
 
-              {/* Content based on the selected tab */}
               {selectedTab === 'details' ? (
                   <ScrollView style={{flex: 1}}>
                     <View style={styles.modalContainer}>
@@ -117,7 +116,7 @@ const PopupModal = ({ visible, onClose, item }) => {
                       <View style={styles.body}>
                         <Text style={styles.description}>{modalData.description}</Text>
                         <Text style={styles.details}>{`Date: ${formatDate(modalData.dateTime)}`}</Text>
-                        <Text style={styles.details}>{`Location: ${modalData.location || 'N/A'}`}</Text>
+                        <Text style={styles.details}>{`Location: ${modalData.locationDetails || 'N/A'}`}</Text>
                         <Text style={styles.details}>{`Category: ${modalData.category || 'N/A'}`}</Text>
                         <Text style={styles.details}>{`Organizer: ${modalData.organizer || 'N/A'}`}</Text>
                         <Text style={styles.details}>{`Contact: ${modalData.contactEmail || 'N/A'}`}</Text>

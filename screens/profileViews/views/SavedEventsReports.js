@@ -37,18 +37,25 @@ const SavedEventsReports = () => {
 
     const fetchSavedItems = async (savedItemsIds) => {
         const itemsData = await Promise.all(savedItemsIds.map(async (itemId) => {
-            const isEvent = itemId.startsWith('E'); 
-            const collection = isEvent ? 'events' : 'reports';
-            const itemRef = doc(firestore, collection, itemId);
-            const itemSnap = await getDoc(itemRef);
+            let itemRef = doc(firestore, 'events', itemId);
+            let itemSnap = await getDoc(itemRef);
+            
             if (itemSnap.exists()) {
-                return { ...itemSnap.data(), id: itemSnap.id, type: isEvent ? 'event' : 'report' };
+                return { ...itemSnap.data(), id: itemSnap.id, type: 'event' };
+            } else {
+                itemRef = doc(firestore, 'reports', itemId);
+                itemSnap = await getDoc(itemRef);
+                
+                if (itemSnap.exists()) {
+                    return { ...itemSnap.data(), id: itemSnap.id, type: 'report' };
+                }
             }
+            
             return null;
         }));
-        
-        setEventsReports(itemsData.filter(Boolean)); 
+        setEventsReports(itemsData.filter(Boolean));
     };
+    
 
     const handleItemPress = (item) => {
         setSelectedItem(item);
@@ -56,7 +63,7 @@ const SavedEventsReports = () => {
     };
 
 
-    const unsaveFromUser = async (documentId, isEvent) => {
+    const unsaveFromUser = async (documentId) => {
         try {
             const userInfoString = await AsyncStorage.getItem('userInfo');
             if (!userInfoString) {
@@ -66,99 +73,126 @@ const SavedEventsReports = () => {
             const { email } = JSON.parse(userInfoString);
     
             const userRef = doc(firestore, 'users', email);
-            const fieldToUpdate = isEvent ? 'savedEvents' : 'savedReports';
     
+            // Assuming you want to update 'savedItems' field when removing a bookmark
             await updateDoc(userRef, {
-                [fieldToUpdate]: arrayRemove(documentId)
+                savedItems: arrayRemove(documentId)
             });
     
-            console.log(`Removed bookmark for ${isEvent ? 'event' : 'report'} with ID: ${documentId} from user ${email}`);
+            console.log(`Removed bookmark with ID: ${documentId} from user ${email}`);
             
-            await fetchSavedEventsAndReports(email);
+            // Call fetchSavedItems to refresh the list after removing a bookmark
+            const userDoc = await getDoc(userRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const savedItems = userData.savedItems || [];
+                fetchSavedItems(savedItems);
+            }
         } catch (error) {
             console.error('Error removing bookmark from user:', error);
         }
     };
     
+    
 
     const handleRemoveBookmark = async (documentId, isEvent) => {
         const item = { id: documentId, isEvent };
     
-        Alert.alert(
-            'Remove Bookmark',
-            'Are you sure you want to remove this bookmark?',
-            [
-                {
-                    text: 'Cancel',
-                    style: 'cancel',
-                },
-                {
-                    text: 'Remove',
-                    onPress: async () => {
-                        await unsaveFromUser(documentId, isEvent);
-                        console.log('Bookmark removed:', documentId);
+            Alert.alert(
+                'Remove Bookmark',
+                'Are you sure you want to remove this bookmark?',
+                [
+                    {
+                        text: 'Cancel',
+                        style: 'cancel',
                     },
-                    
-                },
-            ],
-            { cancelable: true }
+                    {
+                        text: 'Remove',
+                        onPress: async () => {
+                            await unsaveFromUser(documentId, isEvent);
+                            console.log('Bookmark removed:', documentId);
+                        },
+                        
+                    },
+                ],
+                { cancelable: true }
+            );
+        };
+
+
+        const filteredItems = eventsReports.filter(item =>
+            filter === 'both' ||
+            (filter === 'events' && item.type === 'event') ||
+            (filter === 'reports' && item.type === 'report')
         );
+        const getIconName = (item) => {
+        switch (item.type) {
+            case 'event':
+                return { icon: 'event', color: '#1976d2' };
+            case 'report':
+                return { icon: 'report-problem', color: '#d32f2f' };
+            default:
+                return { icon: 'info', color: '#9e9e9e' };
+        }
+    };
+
+    const formatDate = (timestamp) => {
+        if (!timestamp) {
+            return '';
+        }
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toLocaleDateString("en-US", {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
     };
 
 
-    const filteredItems = eventsReports.filter(item =>
-        filter === 'both' ||
-        (filter === 'events' && item.type === 'event') ||
-        (filter === 'reports' && item.type === 'report')
-    );
-    const getIconName = (item) => {
-    switch (item.type) {
-        case 'event':
-            return { icon: 'event', color: '#1976d2' };
-        case 'report':
-            return { icon: 'report-problem', color: '#d32f2f' };
-        default:
-            return { icon: 'info', color: '#9e9e9e' };
-    }
-};
 
+    const renderItem = ({ item }) => {
+        if (!item) {
+            console.error('Item is undefined', item);
+            return null;
+        }
 
+        // Adjust these lines to match the exact field names from your Firestore documents.
+        const itemLocationDetails = item.locationDetails; // Updated field name
+        const itemDate = formatDate(item.dateTime); // Convert the Firestore Timestamp to a string
+        console.log('item', item);
 
-const renderItem = ({ item }) => {
-    if (!item || !item.type) {
-        console.error('Item or item type is undefined', item);
-        return null;
-    }
-
-    return (
-        <View style={styles.listItem}>
+        return (
+            <View style={styles.listItem}>
             <View style={styles.itemDetails}>
                 <Text style={styles.listItemHeader}>{item.title}</Text>
-                <Text style={styles.listItemText}>Location: {item.location}</Text>
-                <Text style={styles.listItemText}>Date: {item.date}</Text>
+                <Text style={styles.listItemText}>Type: {item.type}</Text>
+                <Text style={styles.listItemText}>Location: {itemLocationDetails}</Text>
+                <Text style={styles.listItemText}>Date: {itemDate}</Text>
             </View>
-            <View style={styles.listItemActions}>
-                <TouchableOpacity
-                    onPress={() => handleRemoveBookmark(item.id, item.type === 'event')}
-                    style={styles.removeButton}
-                >
-                    <Text style={styles.removeButtonText}>Remove Bookmark</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => handleItemPress(item)}
-                    style={styles.viewInfo}
-                >
-                    <Text style={styles.viewInfoText}>View Details</Text>
-                </TouchableOpacity>
+                <View style={styles.listItemActions}>
+                    <TouchableOpacity
+                        onPress={() => handleRemoveBookmark(item.id, item.type === 'event')}
+                        style={styles.removeButton}
+                    >
+                        <Text style={styles.removeButtonText}>Remove Bookmark</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => handleItemPress(item)}
+                        style={styles.viewInfo}
+                    >
+                        <Text style={styles.viewInfoText}>View Details</Text>
+                    </TouchableOpacity>
+                </View>
+                <PopupModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    item={selectedItem}
+                    />
             </View>
-            <PopupModal
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                item={selectedItem}
-                />
-        </View>
-    );
-};
+        );
+    };
 
     return (
         <SafeAreaView style={styles.container}>

@@ -5,15 +5,14 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import styles from './HomeScreen.styles.js';
 import * as Location from 'expo-location';
-import { firestore } from '../../backend/firebase.js'; 
+import { firestore } from '../../backend/firebase.js';
 import { collection, getDocs } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 import options from '../../backend/options.json';
 import MultipleEventsModal from './MultipleEventsModal.js';
 import PopupModal from "./detailsView/PopupModal";
 
-
-const HomeScreen = ({  }) => {
+const HomeScreen = () => {
     const navigation = useNavigation();
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -23,7 +22,6 @@ const HomeScreen = ({  }) => {
     const [isLocationModalVisible, setIsLocationModalVisible] = useState(false);
     const [locationItems, setLocationItems] = useState([]);
 
-    
     const [showMap, setShowMap] = useState(true);
     const [mapRegion, setMapRegion] = useState({
         latitude: 40.204444839295846,
@@ -50,18 +48,49 @@ const HomeScreen = ({  }) => {
                 const reportsCollectionRef = collection(firestore, 'reports');
     
                 const eventsSnapshot = await getDocs(eventsCollectionRef);
-                const fetchedEvents = eventsSnapshot.docs.map(doc => ({
-                    ...doc.data(),
-                    id: `${doc.id}`,
-                    isEvent: true,
-                }));
+                const fetchedEvents = eventsSnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    let latitude, longitude;
+                  
+                    if (typeof data.locationCords === 'string') {
+                      [latitude, longitude] = data.locationCords.split(', ').map(Number);
+                    } else {
+                      console.error('Error parsing location cords for event:', data);
+                      latitude = null;
+                      longitude = null;
+
+                    }
+                  
+                    return {
+                      ...data,
+                      id: doc.id,
+                      isEvent: true,
+                      location: { latitude, longitude },
+                    };
+                  });
     
                 const reportsSnapshot = await getDocs(reportsCollectionRef);
-                const fetchedReports = reportsSnapshot.docs.map(doc => ({
-                    ...doc.data(),
-                    id: `${doc.id}`,
+                const fetchedReports = reportsSnapshot.docs.map(doc => {
+                const data = doc.data();
+                let latitude, longitude;
+
+                if (typeof data.locationCords === 'string') {
+                    [latitude, longitude] = data.locationCords.split(', ').map(Number);
+                } else {
+                    console.error('Error parsing location cords for report:', data);
+                    latitude = null;
+                    longitude = null;
+                    // You might want to handle this situation differently,
+                    // such as by not including this item in the list.
+                }
+
+                return {
+                    ...data,
+                    id: doc.id,
                     isReport: true,
-                }));
+                    location: { latitude, longitude },
+                };
+                });
 
                 setListData([...fetchedEvents, ...fetchedReports]);
             };
@@ -69,20 +98,20 @@ const HomeScreen = ({  }) => {
             fetchData();
         }, [])
     );
-    
+
     const formatDate = (timestamp) => {
         if (!timestamp) {
-          return 'N/A';
+            return 'N/A';
         }
         const date = timestamp.toDate();
         return date.toLocaleDateString("en-US", {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
         });
-      };
+    };
 
     useEffect(() => {
         navigation.setOptions({
@@ -94,18 +123,17 @@ const HomeScreen = ({  }) => {
             title: showMap ? "Map View" : "List View",
         });
 
-
         const watchUserLocation = async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 Alert.alert('Permission to access location was denied');
                 return;
             }
-    
+
             watchPositionSub = await Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.High,
-                    distanceInterval: 5, 
+                    distanceInterval: 5,
                 },
                 (location) => {
                     setUserLocation({
@@ -117,7 +145,7 @@ const HomeScreen = ({  }) => {
                 }
             );
         };
-    
+
         watchUserLocation();
 
         return () => {
@@ -125,9 +153,7 @@ const HomeScreen = ({  }) => {
                 watchPositionSub.remove();
             }
         };
-    }, [showMap, navigation]); 
-
-
+    }, [showMap, navigation]);
 
     const zoomIn = () => {
         setMapRegion(prevRegion => ({
@@ -136,7 +162,7 @@ const HomeScreen = ({  }) => {
             longitudeDelta: prevRegion.longitudeDelta / 2,
         }));
     };
-    
+
     const zoomOut = () => {
         setMapRegion(prevRegion => ({
             ...prevRegion,
@@ -144,7 +170,7 @@ const HomeScreen = ({  }) => {
             longitudeDelta: prevRegion.longitudeDelta * 2,
         }));
     };
-    
+
     const goToPennState = () => {
         setMapRegion(pennStateCoords);
         setShowMap(true);
@@ -155,94 +181,45 @@ const HomeScreen = ({  }) => {
         if (category) {
             return { icon: category.icon, color: category.color };
         } else {
-            return { icon: 'info', color: '#9e9e9e' }; 
+            return { icon: 'info', color: '#9e9e9e' };
         }
     };
 
     const getIconName = (item) => {
         if (item.isEvent) {
-            return { icon: 'event', color: '#1976d2' };
+            return getCategoryIcon(item.category);
         } else if (item.isReport) {
-            return getCategoryIcon(item.category); 
+            return getCategoryIcon(item.category);
         } else {
-            return { icon: 'info', color: '#9e9e9e' }; 
+            return { icon: 'info', color: '#9e9e9e' };
         }
     };
 
-    
-
     const renderMarkers = () => {
-        const itemsByLocation = listData.reduce((acc, item) => {
-            const location = options.locations.find(loc => loc.name === item.location);
-            if (location) {
-                const key = `${location.latitude}-${location.longitude}`;
-                if (!acc[key]) {
-                    acc[key] = {
-                        ...location,
-                        items: [item]
-                    };
-                } else {
-                    acc[key].items.push(item);
-                }
-            }
-            return acc;
-        }, {});
-    
-        return Object.entries(itemsByLocation).map(([key, locationWithItems]) => {
-            const { latitude, longitude, items } = locationWithItems;
-            if (items.length === 1) {
-                const item = items[0];
-                const { icon, color } = getIconName(item);
-                return (
-                    <Marker
-                        style={{opacity: 1}}
-                        key={item.id}
-                        coordinate={{
-                            latitude,
-                            longitude
-                        }}
-                        onPress={() => handleCalloutPress(item)}>
-                        <Icon name={icon} size={30} color={color} />
-                    </Marker>
-                );
-            } else {
-                const count = items.length; 
-                return (
+        return listData.map(item => {
+            const { latitude, longitude } = item.location;
+            const { icon, color } = getIconName(item);
+
+            return (
                 <Marker
-                    key={key}
-                    coordinate={{
-                        latitude,
-                        longitude
-                    }}
-                    onPress={() => handleMultipleItemsPress(items)}
-                >
-                    <View style={styles.customMarkerView}
-                    >
-                        <Text style={styles.customMarkerText}>{`${count} Items`}</Text>
-                    </View>
+                    key={item.id}
+                    coordinate={{ latitude, longitude }}
+                    onPress={() => handleCalloutPress(item)}>
+                    <Icon name={icon} size={30} color={color} />
                 </Marker>
-
-
-                );
-            }
+            );
         });
     };
-    
+
     const handleCalloutPress = (item) => {
         setSelectedItem(item);
         setModalVisible(true);
     };
 
     const handleMultipleItemsPress = (items) => {
-        setLocationItems(items); 
-        setIsLocationModalVisible(true); 
+        setLocationItems(items);
+        setIsLocationModalVisible(true);
     };
-
-    const handleDesc = (item) => {
-        setSelectedItem(item);
-        setModalVisible(true);
-    };
-    
 
     const goToUserLocation = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -259,38 +236,36 @@ const HomeScreen = ({  }) => {
         });
         setShowMap(true);
     };
-      
 
     const renderItem = ({ item }) => {
+        if (!item) {
+            console.error('Item is undefined: ', item);
+            return null;
+        }
         const { icon, color } = getIconName(item);
-    
+
         const handleMap = () => {
-            const location = options.locations.find(loc => loc.name === item.location);
-    
-            if (location) {
-                setMapRegion({
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    latitudeDelta: 0.005,
-                    longitudeDelta: 0.005,
-                });
-                setShowMap(true);
-            } else {
-                console.log('Location not found for:', item.location);
-            }
+            setMapRegion({
+                latitude: item.location.latitude,
+                longitude: item.location.longitude,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+            });
+            setShowMap(true);
         };
-        
 
         return (
             <TouchableOpacity style={styles.eventItem} onPress={() => handleCalloutPress(item)}>
                 <View style={[styles.iconContainer, { backgroundColor: item.color || '#007bff' }]}>
                     <Icon name={getIconName(item).icon} size={24} color="#fff" />
                 </View>
-                <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.description}>{`Date: ${item.dateTime ? formatDate(item.dateTime) : 'N/A'}`}</Text>
-                    <Text style={styles.description}>{`Location: ${item.location}`}</Text>
-                    {item.participants && <Text style={styles.description}>{`Participants: ${item.participants}`}</Text>}
+                    <View style={{ flex: 1, justifyContent: "center" }}>
+                    <View style={styles.itemDetails}>
+                    <Text style={styles.listItemHeader}>{item.title}</Text>
+                    <Text style={styles.listItemText}>Type: {item.type}</Text>
+                    <Text style={styles.listItemText}>Location: {item.locationDetails}</Text>
+                    <Text style={styles.listItemText}>Date: {formatDate(item.dateTime)}</Text>
+                </View>
                 </View>
                 <View style={styles.buttonsContainer}>
                     <TouchableOpacity onPress={handleMap} style={styles.button}>
@@ -302,14 +277,10 @@ const HomeScreen = ({  }) => {
                         onClose={() => setModalVisible(false)}
                         item={selectedItem}
                     />
-                 </View>
+                </View>
             </TouchableOpacity>
-            
-            
         );
-        
     };
-    
 
     return (
         <View style={styles.container}>
@@ -341,7 +312,7 @@ const HomeScreen = ({  }) => {
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={goToUserLocation} style={styles.currentLocationButton}>
-                            <Icon name="my-location" size={25} color="#000" /> 
+                            <Icon name="my-location" size={25} color="#000" />
                         </TouchableOpacity>
 
                         <PopupModal
@@ -349,7 +320,6 @@ const HomeScreen = ({  }) => {
                             onClose={() => setModalVisible(false)}
                             item={selectedItem}
                         />
-
 
                         <MultipleEventsModal
                             isLocationModalVisible={isLocationModalVisible}
@@ -364,14 +334,14 @@ const HomeScreen = ({  }) => {
                 </>
             ) : (
                 <FlatList
-                data={listData}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-            />
+                    data={listData}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderItem}
+                />
             )}
 
         </View>
     );
 };
 
-export default HomeScreen;  
+export default HomeScreen;
