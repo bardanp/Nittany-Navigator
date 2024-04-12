@@ -86,6 +86,7 @@ const CommentsSection = ({ itemId }) => {
     } catch (error) {
       setAddError('Failed to post the comment. Please try again.');
     }
+    Alert.alert('Comment added successfully');
     setIsPostingComment(false);
   };
 
