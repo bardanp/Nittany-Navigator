@@ -37,14 +37,14 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: colors.background,
     width: width,
-    maxHeight: height * 0.85,
+    maxHeight: height,
     elevation: 5,
     overflow: 'hidden',
   },
   scrollViewContainer: {
     flexGrow: 1,
-    alignItems: 'center',
   },
+  
   actionContainer: {
     position: 'absolute',
     top: scale(3),
@@ -66,10 +66,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start', // Align items to the start to handle wrapped text
     backgroundColor: colors.primary,
     padding: scale(16),
+    paddingTop: scale(20), // Add a bit more padding on the top
+    paddingBottom: scale(20), // Add padding on the bottom
   },
+  
   category: {
     fontFamily: 'Montserrat-Bold',
     fontSize: scale(20),
@@ -98,9 +101,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: 'Montserrat-Bold',
-    fontSize: scale(24),
+    fontSize: scale(22),
     color: colors.white,
+    textAlign: 'center',
+    flex: 1, 
+    flexWrap: 'wrap', 
   },
+  
   description: {
     fontFamily: 'Montserrat-Bold',
     fontSize: scale(16),

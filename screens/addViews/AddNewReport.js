@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  Switch,
   Alert,
-  Image,
   Modal,
   StyleSheet,
   ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Platform,
   TouchableWithoutFeedback,
   FlatList,
-  TouchableOpacity,
+  Image,
+  SafeAreaView,
 } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { auth, firestore, storage } from '../../backend/firebase';
@@ -20,72 +22,33 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import options from '../../backend/options.json';
 import { useNavigation } from '@react-navigation/native';
-import SubmitSuccessScreen from './SubmitSuccessScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddNewReport = () => {
   const [title, setTitle] = useState('');
-  const [emergency, setEmergency] = useState(false);
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const [date, setDate] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [locationId, setLocationId] = useState(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [contactEmail, setContactEmail] = useState('');
   const [categoryId, setCategoryId] = useState(null);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
-  const [reportCategories, setReportCategories] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [createdBy, setCreatedBy] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const navigation = useNavigation();
+  const [locationDetails, setLocationDetails] = useState('');
+  const [validationMessage, setValidationMessage] = useState('');
 
-  const CustomDateTimePickerModal = ({ isVisible, onClose, onConfirm }) => {
-    return (
-      <Modal
-        visible={isVisible}
-        transparent={false}
-        animationType="slide"
-        onRequestClose={onClose}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Select a Date and Time</Text>
-            <DateTimePickerModal
-              isVisible={isVisible}
-              mode="datetime"
-              onConfirm={onConfirm}
-              onCancel={onClose}
-            />
-          </View>
-        </View>
-      </Modal>
-    );
-  };
 
-  const handleImagePick = () => {
-    Alert.alert('Upload Photo', 'Choose an option', [
-      { text: 'Take Photo', onPress: handleTakePhoto },
-      { text: 'Choose from Gallery', onPress: handleChooseFromGallery },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
-  };
 
-  const handleChooseFromGallery = async () => {
-    const libraryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (libraryPermission.status !== 'granted') {
-      alert('Media library access is required to choose a photo.');
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
+  const [region, setRegion] = useState({
+    latitude: 40.204444839295846,
+    longitude: -76.74518002144552,
+    latitudeDelta: 0.04,
+    longitudeDelta: 0.05,
+  });
 
   useEffect(() => {
     (async () => {
@@ -108,22 +71,22 @@ const AddNewReport = () => {
       }
     }
     fetchUserInfo();
-    setReportCategories(options.reportCategories); 
+    setCategoryOptions(options.categories);
   }, []);
 
-  const selectImageFromGallery = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    
-    if (!result.canceled && result.assets) {
-      setImage(result.assets[0].uri);
-    }
+  const handleImagePick = () => {
+    Alert.alert('Upload Photo', 'Choose an option', [
+      { text: 'Take Photo', onPress: handleTakePhoto },
+      { text: 'Choose from Gallery', onPress: handleChooseFromGallery },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
-  
+
+  const handleMapPress = (e) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    setSelectedLocation({ latitude, longitude });
+    setShowLocationPicker(false); 
+  };
 
   const handleTakePhoto = async () => {
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
@@ -131,75 +94,131 @@ const AddNewReport = () => {
       alert('Camera access is required to take a photo.');
       return;
     }
+
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
+
     if (!result.cancelled) {
       setImage(result.uri);
     }
   };
-  
-  
-  const handleSubmit = async () => {
-    console.log('Submitting report...');
-    if (!title || !description || !date, !locationId, !categoryId) {
-      Alert.alert('Missing Fields', 'Please ensure all fields are filled and an image is selected.');
-      return; 
+
+  const handleChooseFromGallery = async () => {
+    const libraryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (libraryPermission.status !== 'granted') {
+      alert('Media library access is required to choose a photo.');
+      return;
     }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      if (result.assets && result.assets.length > 0) {
+        setImage(result.assets[0].uri);
+      }
+    }
+  };
+
+  const validateEmail = (email) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  const renderImage = () => {
+    if (image) {
+      console.log("Rendering image with URI:", image); 
+      return (
+        <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
+      );
+    }
+    return null;
+  };
   
+  const clearImage = () => {
+    setImage(null);
+  };
+
+  const handleSubmit = async () => {
+    console.log('Submitting event...');
+    setValidationMessage('');
+
+    if ( !locationCords || !category || !createdBy) {
+      setValidationMessage('Missing Information! Please fill in all required fields.');
+      return;
+    }
+
+    if (!title || title.length < 4 || title.length > 50) {
+      setValidationMessage('Title must be between 4 and 50 characters.');
+      return;
+    }
+
+    if (!description || description.length < 4 || description.length > 200) {
+      setValidationMessage('Description must be between 4 and 200 characters.');
+      return;
+    }
+    
+    if (!contactEmail || !validateEmail(contactEmail)) {
+      setValidationMessage('Please enter a valid email address.');
+      return;
+    }
+
+    if (!locationDetails || locationDetails.length < 4 || locationDetails.length > 50) {
+      setValidationMessage('Location details must be between 4 and 50 characters.');
+      return;
+    }
+
+
+    const selectedCategory = options.categories.find(cat => cat.id === categoryId);
+    if (!selectedCategory) {
+      Alert.alert('Invalid Selection', 'Please select a valid category.');
+      return;
+    }
+
     try {
       let imageUrl = '';
       if (image) {
-        try {
-          const response = await fetch(image);
-          const blob = await response.blob();
-          const imageName = `report_images/${Date.now()}`;
-          const imageRef = ref(storage, imageName);
-          const snapshot = await uploadBytes(imageRef, blob);
-          imageUrl = await getDownloadURL(snapshot.ref);
-        
-        } catch (error) {
-          console.error('Error uploading image:', error);
-          Alert.alert('Upload Error', 'Failed to upload image.');
-          return; 
-        }
+        console.log('Starting image upload', {image});
+        const response = await fetch(image);
+        const blob = await response.blob();
+        const imageName = `report_images/${Date.now()}`;
+        const imageRef = ref(storage, imageName);
+        const snapshot = await uploadBytes(imageRef, blob);
+        imageUrl = await getDownloadURL(snapshot.ref);
       }
-      
-      const reportData = {
+
+      console.log('Image uploaded', {imageUrl});
+
+
+      const reportInfo = {
         title,
-        emergency,
         description,
         image: imageUrl,
         dateTime: date ? Timestamp.fromMillis(date.getTime()) : null,
-        location: locationId ? options.locations.find((loc) => loc.id === locationId).name : '',
-        category: categoryId ? options.categories.find((cat) => cat.id === categoryId).name : '',
+        locationCords: selectedLocation ? `${selectedLocation.latitude}, ${selectedLocation.longitude}` : null,
+        locationDetails, 
+        contactEmail,
+        category: selectedCategory.name,
         submittedOn: Timestamp.now(),
-        createdBy: createdBy,
+        createdBy,
       };
-      await addDoc(collection(firestore, 'reports'), reportData);
+      
+      console.log('Adding report to Firestore', {reportInfo});
+
+      await addDoc(collection(firestore, 'reports'), reportInfo);
       Alert.alert('Success', 'Report added successfully!');
       navigation.goBack();
     } catch (error) {
-      console.error('Error adding report to Firestore:', error);
-      Alert.alert('Error', 'Failed to add the report.');
+      console.log('Error in handleSubmit', error);
+      Alert.alert('Error', 'Failed to add the report. ' + error.message);
     }
-  };
-  
-
-  const renderImage = () => {
-  if (image) {
-    console.log("Rendering image with URI:", image); 
-    return (
-      <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
-    );
-  }
-    return null;
-  };
-
-  const clearImage = () => {
-    setImage(null);
   };
 
   const renderSelectedDate = () => {
@@ -209,18 +228,36 @@ const AddNewReport = () => {
     return null;
   };
 
-  const renderSelectedLocation = () => {
-    const selectedLocation = locationId ? options.locations.find((loc) => loc.id === locationId) : null;
-    if (selectedLocation) {
-      return <Text style={styles.selectedText}>Selected Location: {selectedLocation.name}</Text>;
-    }
-    return null;
+  const renderLocationSelector = () => {
+    return (
+    <View style={styles.actionContainer}>
+      <Text style={styles.actionText} onPress={() => setShowLocationPicker(true)}>
+        Select Location
+      </Text>
+      {selectedLocation && (
+        <>
+          <Text style={styles.locationText}>
+            {`Latitude: ${selectedLocation.latitude.toFixed(5)}, Longitude: ${selectedLocation.longitude.toFixed(5)}`}
+          </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Location Details: 'Olmstead East, Room # XXX'"
+            onChangeText={setLocationDetails}
+            value={locationDetails}
+            placeholderTextColor="#999"
+          />
+        </>
+      )}
+    </View>
+
+    );
   };
+  
 
   const renderSelectedCategory = () => {
-    const selectedCategory = categoryId ? reportCategories.find((cat) => cat.id === categoryId) : null;
+    const selectedCategory = categoryId ? options.categories.find((cat) => cat.id === categoryId) : null;
     if (selectedCategory) {
-      return <Text style={styles.selectedText}>Selected Category: {selectedCategory.name}</Text>;
+      return <Text style={styles.selectedText}>Selected Report Category: {selectedCategory.name}</Text>;
     }
     return null;
   };
@@ -235,15 +272,6 @@ const AddNewReport = () => {
         value={title}
         placeholderTextColor="#999"
       />
-      <View style={styles.switchContainer}>
-        <Text style={styles.label}>Emergency:</Text>
-        <Switch
-          onValueChange={setEmergency}
-          value={emergency}
-          trackColor={{ false: '#ccc', true: '#3498db' }}
-          thumbColor={emergency ? '#fff' : '#f4f3f4'}
-        />
-      </View>
       <TextInput
         style={styles.inputMultiline}
         placeholder="Description"
@@ -252,60 +280,67 @@ const AddNewReport = () => {
         value={description}
         placeholderTextColor="#999"
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Contact Email"
+        onChangeText={setContactEmail}
+        value={contactEmail}
+        placeholderTextColor="#999"
+      />
       <View style={styles.actionContainer}>
         <Text style={styles.actionText} onPress={() => setShowDatePicker(true)}>
           Pick Date & Time
         </Text>
         {renderSelectedDate()}
+        {renderLocationSelector()}
       </View>
-      <CustomDateTimePickerModal
+      <DateTimePickerModal
         isVisible={showDatePicker}
+        mode="datetime"
         onConfirm={(selectedDate) => {
           setShowDatePicker(false);
           setDate(new Date(selectedDate));
         }}
-        onClose={() => setShowDatePicker(false)}
+        onCancel={() => setShowDatePicker(false)}
       />
-      <View style={styles.actionContainer}>
-        <Text style={styles.actionText} onPress={() => setShowLocationPicker(true)}>
-          Select Location
-        </Text>
-        {renderSelectedLocation()}
-      </View>
       <Modal
         visible={showLocationPicker}
         animationType="slide"
         transparent={false}
         onRequestClose={() => setShowLocationPicker(false)}
       >
-        <TouchableWithoutFeedback onPress={() => setShowLocationPicker(false)}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalTitle}>Select Location</Text>
-              <FlatList
-                data={options.locations}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TouchableWithoutFeedback
-                    onPress={() => {
-                      setLocationId(item.id);
-                      setShowLocationPicker(false);
-                    }}
-                  >
-                    <Text style={styles.item}>{item.name}</Text>
-                  </TouchableWithoutFeedback>
-                )}
-              />
-              <TouchableWithoutFeedback onPress={() => setShowLocationPicker(false)}>
-                <View style={[styles.modalButton, styles.closeButton]}>
-                  <Text style={styles.modalButtonText}>Close</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+        <View style={styles.fullscreen}>
+          <MapView
+            style={StyleSheet.absoluteFill}
+            initialRegion={region}
+            onRegionChangeComplete={newRegion => setRegion(newRegion)}
+          >
+        </MapView>
+        <Image
+          source={require('../../assets/marker.png')}
+          style={styles.marker}
+        />
 
+          <SafeAreaView style={styles.footer}>
+          <Text style={styles.region}>
+            {`Lat: ${region.latitude.toFixed(5)}, Lon: ${region.longitude.toFixed(5)}`}
+          </Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              setShowLocationPicker(false);
+              setSelectedLocation({
+                latitude: region.latitude,
+                longitude: region.longitude,
+              }); 
+            }}
+          >
+            <Text style={styles.buttonText}>Confirm Selection</Text>
+          </TouchableOpacity>
+
+        </SafeAreaView>
+        </View>
+      </Modal>
       <View style={styles.actionContainer}>
         <Text style={styles.actionText} onPress={() => setShowCategoryPicker(true)}>
           Select Report Category
@@ -321,10 +356,10 @@ const AddNewReport = () => {
         <TouchableWithoutFeedback onPress={() => setShowCategoryPicker(false)}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalTitle}>Select Report Category</Text>
+              <Text style={styles.modalTitle}>Select Category</Text>
               <FlatList
-                data={reportCategories}
-                keyExtractor={(item) => item.id}
+                data={categoryOptions}
+                keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                   <TouchableWithoutFeedback
                     onPress={() => {
@@ -345,24 +380,27 @@ const AddNewReport = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-
-      <TouchableWithoutFeedback onPress={handleImagePick}>
+      <TouchableOpacity onPress={handleImagePick}>
         <View style={styles.actionContainer}>
           <Text style={styles.actionText}>Pick Image</Text>
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
       {renderImage()}
       {image && (
-      <TouchableOpacity style={styles.clearButton} onPress={clearImage}>
-        <Text style={styles.clearButtonText}>Clear Image</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.clearButton} onPress={clearImage}>
+          <Text style={styles.clearButtonText}>Clear Image</Text>
+        </TouchableOpacity>
       )}
-
-      <TouchableWithoutFeedback onPress={handleSubmit}>
+      <TouchableOpacity onPress={handleSubmit}>
         <View style={styles.submitButton}>
           <Text style={styles.buttonText}>Submit Report</Text>
         </View>
-      </TouchableWithoutFeedback>
+        <View>
+        {validationMessage !== '' && (
+            <Text style={styles.validationMessage}>{validationMessage}</Text>
+          )}
+        </View>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -370,15 +408,14 @@ const AddNewReport = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 20,
+    padding: 16,
     backgroundColor: '#fff',
-    alignItems: 'left',
-    justifyContent: 'left',
   },
   header: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 16,
+    textAlign: 'center',
     color: '#333',
   },
   label: {
@@ -390,64 +427,64 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff6347',
     padding: 10,
     borderRadius: 5,
+    marginTop: 5,
   },
   clearButtonText: {
     color: '#fff',
-    textAlign: 'center',
+    textAlign: 'left',
     fontWeight: 'bold',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    width: '100%',
+    borderWidth: 2,
+    borderColor: '#ddd',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+    fontSize: 14, // Smaller text
     backgroundColor: '#f9f9f9',
-    fontSize: 16,
-    color: '#333',
   },
   inputMultiline: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderWidth: 2,
+    borderColor: '#ddd',
     borderRadius: 8,
-    padding: 15,
-    marginBottom: 20,
-    minHeight: 150,
+    padding: 12,
+    minHeight: 100,
+    textAlign: 'auto',
     width: '100%',
     backgroundColor: '#f9f9f9',
+    marginBottom: 12,
     fontSize: 16,
     color: '#333',
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
   },
   actionContainer: {
     width: '100%',
-    marginBottom: 20,
   },
   actionText: {
-    color: '#3498db',
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
+    marginTop: 10,
+    color: '#007bff',
   },
   selectedText: {
     fontSize: 16,
+    marginTop: 10,
     marginBottom: 10,
-    color: '#333',
+    color: '#495057',
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 150,
     borderRadius: 8,
-    marginBottom: 20,
-    borderColor: 'red', 
-    borderWidth: 2, 
-    backgroundColor: 'lightgrey', 
+    marginTop: 10,
+    marginBottom: 10,
+    borderColor: 'red',
+    borderWidth: 2,
+    backgroundColor: 'lightgrey',
   },
   centeredView: {
     flex: 1,
@@ -456,15 +493,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalView: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 12,
-    elevation: 5,
-    padding: 25,
-    alignItems: 'center',
-    maxHeight: '60%',
-    alignSelf: 'center',
-    marginTop: 'auto',
-    marginBottom: 'auto',
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
   },
   modalTitle: {
     fontSize: 20,
@@ -501,10 +542,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   closeButton: {
-    backgroundColor: '#bdc3c7',
+    backgroundColor: '#aaa', 
     marginTop: 10,
   },
+  cancelButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    padding: 10,
+  },
   submitButton: {
+    marginTop: 20,
     backgroundColor: '#27ae60',
     paddingVertical: 12,
     paddingHorizontal: 25,
@@ -512,11 +560,75 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
+  fullscreen: {
+    flex: 1,
+  },
+  marker: {
+    height: 50, 
+    width: 50,  
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: -25, 
+    marginTop: -50, 
+  },
+  footer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    bottom: 0,
+    position: 'absolute',
+    width: '100%',
+  },
+  locationContainer: {
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    alignSelf: 'center',
+    marginVertical: 8,
+  },
+  locationText: {
+    fontSize: 16,
+    color: '#333',
+    padding: 10,
+    marginTop: 5,
+    marginBottom: 15, // Add some margin below the location text
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9', // Give it a distinct background if needed
+    textAlign: 'center',
+  },
+  region: {
+    color: '#fff',
+    paddingTop: 18,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#27ae60', // A pleasant green color
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    marginVertical: 20,
+    alignItems: 'center',
+    alignSelf: 'center',
+    width: '80%',
+    borderRadius: 30, // Rounded corners
+    marginHorizontal: 50, // Center the button by providing horizontal margins
+    shadowColor: '#000', // Shadow for button to make it pop a bit
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   buttonText: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
+  
 });
 
 export default AddNewReport;

@@ -32,7 +32,6 @@ const AddNewEvent = () => {
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [organizer, setOrganizer] = useState('');
   const [contactEmail, setContactEmail] = useState('');
-  const [rsvpCount, setRsvpCount] = useState(0);
   const [categoryId, setCategoryId] = useState(null);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
@@ -40,9 +39,9 @@ const AddNewEvent = () => {
   const [createdBy, setCreatedBy] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(null);
   const navigation = useNavigation();
-  const [name, setName] = useState('');
-  const [details, setDetails] = useState('');
   const [locationDetails, setLocationDetails] = useState('');
+  const [validationMessage, setValidationMessage] = useState('');
+
 
 
   const [region, setRegion] = useState({
@@ -129,6 +128,12 @@ const AddNewEvent = () => {
     }
   };
 
+  const validateEmail = (email) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+  
+
   const renderImage = () => {
     if (image) {
       console.log("Rendering image with URI:", image); 
@@ -145,14 +150,37 @@ const AddNewEvent = () => {
 
   const handleSubmit = async () => {
     console.log('Submitting event...');
-    if (!title || !description || !selectedLocation || !categoryId || !createdBy) {
-      Alert.alert('Missing Information', 'Please fill in all required fields.');
-      return; 
+    setValidationMessage('');
+
+    if ( !locationCords || !category || !createdBy) {
+      setValidationMessage('Missing Information! Please fill in all required fields.');
+      return;
+    }
+
+    if (!title || title.length < 4 || title.length > 50) {
+      setValidationMessage('Title must be between 4 and 50 characters.');
+      return;
+    }
+    
+    if (!description || description.length < 4 || description.length > 200) {
+      setValidationMessage('Description must be between 4 and 200 characters.');
+      return;
+    }
+    
+
+    if (organizer && organizer.length > 50) {
+      setValidationMessage('Organizer name must be less than 50 characters.');
+      return;
+    }
+
+    if (!contactEmail || !validateEmail(contactEmail)) {
+      setValidationMessage('Please enter a valid email address.');
+      return;
     }
 
     const selectedCategory = options.categories.find(cat => cat.id === categoryId);
     if (!selectedCategory) {
-      Alert.alert('Invalid Selection', 'Please select a valid category.');
+      setValidationMessage('Invalid Selection! Please select a valid category.');
       return;
     }
 
@@ -176,7 +204,6 @@ const AddNewEvent = () => {
         locationDetails, 
         organizer,
         contactEmail,
-        rsvpCount,
         category: selectedCategory.name,
         submittedOn: Timestamp.now(),
         createdBy,
@@ -372,6 +399,12 @@ const AddNewEvent = () => {
         <View style={styles.submitButton}>
           <Text style={styles.buttonText}>Submit Event</Text>
         </View>
+        <View>
+        {validationMessage !== '' && (
+            <Text style={styles.validationMessage}>{validationMessage}</Text>
+          )}
+        </View>
+        
       </TouchableOpacity>
     </ScrollView>
   );
@@ -394,6 +427,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginRight: 10,
     color: '#333',
+  },
+  validationMessage: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
   },
   clearButton: {
     backgroundColor: '#ff6347',

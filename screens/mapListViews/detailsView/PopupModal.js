@@ -72,9 +72,9 @@ const PopupModal = ({ visible, onClose, item }) => {
           animationType="fade"
       >
         {modalData && (
-            <View style={styles.modalOverlay}>
-              {/* Tab navigation */}
+          <View style={styles.modalOverlay}>
               <View style={styles.tabContainer}>
+              
                 <TouchableOpacity
                     style={[styles.tab, selectedTab === 'details' && styles.activeTab]}
                     onPress={() => setSelectedTab('details')}
@@ -90,8 +90,9 @@ const PopupModal = ({ visible, onClose, item }) => {
               </View>
 
               {selectedTab === 'details' ? (
-                  <ScrollView style={{flex: 1}}>
                     <View style={styles.modalContainer}>
+                      <ScrollView style={styles.scrollViewContainer}></ScrollView>
+                      
                       <View style={styles.header}>
                         <BookmarkButton
                             itemId={item.id}
@@ -120,14 +121,13 @@ const PopupModal = ({ visible, onClose, item }) => {
                         <Text style={styles.details}>{`Category: ${modalData.category || 'N/A'}`}</Text>
                         <Text style={styles.details}>{`Organizer: ${modalData.organizer || 'N/A'}`}</Text>
                         <Text style={styles.details}>{`Contact: ${modalData.contactEmail || 'N/A'}`}</Text>
-                        <Text style={styles.details}>{`RSVP Count: ${modalData.RSVP || 0}`}</Text>
                         <Text style={styles.details}>{`Created by: ${modalData.createdBy || 'Unknown'}`}</Text>
                         {modalData.isEvent === false && modalData.emergency && (
                             <Text style={styles.emergency}>EMERGENCY</Text>
                         )}
                       </View>
                     </View>
-                  </ScrollView>
+
               ) : (
                   <CommentsSection itemId={item.id}/>
               )}

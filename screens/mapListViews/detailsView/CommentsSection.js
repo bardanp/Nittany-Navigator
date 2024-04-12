@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import { firestore } from '../../../backend/firebase';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { collection, query, where, orderBy, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './CommentsSection.styles';
 import { Ionicons } from '@expo/vector-icons';
+import { Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 
 const CommentsSection = ({ itemId }) => {
   const [comments, setComments] = useState([]);
@@ -116,53 +117,53 @@ const CommentsSection = ({ itemId }) => {
   };
 
   return (
-    <>
-      {loadingComments ? (
-        <ActivityIndicator size="large" color="#007bff" />
-      ) : comments.length > 0 ? (
-        <FlatList
-          data={comments}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.commentContainer}>
-              <View style={styles.commentHeader}>
-                <Text style={styles.commentAuthor}>{item.createdBy}</Text>
-                {item.creatorEmail === currentUserEmail && (
-                  <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={styles.deleteButton}>
-                    <Ionicons name="trash-bin-outline" size={20} color="#6c757d" />
-                  </TouchableOpacity>
-                )}
-              </View>
-              <Text style={styles.commentText}>{item.text}</Text>
-              <Text style={styles.commentDate}>{formatDate(item.createdAt)}</Text>
-            </View>
+        <>
+          {loadingComments ? (
+            <ActivityIndicator size="large" color="#007bff" />
+          ) : comments.length > 0 ? (
+            <FlatList
+              data={comments}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.commentContainer}>
+                  <View style={styles.commentHeader}>
+                    <Text style={styles.commentAuthor}>{item.createdBy}</Text>
+                    {item.creatorEmail === currentUserEmail && (
+                      <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={styles.deleteButton}>
+                        <Ionicons name="trash-bin-outline" size={20} color="#6c757d" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  <Text style={styles.commentText}>{item.text}</Text>
+                  <Text style={styles.commentDate}>{formatDate(item.createdAt)}</Text>
+                </View>
+              )}
+              style={{ flex: 1 }}
+            />
+          ) : loadCommentsError ? (
+            <Text style={styles.errorText}>{loadCommentsError}</Text>
+          ) : (
+            <Text style={styles.noCommentsText}>No comments yet. Be the first to comment!</Text>
           )}
-          style={{ width: '100%' }}
-        />
-      ) : loadCommentsError ? (
-        <Text style={styles.errorText}>{loadCommentsError}</Text>
-      ) : (
-        <Text style={styles.noCommentsText}>No comments yet. Be the first to comment!</Text>
-      )}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder={isLoadingUser ? "Loading user info..." : addError || "Add a comment..."}
-          value={newCommentText}
-          onChangeText={setNewCommentText}
-          multiline
-          editable={!isLoadingUser}
-        />
-        <TouchableOpacity
-          style={[styles.button, isLoadingUser && styles.buttonDisabled]}
-          onPress={handleAddComment}
-          disabled={isLoadingUser}
-        >
-          <Text style={styles.buttonText}>Post</Text>
-        </TouchableOpacity>
-      </View>
-      {deleteError ? Alert.alert('Error', deleteError) : null}
-    </>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder={isLoadingUser ? "Loading user info..." : addError || "Add a comment..."}
+              value={newCommentText}
+              onChangeText={setNewCommentText}
+              multiline
+              editable={!isLoadingUser}
+            />
+            <TouchableOpacity
+              style={[styles.button, isLoadingUser && styles.buttonDisabled]}
+              onPress={handleAddComment}
+              disabled={isLoadingUser}
+            >
+              <Text style={styles.buttonText}>Post</Text>
+            </TouchableOpacity>
+          </View>
+          {deleteError ? Alert.alert('Error', deleteError) : null}
+        </>
   );
 };
 
