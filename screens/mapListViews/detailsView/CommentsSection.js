@@ -17,6 +17,7 @@ const CommentsSection = ({ itemId }) => {
   const [deleteError, setDeleteError] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
   const [loadCommentsError, setLoadCommentsError] = useState('');
+  const [isPostingComment, setIsPostingComment] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUserEmail = async () => {
@@ -63,6 +64,7 @@ const CommentsSection = ({ itemId }) => {
       return;
     }
 
+    setIsPostingComment(true);
     try {
       const userInfoString = await AsyncStorage.getItem('userInfo');
       if (!userInfoString) {
@@ -84,6 +86,7 @@ const CommentsSection = ({ itemId }) => {
     } catch (error) {
       setAddError('Failed to post the comment. Please try again.');
     }
+    setIsPostingComment(false);
   };
 
   const handleDeleteComment = async (commentId) => {
@@ -117,53 +120,58 @@ const CommentsSection = ({ itemId }) => {
   };
 
   return (
-        <>
-          {loadingComments ? (
-            <ActivityIndicator size="large" color="#007bff" />
-          ) : comments.length > 0 ? (
-            <FlatList
-              data={comments}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.commentContainer}>
-                  <View style={styles.commentHeader}>
-                    <Text style={styles.commentAuthor}>{item.createdBy}</Text>
-                    {item.creatorEmail === currentUserEmail && (
-                      <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={styles.deleteButton}>
-                        <Ionicons name="trash-bin-outline" size={20} color="#6c757d" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  <Text style={styles.commentText}>{item.text}</Text>
-                  <Text style={styles.commentDate}>{formatDate(item.createdAt)}</Text>
-                </View>
-              )}
-              style={{ flex: 1 }}
-            />
-          ) : loadCommentsError ? (
-            <Text style={styles.errorText}>{loadCommentsError}</Text>
-          ) : (
-            <Text style={styles.noCommentsText}>No comments yet. Be the first to comment!</Text>
+    <View style={styles.mainContainer}>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder={isLoadingUser ? "Loading user info..." : addError || "Add a comment..."}
+          value={newCommentText}
+          onChangeText={setNewCommentText}
+          multiline
+          editable={!isLoadingUser}
+        />
+        <TouchableOpacity
+        style={[styles.button, (isLoadingUser || isPostingComment) && styles.buttonDisabled]}
+          onPress={handleAddComment}
+          disabled={isLoadingUser || isPostingComment}
+        >
+        {isPostingComment ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Post</Text>
+        )}
+        </TouchableOpacity>
+      </View>
+      {loadingComments ? (
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : comments.length > 0 ? (
+        <FlatList
+        contentContainerStyle={{ paddingHorizontal: 0 }}
+          data={comments}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.commentContainer}>
+              <View style={styles.commentHeader}>
+                <Text style={styles.commentAuthor}>{item.createdBy}</Text>
+                {item.creatorEmail === currentUserEmail && (
+                  <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={styles.deleteButton}>
+                    <Ionicons name="trash-bin-outline" size={20} color="#6c757d" />
+                  </TouchableOpacity>
+                )}
+              </View>
+              <Text style={styles.commentText}>{item.text}</Text>
+              <Text style={styles.commentDate}>{item.createdAt.toDate().toLocaleString()}</Text>
+            </View>
           )}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder={isLoadingUser ? "Loading user info..." : addError || "Add a comment..."}
-              value={newCommentText}
-              onChangeText={setNewCommentText}
-              multiline
-              editable={!isLoadingUser}
-            />
-            <TouchableOpacity
-              style={[styles.button, isLoadingUser && styles.buttonDisabled]}
-              onPress={handleAddComment}
-              disabled={isLoadingUser}
-            >
-              <Text style={styles.buttonText}>Post</Text>
-            </TouchableOpacity>
-          </View>
-          {deleteError ? Alert.alert('Error', deleteError) : null}
-        </>
+          style={{ flex: 1 }}
+        />
+      ) : loadCommentsError ? (
+        <Text style={styles.errorText}>{loadCommentsError}</Text>
+      ) : (
+        <Text style={styles.noCommentsText}>No comments yet. Be the first to comment!</Text>
+      )}
+      {deleteError && Alert.alert('Error', deleteError)}
+    </View>
   );
 };
 

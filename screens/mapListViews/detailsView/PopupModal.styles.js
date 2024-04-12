@@ -66,11 +66,11 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start', // Align items to the start to handle wrapped text
+    alignItems: 'flex-start', 
     backgroundColor: colors.primary,
     padding: scale(16),
-    paddingTop: scale(20), // Add a bit more padding on the top
-    paddingBottom: scale(20), // Add padding on the bottom
+    paddingTop: scale(20), 
+    paddingBottom: scale(20), 
   },
   
   category: {
@@ -106,6 +106,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1, 
     flexWrap: 'wrap', 
+    marginLeft: scale(8),
+    marginRight: scale(8),
   },
   
   description: {

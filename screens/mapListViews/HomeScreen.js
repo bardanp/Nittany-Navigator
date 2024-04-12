@@ -80,8 +80,6 @@ const HomeScreen = () => {
                     console.error('Error parsing location cords for report:', data);
                     latitude = null;
                     longitude = null;
-                    // You might want to handle this situation differently,
-                    // such as by not including this item in the list.
                 }
 
                 return {

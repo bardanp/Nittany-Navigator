@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     marginBottom: 10,
-    fontSize: 14, // Smaller text
+    fontSize: 14, 
     backgroundColor: '#f9f9f9',
   },
   inputMultiline: {
@@ -590,9 +590,9 @@ const styles = StyleSheet.create({
     color: '#333',
     padding: 10,
     marginTop: 5,
-    marginBottom: 15, // Add some margin below the location text
+    marginBottom: 15, 
     borderRadius: 8,
-    backgroundColor: '#f9f9f9', // Give it a distinct background if needed
+    backgroundColor: '#f9f9f9',
     textAlign: 'center',
   },
   region: {
@@ -603,16 +603,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#27ae60', // A pleasant green color
+    backgroundColor: '#27ae60', 
     paddingVertical: 15,
     paddingHorizontal: 25,
     marginVertical: 20,
     alignItems: 'center',
     alignSelf: 'center',
     width: '80%',
-    borderRadius: 30, // Rounded corners
-    marginHorizontal: 50, // Center the button by providing horizontal margins
-    shadowColor: '#000', // Shadow for button to make it pop a bit
+    borderRadius: 30, 
+    marginHorizontal: 50, 
+    shadowColor: '#000', 
     shadowOffset: {
       width: 0,
       height: 2,

@@ -74,14 +74,14 @@ const SavedEventsReports = () => {
     
             const userRef = doc(firestore, 'users', email);
     
-            // Assuming you want to update 'savedItems' field when removing a bookmark
+            
             await updateDoc(userRef, {
                 savedItems: arrayRemove(documentId)
             });
     
             console.log(`Removed bookmark with ID: ${documentId} from user ${email}`);
             
-            // Call fetchSavedItems to refresh the list after removing a bookmark
+            
             const userDoc = await getDoc(userRef);
             if (userDoc.exists()) {
                 const userData = userDoc.data();
@@ -157,10 +157,8 @@ const SavedEventsReports = () => {
             console.error('Item is undefined', item);
             return null;
         }
-
-        // Adjust these lines to match the exact field names from your Firestore documents.
-        const itemLocationDetails = item.locationDetails; // Updated field name
-        const itemDate = formatDate(item.dateTime); // Convert the Firestore Timestamp to a string
+        const itemLocationDetails = item.locationDetails; 
+        const itemDate = formatDate(item.dateTime); 
         console.log('item', item);
 
         return (

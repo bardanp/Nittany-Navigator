@@ -10,7 +10,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     borderRadius: scale(0),
     paddingVertical: scale(8),
-    paddingHorizontal: scale(8),
+    paddingHorizontal: scale(8),  
+    width: '100%', 
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -19,6 +20,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    width: screenWidth,
   },
   commentHeader: {
     flexDirection: 'row',
@@ -62,13 +64,12 @@ const styles = StyleSheet.create({
   },
   commentsListContainer: {
     flex: 1,
-    marginBottom: scale(80), 
+  },
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
   },
   inputContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f8f9fa',
@@ -76,7 +77,6 @@ const styles = StyleSheet.create({
     borderTopColor: '#e0e0e0',
     paddingHorizontal: scale(16),
     paddingVertical: scale(8),
-    paddingBottom: scale(30),
   },
   input: {
     flex: 1,
