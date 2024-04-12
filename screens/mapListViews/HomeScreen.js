@@ -51,16 +51,18 @@ const HomeScreen = () => {
                 const fetchedEvents = eventsSnapshot.docs.map(doc => {
                     const data = doc.data();
                     let latitude, longitude;
-                  
-                    if (typeof data.locationCords === 'string') {
-                      [latitude, longitude] = data.locationCords.split(', ').map(Number);
+            
+                    if (data.locationCords && typeof data.locationCords === 'string') {
+                      [latitude, longitude] = data.locationCords.split(',').map(coord => parseFloat(coord.trim()));
+                    } else if (data.location && typeof data.location === 'object') {
+                      latitude = data.location.latitude;
+                      longitude = data.location.longitude;
                     } else {
-                      console.error('Error parsing location cords for event:', data);
+                      console.error('Error parsing location for event:', data);
                       latitude = null;
                       longitude = null;
-
                     }
-                  
+            
                     return {
                       ...data,
                       id: doc.id,
@@ -68,27 +70,31 @@ const HomeScreen = () => {
                       location: { latitude, longitude },
                     };
                   });
+                  
     
                 const reportsSnapshot = await getDocs(reportsCollectionRef);
                 const fetchedReports = reportsSnapshot.docs.map(doc => {
-                const data = doc.data();
-                let latitude, longitude;
-
-                if (typeof data.locationCords === 'string') {
-                    [latitude, longitude] = data.locationCords.split(', ').map(Number);
-                } else {
-                    console.error('Error parsing location cords for report:', data);
-                    latitude = null;
-                    longitude = null;
-                }
-
-                return {
-                    ...data,
-                    id: doc.id,
-                    isReport: true,
-                    location: { latitude, longitude },
-                };
-                });
+                    const data = doc.data();
+                    let latitude, longitude;
+            
+                    if (data.locationCords && typeof data.locationCords === 'string') {
+                      [latitude, longitude] = data.locationCords.split(',').map(Number);
+                    } else if (data.location && typeof data.location === 'object') {
+                      latitude = data.location.latitude;
+                      longitude = data.location.longitude;
+                    } else {
+                      console.error('Error parsing location cords for report:', data);
+                      latitude = null;
+                      longitude = null;
+                    }
+            
+                    return {
+                      ...data,
+                      id: doc.id,
+                      isReport: true,
+                      location: { latitude, longitude },
+                    };
+                  });
 
                 setListData([...fetchedEvents, ...fetchedReports]);
             };
@@ -260,9 +266,9 @@ const HomeScreen = () => {
                     <View style={{ flex: 1, justifyContent: "center" }}>
                     <View style={styles.itemDetails}>
                     <Text style={styles.listItemHeader}>{item.title}</Text>
-                    <Text style={styles.listItemText}>Type: {item.type}</Text>
-                    <Text style={styles.listItemText}>Location: {item.locationDetails}</Text>
+                    <Text style={styles.listItemText}>{`Location: ${item.locationDetails || 'N/A'}`}</Text>
                     <Text style={styles.listItemText}>Date: {formatDate(item.dateTime)}</Text>
+                    <Text style={styles.listItemText}>{`Created by: ${item.createdBy || 'Unknown'}`}</Text>
                 </View>
                 </View>
                 <View style={styles.buttonsContainer}>

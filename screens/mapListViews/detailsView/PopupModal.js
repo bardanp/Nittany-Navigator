@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, TouchableOpacity, View, Text, Pressable, ScrollView, Image, Dimensions } from 'react-native';
+import { Modal, Alert, TouchableOpacity, View, Text, Pressable, ScrollView, Image, Dimensions, Linking } from 'react-native';
 import noPicturesIcon from '../../../assets/no-pictures.png';
 import { firestore } from '../../../backend/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -11,7 +11,8 @@ import { updateDoc, arrayUnion } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import BookmarkButton from './BookmarkButton';
 import CommentsSection from './CommentsSection';
-import { StackView } from '@react-navigation/stack';
+import { MaterialIcons } from '@expo/vector-icons';
+
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +24,7 @@ const PopupModal = ({ visible, onClose, item }) => {
 
   useEffect(() => {
     setModalData(item);
+    console.log("Item:", item);
   }, [item]);
 
 
@@ -37,6 +39,45 @@ const PopupModal = ({ visible, onClose, item }) => {
     });
   };
 
+  const openDirections = (modalData) => {
+    const { title, locationCords } = modalData;
+    let latitude, longitude;
+    if (locationCords && typeof locationCords === 'string') {
+      [latitude, longitude] = locationCords.split(',').map(coord => parseFloat(coord.trim()));
+    }
+  
+    if (!latitude || !longitude) {
+      console.error("Invalid location coordinates:", { latitude, longitude });
+      Alert.alert("Location Error", "Invalid location coordinates.");
+      return;
+    }
+  
+    const encodedLabel = encodeURIComponent(title); 
+    const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+    const latLng = `${latitude},${longitude}`;
+    const url = Platform.select({
+      ios: `${scheme}${encodedLabel}@${latLng}`,
+      android: `${scheme}${latLng}(${encodedLabel})`,
+    });
+  
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          console.error("Don't know how to open URI:", url);
+          Alert.alert("Error", "Unable to open maps.");
+        }
+      })
+      .catch((err) => {
+        console.error("An error occurred", err);
+        Alert.alert("Error", "An unexpected error occurred.");
+      });
+  };
+  
+  
+  
+  
 
   useEffect(() => {
     const fetchModalDataAndCheckSavedStatus = async () => {
@@ -73,6 +114,24 @@ const PopupModal = ({ visible, onClose, item }) => {
       >
         {modalData && (
           <View style={styles.modalOverlay}>
+              <View style={styles.buttonContainer}>
+                <BookmarkButton
+                    itemId={item.id}
+                    isEvent={item.isEvent}
+                    onBookmarkChange={onBookmarkChange}
+                />
+                <TouchableOpacity
+                  onPress={() => openDirections(modalData)}
+                  style={styles.directionsButton}
+                >
+                  <MaterialIcons name="directions" size={28} color={colors.white} />
+                </TouchableOpacity>
+
+
+                <Pressable onPress={onClose} style={styles.closeIconContainer}>
+                  <Ionicons name="close" size={28} color={colors.closeIcon}/>
+                </Pressable>
+              </View>
               <View style={styles.tabContainer}>
               
                 <TouchableOpacity
@@ -92,19 +151,9 @@ const PopupModal = ({ visible, onClose, item }) => {
               {selectedTab === 'details' ? (
                     <View style={styles.modalContainer}>
                       <ScrollView style={styles.scrollViewContainer}></ScrollView>
-                      
                       <View style={styles.header}>
-                        <BookmarkButton
-                            itemId={item.id}
-                            isEvent={item.isEvent}
-                            onBookmarkChange={onBookmarkChange}
-                        />
                         <Text style={styles.title}>{modalData.title}</Text>
-                        <Pressable onPress={onClose} style={styles.closeIconContainer}>
-                          <Ionicons name="close" size={28} color={colors.closeIcon}/>
-                        </Pressable>
                       </View>
-
                       <View style={styles.imageContainer}>
                         <Image
                             source={modalData.image ? {uri: modalData.image} : noPicturesIcon}
@@ -122,9 +171,6 @@ const PopupModal = ({ visible, onClose, item }) => {
                         <Text style={styles.details}>{`Organizer: ${modalData.organizer || 'N/A'}`}</Text>
                         <Text style={styles.details}>{`Contact: ${modalData.contactEmail || 'N/A'}`}</Text>
                         <Text style={styles.details}>{`Created by: ${modalData.createdBy || 'Unknown'}`}</Text>
-                        {modalData.isEvent === false && modalData.emergency && (
-                            <Text style={styles.emergency}>EMERGENCY</Text>
-                        )}
                       </View>
                     </View>
 

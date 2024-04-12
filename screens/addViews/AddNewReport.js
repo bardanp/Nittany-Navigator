@@ -150,11 +150,6 @@ const AddNewReport = () => {
     console.log('Submitting event...');
     setValidationMessage('');
 
-    if ( !locationCords || !category || !createdBy) {
-      setValidationMessage('Missing Information! Please fill in all required fields.');
-      return;
-    }
-
     if (!title || title.length < 4 || title.length > 50) {
       setValidationMessage('Title must be between 4 and 50 characters.');
       return;
@@ -172,6 +167,11 @@ const AddNewReport = () => {
 
     if (!locationDetails || locationDetails.length < 4 || locationDetails.length > 50) {
       setValidationMessage('Location details must be between 4 and 50 characters.');
+      return;
+    }
+
+    if (!createdBy) {
+      setValidationMessage('Missing Information! Please fill in all required fields.');
       return;
     }
 
@@ -491,6 +491,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  validationMessage: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
   },
   modalView: {
     margin: 20,

@@ -95,15 +95,17 @@ const AddNewEvent = () => {
       alert('Camera access is required to take a photo.');
       return;
     }
-
+  
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-
-    if (!result.cancelled) {
-      setImage(result.uri);
+  
+    if (!result.canceled) {
+      if (result.assets && result.assets.length > 0) {
+        setImage(result.assets[0].uri);
+      }
     }
   };
 
@@ -113,14 +115,14 @@ const AddNewEvent = () => {
       alert('Media library access is required to choose a photo.');
       return;
     }
-
+  
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-
+  
     if (!result.canceled) {
       if (result.assets && result.assets.length > 0) {
         setImage(result.assets[0].uri);
@@ -152,11 +154,6 @@ const AddNewEvent = () => {
     console.log('Submitting event...');
     setValidationMessage('');
 
-    if ( !locationCords || !category || !createdBy) {
-      setValidationMessage('Missing Information! Please fill in all required fields.');
-      return;
-    }
-
     if (!title || title.length < 4 || title.length > 50) {
       setValidationMessage('Title must be between 4 and 50 characters.');
       return;
@@ -181,6 +178,11 @@ const AddNewEvent = () => {
     const selectedCategory = options.categories.find(cat => cat.id === categoryId);
     if (!selectedCategory) {
       setValidationMessage('Invalid Selection! Please select a valid category.');
+      return;
+    }
+
+    if (!createdBy) {
+      setValidationMessage('Missing Information! Please fill in all required fields.');
       return;
     }
 

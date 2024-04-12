@@ -93,6 +93,7 @@ const CommentsSection = ({ itemId }) => {
   const handleDeleteComment = async (commentId) => {
     try {
       await deleteDoc(doc(firestore, 'comments', commentId));
+      Alert.alert('Comment deleted successfully');
       fetchComments();
     } catch (error) {
       setDeleteError('Failed to delete the comment. Please try again.');
