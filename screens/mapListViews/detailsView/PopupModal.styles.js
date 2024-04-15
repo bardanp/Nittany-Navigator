@@ -4,6 +4,7 @@ import * as Font from 'expo-font';
 const { width, height } = Dimensions.get('window');
 const modalWidth = width * 0.9;
 
+
 const colors = {
   background: '#FFFFFF',
   primary: '#0A47A0',
@@ -78,8 +79,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    marginTop: 60,  
-    paddingVertical: scale(2), 
+    marginTop: 70,
+    paddingVertical: scale(15),
     paddingHorizontal: scale(16), 
     backgroundColor: colors.primary,
     borderTopRightRadius: scale(15),
@@ -89,9 +90,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   directionsButton: {
-    padding: scale(6),
+    padding: scale(2),
     marginRight: scale(8),
-    borderRadius: scale(10),
+    borderRadius: scale(25),
     backgroundColor: colors.actionBlue,
     justifyContent: 'center',
     alignItems: 'center',
@@ -205,7 +206,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   closeButton: {
-    backgroundColor: colors.closeButton,
     padding: scale(6),
     borderRadius: scale(14),
     elevation: scale(4),

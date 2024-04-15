@@ -64,6 +64,11 @@ const CommentsSection = ({ itemId }) => {
       return;
     }
 
+    if (newCommentText.trim().length >= 250){
+      Alert.alert("The text is too long, please only use a maximum of 250 characters.")
+      return;
+    }
+
     setIsPostingComment(true);
     try {
       const userInfoString = await AsyncStorage.getItem('userInfo');
@@ -157,7 +162,7 @@ const CommentsSection = ({ itemId }) => {
                 <Text style={styles.commentAuthor}>{item.createdBy}</Text>
                 {item.creatorEmail === currentUserEmail && (
                   <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={styles.deleteButton}>
-                    <Ionicons name="trash-bin-outline" size={20} color="#6c757d" />
+                    <Ionicons name="trash-bin" size={20} color="red" />
                   </TouchableOpacity>
                 )}
               </View>

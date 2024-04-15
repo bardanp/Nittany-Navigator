@@ -11,7 +11,8 @@ import { updateDoc, arrayUnion } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import BookmarkButton from './BookmarkButton';
 import CommentsSection from './CommentsSection';
-import { MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
+
 
 
 const { width } = Dimensions.get('window');
@@ -121,10 +122,10 @@ const PopupModal = ({ visible, onClose, item }) => {
                     onBookmarkChange={onBookmarkChange}
                 />
                 <TouchableOpacity
-                  onPress={() => openDirections(modalData)}
-                  style={styles.directionsButton}
+                    onPress={() => openDirections(modalData)}
+                    style={styles.directionsButton}
                 >
-                  <MaterialIcons name="directions" size={28} color={colors.white} />
+                  <FontAwesome name="map-marker" size={40} color={colors.white} />
                 </TouchableOpacity>
 
 
