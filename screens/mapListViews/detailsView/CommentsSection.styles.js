@@ -10,8 +10,7 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     borderRadius: scale(0),
     paddingVertical: scale(8),
-    paddingHorizontal: scale(8),  
-    width: '100%', 
+    paddingHorizontal: scale(8),
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

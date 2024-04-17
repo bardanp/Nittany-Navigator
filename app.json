@@ -1,8 +1,8 @@
 {
   "expo": {
     "scheme": "nittany-navigator",
-    "name": "NittanyNav",
-    "slug": "NittanyNav",
+    "name": "NittanyNavigator",
+    "slug": "nittany-navigator",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,25 +18,30 @@
     "ios": {
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to capture event photos.",
-        "NSPhotoLibraryUsageDescription": "This app accesses the photo library to select event photos."
+        "NSPhotoLibraryUsageDescription": "This app accesses the photo library to select event photos.",
+        "NSCalendarsUsageDescription": "This app needs access to your calendar to add and manage events."
       },
       "supportsTablet": true,
       "bundleIdentifier": "com.bardanphuyel.nittany-navigator"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff",
-        "permissions": [
-          "CAMERA",
-          "READ_EXTERNAL_STORAGE",
-          "WRITE_EXTERNAL_STORAGE"
-        ]
+        "foregroundImage": "./assets/favicon.png",
+        "backgroundColor": "#ffffff"
       },
-      "package": "com.bardanphuyel.NittanyNav"
+      "package": "com.bardanphuyel"
+    },
+    "notification": {
+      "icon": "./assets/favicon.png"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e3d5daae-29c8-4f97-b0f9-2782b2642383"
+      }
+    },
+    "owner": "bardanp"
   }
 }

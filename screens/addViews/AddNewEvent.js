@@ -572,7 +572,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
   },
   fullscreen: {
     flex: 1,

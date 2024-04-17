@@ -6,6 +6,7 @@ import LoginPage from "./screens/loginViews/LoginPage";
 import MainMenu from "./screens/loginViews/MainMenu";
 import ProfileScreen from "./screens/profileViews/ProfileScreen";
 import SettingsScreen from "./screens/profileViews/views/SettingScreen";
+import NotificationSettingsScreen from "./screens/profileViews/views/Settings/NotificationSettingsScreen";
 import SubmitSuccessScreen from "./screens/addViews/SubmitSuccessScreen";
 import SavedEventsReports from "./screens/profileViews/views/SavedEventsReports";
 import UserEventsReports from "./screens/profileViews/views/UserEventsReports";
@@ -13,8 +14,9 @@ import { firestore } from "./backend/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import About from "./screens/profileViews/views/About";
 import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
-import { TamaguiProvider } from '@tamagui/core'
-import config from './tamagui.config'
+import { TamaguiProvider } from '@tamagui/core';
+import config from './tamagui.config';
+import { setupNotifications } from './backend/notifyUsers';
 
 const Stack = createStackNavigator();
 
@@ -44,6 +46,7 @@ const App = () => {
     };
 
     checkAuthStatus();
+    setupNotifications();
 
     const checkFirestoreConnection = async () => {
       try {
@@ -80,6 +83,11 @@ const App = () => {
           name="Settings"
           component={SettingsScreen}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+            name="NotificationSettings"
+            component={NotificationSettingsScreen}
+            options={{ headerShown: false }}
         />
         <Stack.Screen
           name="SubmitSuccess"

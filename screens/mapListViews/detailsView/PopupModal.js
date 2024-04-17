@@ -6,27 +6,23 @@ import { doc, getDoc } from 'firebase/firestore';
 import { arrayRemove } from 'firebase/firestore';
 import styles from './PopupModal.styles';
 import { colors } from './PopupModal.styles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { updateDoc, arrayUnion } from 'firebase/firestore';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import BookmarkButton from './BookmarkButton';
 import CommentsSection from './CommentsSection';
-import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
+import { Platform } from 'react-native';
+import RNCalendarEvents from 'react-native-calendar-events';
 
-
-
-const { width } = Dimensions.get('window');
 
 const PopupModal = ({ visible, onClose, item }) => {
   const [modalData, setModalData] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [selectedTab, setSelectedTab] = useState('details'); 
-
+  const [selectedTab, setSelectedTab] = useState('details');
 
   useEffect(() => {
     setModalData(item);
-    console.log("Item:", item);
   }, [item]);
+
 
 
   const formatDate = (timestamp) => {
@@ -75,14 +71,20 @@ const PopupModal = ({ visible, onClose, item }) => {
         Alert.alert("Error", "An unexpected error occurred.");
       });
   };
-  
-  
-  
-  
+
+
+
+
 
   useEffect(() => {
     const fetchModalDataAndCheckSavedStatus = async () => {
       if (!item || !item.id) return;
+
+      // Check for calendar permissions
+      const authStatus = await RNCalendarEvents.checkPermissions();
+      if (authStatus !== 'authorized') {
+        await RNCalendarEvents.requestPermissions();
+      }
 
       const documentRef = doc(firestore, item.type === 'event' ? 'events' : 'reports', item.id);
       try {
@@ -96,6 +98,39 @@ const PopupModal = ({ visible, onClose, item }) => {
     };
     fetchModalDataAndCheckSavedStatus();
   }, [item]);
+
+  const addEventToCalendar = async () => {
+    if (!modalData) return;
+
+    const { title, dateTime, locationDetails } = modalData;
+    const startDate = new Date(dateTime.seconds * 1000);
+    const endDate = new Date(startDate.getTime() + 2 * 3600 * 1000); // Assuming event lasts 2 hours
+
+    try {
+
+      if (RNCalendarEvents) {
+        RNCalendarEvents.saveEvent('Title of event', { /* Event Details */ });
+      } else {
+        console.error("RNCalendarEvents is not available");
+      }
+
+
+      const eventId = await RNCalendarEvents.saveEvent(title, {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        location: locationDetails,
+        notes: 'Added from App',
+      });
+
+      console.log(`Event created with ID: ${eventId}`);
+      Alert.alert("Success", "Event added to calendar");
+    } catch (error) {
+      console.error("Error adding event to calendar:", error);
+      Alert.alert("Error", "Could not add event to calendar");
+    }
+  };
+
+
 
 
   const onBookmarkChange = async (email, itemId, isEvent, action) => {
@@ -121,6 +156,12 @@ const PopupModal = ({ visible, onClose, item }) => {
                     isEvent={item.isEvent}
                     onBookmarkChange={onBookmarkChange}
                 />
+
+                <Pressable onPress={addEventToCalendar} style={styles.saveButton}>
+                  <Text style={styles.saveButtonText}>Add to Calendar</Text>
+                </Pressable>
+
+
                 <TouchableOpacity
                     onPress={() => openDirections(modalData)}
                     style={styles.directionsButton}

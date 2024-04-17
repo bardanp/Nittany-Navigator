@@ -85,8 +85,11 @@ const LoginPage = ({ navigation }) => {
         preferences: {
           language: 'English', 
           notifications: {
-            app: true, 
-            events: true, 
+            app: true,
+            reportsPush: true,
+            eventsPush: true,
+            reportsEmail: true,
+            eventsEmail: true,
           },
           theme: 'light', 
         },
