@@ -103,30 +103,34 @@ const PopupModal = ({ visible, onClose, item }) => {
   }, [item]);
 
   const addEventToCalendar = async () => {
-    if (!modalData) return;
+    Alert.alert("Coming very soon!");
 
-    const { title, dateTime, locationDetails } = modalData;
-    const startDate = new Date(dateTime.seconds * 1000);
-    const endDate = new Date(startDate.getTime() + 2 * 3600 * 1000); // Assuming event lasts 2 hours
 
-    try {
-      if (RNCalendarEvents) {
-        const eventId = await RNCalendarEvents.saveEvent(title, {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          location: locationDetails,
-          notes: 'Added from App',
-        });
 
-        console.log(`Event created with ID: ${eventId}`);
-        Alert.alert("Success", "Event added to calendar");
-      } else {
-        console.error("RNCalendarEvents is not available");
-      }
-    } catch (error) {
-      console.error("Error adding event to calendar:", error);
-      Alert.alert("Error", "Could not add event to calendar");
-    }
+    // if (!modalData) return;
+    //
+    // const { title, dateTime, locationDetails } = modalData;
+    // const startDate = new Date(dateTime.seconds * 1000);
+    // const endDate = new Date(startDate.getTime() + 2 * 3600 * 1000); // Assuming event lasts 2 hours
+    //
+    // try {
+    //   if (RNCalendarEvents) {
+    //     const eventId = await RNCalendarEvents.saveEvent(title, {
+    //       startDate: startDate.toISOString(),
+    //       endDate: endDate.toISOString(),
+    //       location: locationDetails,
+    //       notes: 'Added from App',
+    //     });
+    //
+    //     console.log(`Event created with ID: ${eventId}`);
+    //     Alert.alert("Success", "Event added to calendar");
+    //   } else {
+    //     console.error("RNCalendarEvents is not available");
+    //   }
+    // } catch (error) {
+    //   console.error("Error adding event to calendar:", error);
+    //   Alert.alert("Error", "Could not add event to calendar");
+    // }
   };
 
 

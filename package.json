@@ -1,9 +1,8 @@
 {
   "name": "nittanynav",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web"
@@ -46,7 +45,7 @@
     "firebase-admin": "^12.0.0",
     "jwt-decode": "^4.0.0",
     "metro-core": "^0.80.6",
-    "react": "^18.2.0",
+    "react": "18.2.0",
     "react-dom": "^18.2.0",
     "react-native": "0.72.10",
     "react-native-calendar-events": "^2.2.0",
