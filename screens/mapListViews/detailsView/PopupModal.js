@@ -14,6 +14,7 @@ import { Platform } from 'react-native';
 import RNCalendarEvents from 'react-native-calendar-events';
 
 
+
 const PopupModal = ({ visible, onClose, item }) => {
   const [modalData, setModalData] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
@@ -22,8 +23,6 @@ const PopupModal = ({ visible, onClose, item }) => {
   useEffect(() => {
     setModalData(item);
   }, [item]);
-
-
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp.seconds * 1000);
@@ -80,10 +79,14 @@ const PopupModal = ({ visible, onClose, item }) => {
     const fetchModalDataAndCheckSavedStatus = async () => {
       if (!item || !item.id) return;
 
-      // Check for calendar permissions
-      const authStatus = await RNCalendarEvents.checkPermissions();
-      if (authStatus !== 'authorized') {
-        await RNCalendarEvents.requestPermissions();
+      // Check if RNCalendarEvents is available
+      if (RNCalendarEvents) {
+        const authStatus = await RNCalendarEvents.checkPermissions();
+        if (authStatus !== 'authorized') {
+          await RNCalendarEvents.requestPermissions();
+        }
+      } else {
+        console.error("RNCalendarEvents is not available");
       }
 
       const documentRef = doc(firestore, item.type === 'event' ? 'events' : 'reports', item.id);
@@ -107,23 +110,19 @@ const PopupModal = ({ visible, onClose, item }) => {
     const endDate = new Date(startDate.getTime() + 2 * 3600 * 1000); // Assuming event lasts 2 hours
 
     try {
-
       if (RNCalendarEvents) {
-        RNCalendarEvents.saveEvent('Title of event', { /* Event Details */ });
+        const eventId = await RNCalendarEvents.saveEvent(title, {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          location: locationDetails,
+          notes: 'Added from App',
+        });
+
+        console.log(`Event created with ID: ${eventId}`);
+        Alert.alert("Success", "Event added to calendar");
       } else {
         console.error("RNCalendarEvents is not available");
       }
-
-
-      const eventId = await RNCalendarEvents.saveEvent(title, {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        location: locationDetails,
-        notes: 'Added from App',
-      });
-
-      console.log(`Event created with ID: ${eventId}`);
-      Alert.alert("Success", "Event added to calendar");
     } catch (error) {
       console.error("Error adding event to calendar:", error);
       Alert.alert("Error", "Could not add event to calendar");

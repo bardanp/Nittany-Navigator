@@ -41,20 +41,22 @@ const registerForPushNotificationsAsync = async () => {
             return;
         }
 
-        // Conditional config based on whether you're using classic build or EAS build.
-        const config = Constants.manifest.releaseChannel
-            ? Constants.manifest
-            : Constants.expoConfig;
+        const config = Constants.expoConfig;
+
+
+
 
         // Ensure the projectId is set correctly in app.json under extra.
-        const projectId = config.extra?.eas?.projectId;
+        const projectId = config.extra.eas.projectId;
         if (!projectId) {
             console.error("Project ID is not set in app.json");
             return;
         }
 
-        // You may not need to pass the projectId when using the classic build system.
-        token = (await Notifications.getExpoPushTokenAsync({ experienceId: config.experienceId })).data;
+
+        // Modify the token retrieval to include projectId
+        token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+
     } else {
         console.warn('Must use physical device for Push Notifications');
     }
