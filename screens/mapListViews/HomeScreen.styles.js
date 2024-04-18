@@ -68,6 +68,30 @@ export default StyleSheet.create({
         color: 'red',
         fontWeight: 'bold',
     },
+    searchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: 'white', 
+    },
+    searchInput: {
+    flex: 1, 
+    backgroundColor: '#f2f2f2',
+    borderRadius: 10,
+    padding: 15,
+    marginRight: 10, 
+    },
+    filterButton: {
+    backgroundColor: '#007bff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    },
+    filterButtonText: {
+    color: 'white',
+    fontSize: 16,
+    },
     eventItem: {
         backgroundColor: '#ffffff',
         borderRadius: scale(8),

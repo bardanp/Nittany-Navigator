@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, View, Text, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView, Dimensions } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'; 
+import { doc, onSnapshot, getFirestore } from 'firebase/firestore'; 
 
 const ProfileScreen = () => {
   const [userInfo, setUserInfo] = useState({
@@ -12,14 +13,11 @@ const ProfileScreen = () => {
     primaryAffiliation: 'Not specified',
     profilePicUri: null,
     campus: 'Not specified', 
+    isAdmin: false 
   });
-  
 
   const navigation = useNavigation();
-
-  function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  }
+  const db = getFirestore(); // Initialize Firestore
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -29,34 +27,41 @@ const ProfileScreen = () => {
             setUserInfo({
                 email: userInfo.email,
                 fullName: `${userInfo.firstName} ${userInfo.lastName}`,
-                primaryAffiliation: capitalizeFirstLetter(userInfo.userType), 
+                primaryAffiliation: userInfo.userType, 
                 campus: userInfo.campus,
             });
+
+            const userRef = doc(db, 'users', userInfo.email);
+            const unsubscribe = onSnapshot(userRef, (doc) => {
+                if (doc.exists()) {
+                    setUserInfo(prev => ({ ...prev, isAdmin: !!doc.data().isAdmin }));
+                } else {
+                    setUserInfo(prev => ({ ...prev, isAdmin: false }));
+                }
+            });
+
+            return () => unsubscribe(); // Cleanup the listener on component unmount
         }
     };
     loadUserInfo();
   }, []);
 
   const profilePicSource = userInfo.profilePicUri ? { uri: userInfo.profilePicUri } : require('../../assets/no-profile.png');
-  const isAdminUser = userInfo.primaryAffiliation.toUpperCase() !== 'STUDENT';
-
-
-  const profileOptions = [
+  let profileOptions = [
       { title: 'My Events & Reports', description: 'View events and reports made by you.', iconName: 'history', handler: 'UserEventsReports' },
       { title: 'Saved Events & Reports', description: 'View events and reports saved by you.', iconName: 'menu', handler: 'SavedEventsReports' },
       { title: 'About', description: 'Learn more about the application and its creators.', iconName: 'info', handler: 'About' },
       { title: 'Settings', description: 'Adjust profile settings and preferences.', iconName: 'settings', handler: 'Settings' },
-    ];
+  ];
 
-    if (isAdminUser) {
-      profileOptions.push({
-        title: 'Testing Functions',
-        description: 'Made for testing purposes only.',
-        iconName: 'admin-panel-settings',
-        handler: 'AdminPanel', 
-      });
-    }
-
+  if (userInfo.isAdmin) {
+    profileOptions = [...profileOptions, {
+      title: 'Admin Panel',
+      description: 'Access admin settings and tools.',
+      iconName: 'admin-panel-settings',
+      handler: 'AdminPanel', 
+    }];
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +74,6 @@ const ProfileScreen = () => {
             <Text style={styles.userDetail}>Campus: {userInfo.campus}</Text> 
             <Text style={styles.userDetail}>User Type: {userInfo.primaryAffiliation}</Text>
           </View>
-
         </View>
 
         <View style={styles.profileOptions}>

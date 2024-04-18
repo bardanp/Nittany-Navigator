@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Alert, View, TouchableOpacity, Text, Image, FlatList, Modal } from 'react-native';
+import { Alert, View, TouchableOpacity, Text, Image, TextInput, FlatList, Modal } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
@@ -12,15 +12,33 @@ import options from '../../backend/options.json';
 import MultipleEventsModal from './MultipleEventsModal.js';
 import PopupModal from "./detailsView/PopupModal";
 
+const SearchBar = ({ onSearch, searchQuery, toggleFilter, filterType }) => (
+    <View style={[styles.searchContainer, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+        <TextInput
+            style={styles.searchInput}
+            placeholder="Search events or reports..."
+            value={searchQuery}
+            onChangeText={onSearch}
+        />
+        <TouchableOpacity onPress={toggleFilter}>
+            <Icon name={filterType === 'all' ? 'filter-list' : filterType === 'events' ? 'event' : 'report'} size={25} color="#007bff" />
+        </TouchableOpacity>
+    </View>
+);
+
 const HomeScreen = () => {
     const navigation = useNavigation();
-
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [listData, setListData] = useState([]);
     const [userLocation, setUserLocation] = useState(null);
     const [isLocationModalVisible, setIsLocationModalVisible] = useState(false);
     const [locationItems, setLocationItems] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredData, setFilteredData] = useState([]);
+    const [filterType, setFilterType] = useState('all'); // 'all', 'events', 'reports'
+
+
 
     const [showMap, setShowMap] = useState(true);
     const [mapRegion, setMapRegion] = useState({
@@ -40,6 +58,42 @@ const HomeScreen = () => {
     const toggleView = () => {
         setShowMap(!showMap);
     };
+
+    const toggleFilter = () => {
+        setFilterType(current => {
+          if (current === 'all') return 'events';
+          if (current === 'events') return 'reports';
+          return 'all';
+        });
+    };
+      
+
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+        const lowercasedQuery = query.toLowerCase();
+      
+        const filtered = listData
+          .filter(item => {
+            // Apply the category filter
+            if (filterType === 'events' && !item.isEvent) return false;
+            if (filterType === 'reports' && item.isEvent) return false;
+            return true;
+          })
+          .filter(item => {
+            // Apply the search query filter
+            if (query.trim() === '') return true;
+            return (
+              item.title.toLowerCase().includes(lowercasedQuery) ||
+              item.description.toLowerCase().includes(lowercasedQuery) ||
+              (item.organizer && item.organizer.toLowerCase().includes(lowercasedQuery)) ||
+              (item.category && item.category.toLowerCase().includes(lowercasedQuery))
+            );
+          });
+      
+        setFilteredData(filtered);
+      };
+      
+      
 
     useFocusEffect(
         useCallback(() => {
@@ -118,6 +172,23 @@ const HomeScreen = () => {
     };
 
     useEffect(() => {
+        setFilteredData(listData);
+      }, [listData]);
+
+      useEffect(() => {
+        handleSearch(searchQuery);
+      }, [filterType, listData]);
+      
+
+      const FilterButton = () => (
+        <TouchableOpacity onPress={toggleFilter} style={styles.filterButton}>
+          <Text style={styles.filterButtonText}>
+            {filterType === 'all' ? 'All' : filterType === 'events' ? 'Events' : 'Reports'}
+          </Text>
+        </TouchableOpacity>
+      );
+
+    useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
                 <TouchableOpacity onPress={toggleView} style={{ marginRight: 10 }}>
@@ -126,6 +197,8 @@ const HomeScreen = () => {
             ),
             title: showMap ? "Map View" : "List View",
         });
+
+          
 
         const watchUserLocation = async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
@@ -203,7 +276,7 @@ const HomeScreen = () => {
     
 
     const renderMarkers = () => {
-        return listData.map(item => {
+        return filteredData.map(item => {
             const { latitude, longitude } = item.location;
             const { icon, color } = getIconName(item); 
 
@@ -262,6 +335,8 @@ const renderItem = ({ item }) => {
     };
 
         return (
+            <>
+
             <TouchableOpacity style={styles.eventItem} onPress={() => handleCalloutPress(item)}>
                 <View style={[styles.iconContainer, { backgroundColor: color }]}>
                     <Icon name={getIconName(item).icon} size={24} color="#fff" />
@@ -286,6 +361,7 @@ const renderItem = ({ item }) => {
                     />
                 </View>
             </TouchableOpacity>
+            </>
         );
     };
 
@@ -293,6 +369,7 @@ const renderItem = ({ item }) => {
         <View style={styles.container}>
             {showMap ? (
                 <>
+                 <SearchBar onSearch={handleSearch} searchQuery={searchQuery} toggleFilter={toggleFilter} filterType={filterType} />
                     <MapView style={styles.map} region={mapRegion}>
                         {renderMarkers()}
 
@@ -340,11 +417,14 @@ const renderItem = ({ item }) => {
                     </View>
                 </>
             ) : (
+                <>
+                 <SearchBar onSearch={handleSearch} searchQuery={searchQuery} toggleFilter={toggleFilter} filterType={filterType} />
                 <FlatList
-                    data={listData}
+                    data={filteredData}
                     keyExtractor={(item) => item.id}
                     renderItem={renderItem}
                 />
+                </>
             )}
 
         </View>
