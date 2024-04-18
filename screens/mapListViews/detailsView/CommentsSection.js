@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { firestore } from '../../../backend/firebase';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { collection, query, where, orderBy, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './CommentsSection.styles';
 import { Ionicons } from '@expo/vector-icons';
-import { Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
+import Filter from 'bad-words';
+import customBadWords from '../../../backend/bad-words.json';
 
 const CommentsSection = ({ itemId }) => {
   const [comments, setComments] = useState([]);
@@ -18,6 +19,14 @@ const CommentsSection = ({ itemId }) => {
   const [loadingComments, setLoadingComments] = useState(false);
   const [loadCommentsError, setLoadCommentsError] = useState('');
   const [isPostingComment, setIsPostingComment] = useState(false);
+  const filter = new Filter(); 
+
+  useEffect(() => {
+    const customWords = customBadWords
+      .map(section => section.dictionary.map(entry => entry.match))
+      .flat();
+    filter.addWords(...customWords);
+  }, []);
 
   useEffect(() => {
     const fetchCurrentUserEmail = async () => {
@@ -166,7 +175,7 @@ const CommentsSection = ({ itemId }) => {
                   </TouchableOpacity>
                 )}
               </View>
-              <Text style={styles.commentText}>{item.text}</Text>
+              <Text style={styles.commentText}>{filter.clean(item.text)}</Text>
               <Text style={styles.commentDate}>{item.createdAt.toDate().toLocaleString()}</Text>
             </View>
           )}

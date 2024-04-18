@@ -41,8 +41,6 @@ const AddNewReport = () => {
   const [locationDetails, setLocationDetails] = useState('');
   const [validationMessage, setValidationMessage] = useState('');
 
-
-
   const [region, setRegion] = useState({
     latitude: 40.204444839295846,
     longitude: -76.74518002144552,
@@ -71,7 +69,7 @@ const AddNewReport = () => {
       }
     }
     fetchUserInfo();
-    setCategoryOptions(options.categories);
+    setCategoryOptions(options.reportCategories);
   }, []);
 
   const handleImagePick = () => {
@@ -207,6 +205,7 @@ const AddNewReport = () => {
         contactEmail,
         category: selectedCategory.name,
         submittedOn: Timestamp.now(),
+        isReport: true,
         createdBy,
       };
       
@@ -252,7 +251,6 @@ const AddNewReport = () => {
 
     );
   };
-  
 
   const renderSelectedCategory = () => {
     const selectedCategory = categoryId ? options.categories.find((cat) => cat.id === categoryId) : null;
@@ -500,6 +498,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalView: {
+    marginTop: 60,
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 5,

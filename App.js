@@ -16,12 +16,11 @@ import About from "./screens/profileViews/views/About";
 import AdminPanel from "./screens/profileViews/views/Admin/AdminPanel";
 import { TamaguiProvider } from '@tamagui/core';
 import config from './tamagui.config';
-import { setupNotifications } from './backend/notifyUsers';
 
 const Stack = createStackNavigator();
 
-const App = () => {
 
+const App = () => {
   useEffect(() => {
     const originalWarn = console.warn;
     console.warn = (message, ...args) => {
@@ -42,11 +41,11 @@ const App = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = await AsyncStorage.getItem("userToken");
+      console.log("Token:", token);
       setIsAuthenticated(!!token);
     };
 
     checkAuthStatus();
-    setupNotifications();
 
     const checkFirestoreConnection = async () => {
       try {
@@ -121,6 +120,7 @@ const App = () => {
 };
 
 export default App;
+
 
 const RootNavigator = ({ isAuthenticated }) => {
   return (

@@ -208,6 +208,7 @@ const AddNewEvent = () => {
         contactEmail,
         category: selectedCategory.name,
         submittedOn: Timestamp.now(),
+        isEvent: true, 
         createdBy,
       };
       
@@ -510,7 +511,10 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 5,
-    padding: 35,
+    marginTop: '15%',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {

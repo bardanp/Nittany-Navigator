@@ -11,7 +11,6 @@ import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import BookmarkButton from './BookmarkButton';
 import CommentsSection from './CommentsSection';
 import { Platform } from 'react-native';
-import RNCalendarEvents from 'react-native-calendar-events';
 
 
 
@@ -79,16 +78,6 @@ const PopupModal = ({ visible, onClose, item }) => {
     const fetchModalDataAndCheckSavedStatus = async () => {
       if (!item || !item.id) return;
 
-      // Check if RNCalendarEvents is available
-      if (RNCalendarEvents) {
-        const authStatus = await RNCalendarEvents.checkPermissions();
-        if (authStatus !== 'authorized') {
-          await RNCalendarEvents.requestPermissions();
-        }
-      } else {
-        console.error("RNCalendarEvents is not available");
-      }
-
       const documentRef = doc(firestore, item.type === 'event' ? 'events' : 'reports', item.id);
       try {
         const docSnap = await getDoc(documentRef);
@@ -101,39 +90,6 @@ const PopupModal = ({ visible, onClose, item }) => {
     };
     fetchModalDataAndCheckSavedStatus();
   }, [item]);
-
-  const addEventToCalendar = async () => {
-    Alert.alert("Coming very soon!");
-
-
-
-    // if (!modalData) return;
-    //
-    // const { title, dateTime, locationDetails } = modalData;
-    // const startDate = new Date(dateTime.seconds * 1000);
-    // const endDate = new Date(startDate.getTime() + 2 * 3600 * 1000); // Assuming event lasts 2 hours
-    //
-    // try {
-    //   if (RNCalendarEvents) {
-    //     const eventId = await RNCalendarEvents.saveEvent(title, {
-    //       startDate: startDate.toISOString(),
-    //       endDate: endDate.toISOString(),
-    //       location: locationDetails,
-    //       notes: 'Added from App',
-    //     });
-    //
-    //     console.log(`Event created with ID: ${eventId}`);
-    //     Alert.alert("Success", "Event added to calendar");
-    //   } else {
-    //     console.error("RNCalendarEvents is not available");
-    //   }
-    // } catch (error) {
-    //   console.error("Error adding event to calendar:", error);
-    //   Alert.alert("Error", "Could not add event to calendar");
-    // }
-  };
-
-
 
 
   const onBookmarkChange = async (email, itemId, isEvent, action) => {
@@ -159,10 +115,6 @@ const PopupModal = ({ visible, onClose, item }) => {
                     isEvent={item.isEvent}
                     onBookmarkChange={onBookmarkChange}
                 />
-
-                <Pressable onPress={addEventToCalendar} style={styles.saveButton}>
-                  <Text style={styles.saveButtonText}>Add to Calendar</Text>
-                </Pressable>
 
 
                 <TouchableOpacity

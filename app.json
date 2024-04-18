@@ -18,8 +18,7 @@
     "ios": {
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to capture event photos.",
-        "NSPhotoLibraryUsageDescription": "This app accesses the photo library to select event photos.",
-        "NSCalendarsUsageDescription": "This app needs access to your calendar to add and manage events."
+        "NSPhotoLibraryUsageDescription": "This app accesses the photo library to select event photos."
       },
       "supportsTablet": true,
       "bundleIdentifier": "com.bardanphuyel.nittany-navigator"
@@ -32,7 +31,8 @@
       "package": "com.bardanphuyel"
     },
     "notification": {
-      "icon": "./assets/favicon.png"
+      "icon": "./assets/favicon.png",
+      "color": "#fff"
     },
     "web": {
       "favicon": "./assets/favicon.png"

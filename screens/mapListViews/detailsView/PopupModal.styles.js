@@ -57,25 +57,6 @@ const styles = StyleSheet.create({
     marginTop: scale(-18),
     zIndex: 10,
   },
-  addCalendarButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: scale(8),
-    paddingHorizontal: scale(14),
-    borderRadius: scale(14),
-    borderWidth: scale(1),
-    borderColor: colors.primary,
-    backgroundColor: colors.primary,
-    margin: scale(8),
-  },
-  addCalendarButtonText: {
-    fontFamily: 'Montserrat',
-    marginLeft: scale(8),
-    fontSize: scale(14),
-    color: colors.white,
-    fontWeight: '500',
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -84,13 +65,6 @@ const styles = StyleSheet.create({
     padding: scale(16),
     borderBottomWidth: scale(4),
     borderColor: colors.border,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
     elevation: 4,
   },
   buttonContainer: {
@@ -144,13 +118,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderBottomLeftRadius: scale(20),
     borderBottomRightRadius: scale(20),
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
     elevation: 4,
   },
   title: {

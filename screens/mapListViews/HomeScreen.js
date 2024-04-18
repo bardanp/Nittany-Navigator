@@ -94,7 +94,7 @@ const HomeScreen = () => {
                       isReport: true,
                       location: { latitude, longitude },
                     };
-                  });
+                }).filter(item => item !== null);
 
                 setListData([...fetchedEvents, ...fetchedReports]);
             };
@@ -180,36 +180,39 @@ const HomeScreen = () => {
         setShowMap(true);
     };
 
-    const getCategoryIcon = (categoryName) => {
-        const category = options.categories.find(cat => cat.name === categoryName);
+    const getCategoryIcon = (categoryName, isEvent = true) => {
+        const categories = isEvent ? options.categories : options.reportCategories;
+        const category = categories.find(cat => cat.name === categoryName);
         if (category) {
             return { icon: category.icon, color: category.color };
         } else {
             return { icon: 'info', color: '#9e9e9e' };
         }
     };
+    
 
     const getIconName = (item) => {
         if (item.isEvent) {
-            return getCategoryIcon(item.category);
+            return getCategoryIcon(item.category, true);
         } else if (item.isReport) {
-            return getCategoryIcon(item.category);
+            return getCategoryIcon(item.category, false);
         } else {
             return { icon: 'info', color: '#9e9e9e' };
         }
     };
+    
 
     const renderMarkers = () => {
         return listData.map(item => {
             const { latitude, longitude } = item.location;
-            const { icon, color } = getIconName(item);
+            const { icon, color } = getIconName(item); 
 
             return (
                 <Marker
                     key={item.id}
                     coordinate={{ latitude, longitude }}
                     onPress={() => handleCalloutPress(item)}>
-                    <Icon name={icon} size={30} color={color} />
+                    <Icon name={icon} size={28} color={color} />
                 </Marker>
             );
         });
@@ -241,26 +244,26 @@ const HomeScreen = () => {
         setShowMap(true);
     };
 
-    const renderItem = ({ item }) => {
-        if (!item) {
-            console.error('Item is undefined: ', item);
-            return null;
-        }
-        const { icon, color } = getIconName(item);
+const renderItem = ({ item }) => {
+    if (!item) {
+        console.error('Item is undefined: ', item);
+        return null;
+    }
+    const { icon, color } = getIconName(item); 
 
-        const handleMap = () => {
-            setMapRegion({
-                latitude: item.location.latitude,
-                longitude: item.location.longitude,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
-            });
-            setShowMap(true);
-        };
+    const handleMap = () => {
+        setMapRegion({
+            latitude: item.location.latitude,
+            longitude: item.location.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+        });
+        setShowMap(true);
+    };
 
         return (
             <TouchableOpacity style={styles.eventItem} onPress={() => handleCalloutPress(item)}>
-                <View style={[styles.iconContainer, { backgroundColor: item.color || '#007bff' }]}>
+                <View style={[styles.iconContainer, { backgroundColor: color }]}>
                     <Icon name={getIconName(item).icon} size={24} color="#fff" />
                 </View>
                     <View style={{ flex: 1, justifyContent: "center" }}>
