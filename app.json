@@ -31,17 +31,16 @@
       "package": "com.bardanphuyel"
     },
     "notification": {
-      "icon": "./assets/favicon.png",
-      "color": "#fff"
+      "icon": "./assets/favicon.png"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "owner": "bardanp",
     "extra": {
       "eas": {
-        "projectId": "e3d5daae-29c8-4f97-b0f9-2782b2642383"
+        "projectId": "07016a24-a553-4d49-9dba-7e7bdbcbb22d"
       }
-    },
-    "owner": "bardanp"
+    }
   }
 }

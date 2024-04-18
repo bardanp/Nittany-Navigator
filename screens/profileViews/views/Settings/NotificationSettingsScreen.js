@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Switch, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { firestore } from '../../../../backend/firebase';
 import { doc, updateDoc } from "firebase/firestore";
 import AsyncStorage from '@react-native-async-storage/async-storage';
